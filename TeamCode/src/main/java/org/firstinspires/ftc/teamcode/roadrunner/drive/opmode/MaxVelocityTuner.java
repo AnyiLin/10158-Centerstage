@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.roadrunner.drive.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.*;
 
 import java.util.Objects;
 
@@ -67,7 +68,7 @@ public class MaxVelocityTuner extends LinearOpMode {
 
         drive.setDrivePower(new Pose2d());
 
-        double effectiveKf = org.firstinspires.ftc.teamcode.drive.DriveConstants.getMotorVelocityF(veloInchesToTicks(maxVelocity));
+        double effectiveKf = getMotorVelocityF(veloInchesToTicks(maxVelocity));
 
         telemetry.addData("Max Velocity", maxVelocity);
         telemetry.addData("Max Recommended Velocity", maxVelocity * 0.8);
@@ -78,6 +79,6 @@ public class MaxVelocityTuner extends LinearOpMode {
     }
 
     private double veloInchesToTicks(double inchesPerSec) {
-        return inchesPerSec / (2 * Math.PI * org.firstinspires.ftc.teamcode.drive.DriveConstants.WHEEL_RADIUS) / org.firstinspires.ftc.teamcode.drive.DriveConstants.GEAR_RATIO * org.firstinspires.ftc.teamcode.drive.DriveConstants.TICKS_PER_REV;
+        return inchesPerSec / (2 * Math.PI * WHEEL_RADIUS) / GEAR_RATIO * TICKS_PER_REV;
     }
 }

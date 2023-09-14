@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegm
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LogFiles;
+import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,7 +203,7 @@ public class TrajectorySequenceRunner {
 
         final double NOMINAL_VOLTAGE = 12.0;
         double voltage = voltageSensor.getVoltage();
-        if (driveSignal != null && !org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER) {
+        if (driveSignal != null && !RUN_USING_ENCODER) {
             driveSignal = new DriveSignal(
                     driveSignal.getVel().times(NOMINAL_VOLTAGE / voltage),
                     driveSignal.getAccel().times(NOMINAL_VOLTAGE / voltage)

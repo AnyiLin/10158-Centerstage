@@ -45,23 +45,23 @@ public final class LogFiles {
         public long nsInit = System.nanoTime();
         public long nsStart, nsStop;
 
-        public double ticksPerRev = org.firstinspires.ftc.teamcode.drive.DriveConstants.TICKS_PER_REV;
-        public double maxRpm = org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_RPM;
-        public boolean runUsingEncoder = org.firstinspires.ftc.teamcode.drive.DriveConstants.RUN_USING_ENCODER;
-        public double motorP = org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID.p;
-        public double motorI = org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID.i;
-        public double motorD = org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID.d;
-        public double motorF = org.firstinspires.ftc.teamcode.drive.DriveConstants.MOTOR_VELO_PID.f;
-        public double wheelRadius = org.firstinspires.ftc.teamcode.drive.DriveConstants.WHEEL_RADIUS;
-        public double gearRatio = org.firstinspires.ftc.teamcode.drive.DriveConstants.GEAR_RATIO;
-        public double trackWidth = org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-        public double kV = org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
-        public double kA = org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-        public double kStatic = org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
-        public double maxVel = org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
-        public double maxAccel = org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
-        public double maxAngVel = org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_VEL;
-        public double maxAngAccel = org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ANG_ACCEL;
+        public double ticksPerRev = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.TICKS_PER_REV;
+        public double maxRpm = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_RPM;
+        public boolean runUsingEncoder = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.RUN_USING_ENCODER;
+        public double motorP = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID.p;
+        public double motorI = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID.i;
+        public double motorD = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID.d;
+        public double motorF = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MOTOR_VELO_PID.f;
+        public double wheelRadius = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.WHEEL_RADIUS;
+        public double gearRatio = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.GEAR_RATIO;
+        public double trackWidth = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.TRACK_WIDTH;
+        public double kV = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
+        public double kA = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kA;
+        public double kStatic = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kStatic;
+        public double maxVel = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_VEL;
+        public double maxAccel = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
+        public double maxAngVel = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
+        public double maxAngAccel = org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
 
         public double mecTransP = SampleMecanumDrive.TRANSLATIONAL_PID.kP;
         public double mecTransI = SampleMecanumDrive.TRANSLATIONAL_PID.kI;
@@ -81,14 +81,14 @@ public final class LogFiles {
         public double tankHeadingI = org.firstinspires.ftc.teamcode.roadrunner.drive.SampleTankDrive.HEADING_PID.kI;
         public double tankHeadingD = org.firstinspires.ftc.teamcode.roadrunner.drive.SampleTankDrive.HEADING_PID.kD;
 
-        public double trackingTicksPerRev = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.TICKS_PER_REV;
-        public double trackingWheelRadius = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.WHEEL_RADIUS;
-        public double trackingGearRatio = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.GEAR_RATIO;
-        public double trackingLateralDistance = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.LATERAL_DISTANCE;
-        public double trackingForwardOffset = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.FORWARD_OFFSET;
+        public double trackingTicksPerRev = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.TICKS_PER_REV;
+        public double trackingWheelRadius = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.WHEEL_RADIUS;
+        public double trackingGearRatio = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.GEAR_RATIO;
+        public double trackingLateralDistance = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.LATERAL_DISTANCE;
+        public double trackingForwardOffset = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.FORWARD_OFFSET;
 
-        public RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR = org.firstinspires.ftc.teamcode.drive.DriveConstants.LOGO_FACING_DIR;
-        public RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = org.firstinspires.ftc.teamcode.drive.DriveConstants.USB_FACING_DIR;
+        public RevHubOrientationOnRobot.LogoFacingDirection LOGO_FACING_DIR = null;// org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.LOGO_FACING_DIR;
+        public RevHubOrientationOnRobot.UsbFacingDirection USB_FACING_DIR = null; //org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.USB_FACING_DIR;
 
         public List<Long> nsTimes = new ArrayList<>();
 

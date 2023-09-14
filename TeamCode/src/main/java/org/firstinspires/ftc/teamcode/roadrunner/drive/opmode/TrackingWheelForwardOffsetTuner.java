@@ -46,7 +46,7 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        if (!(drive.getLocalizer() instanceof org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer)) {
+        if (!(drive.getLocalizer() instanceof org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer)) {
             RobotLog.setGlobalErrorMsg("StandardTrackingWheelLocalizer is not being set in the "
                     + "drive class. Ensure that \"setLocalizer(new StandardTrackingWheelLocalizer"
                     + "(hardwareMap));\" is called in SampleMecanumDrive.java");
@@ -82,7 +82,7 @@ public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
                 drive.update();
             }
 
-            double forwardOffset = org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer.FORWARD_OFFSET +
+            double forwardOffset = org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer.FORWARD_OFFSET +
                     drive.getPoseEstimate().getY() / headingAccumulator;
             forwardOffsetStats.add(forwardOffset);
 
