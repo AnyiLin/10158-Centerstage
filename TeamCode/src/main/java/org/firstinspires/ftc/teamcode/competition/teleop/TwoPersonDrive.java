@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
@@ -27,20 +28,22 @@ public class TwoPersonDrive extends LinearOpMode {
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
-        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+        //leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+        //rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -67,25 +70,25 @@ public class TwoPersonDrive extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
+            double throttle = 0.2 + 0.8*gamepad1.right_trigger;
+
             double y = -gamepad1.left_stick_y; // Remember, this is reversed!
             double x = 0; // this is strafing
 
-            if (gamepad1.right_trigger != 0 || gamepad1.left_trigger != 0) {
-                x = (-gamepad1.right_trigger+gamepad1.left_trigger);
-            } else if (gamepad1.left_bumper) {
-                x = 0.25;
+            if (gamepad1.left_bumper) {
+                x = -1;
             } else if (gamepad1.right_bumper) {
-                x = -0.25;
+                x = 1;
             }
 
             double rx = 0;
-            if (Math.abs(gamepad1.left_stick_x)>0.1) rx = -gamepad1.left_stick_x;
+            if (Math.abs(gamepad1.left_stick_x)>0.1) rx = gamepad1.left_stick_x;
 
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio, but only when
             // at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1)/throttle;
             double leftFrontPower = (y + x + rx) / denominator;
             double leftRearPower = (y - x + rx) / denominator;
             double rightFrontPower = (y - x - rx) / denominator;
@@ -95,6 +98,8 @@ public class TwoPersonDrive extends LinearOpMode {
             leftRear.setPower(leftRearPower);
             rightFront.setPower(rightFrontPower);
             rightRear.setPower(rightRearPower);
+
+            // TODO: left trigger controls intake
 
             /*
             slides presets:
