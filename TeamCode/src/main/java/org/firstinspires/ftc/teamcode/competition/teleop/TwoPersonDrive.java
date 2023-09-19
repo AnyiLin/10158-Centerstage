@@ -22,25 +22,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     private final long LIFT_TIME_OUT = 1000;
 
-    /**
-     * IMPORTANT NOTES:
-     *
-     * For the Double Shock controllers:
-     * triangle - top
-     * circle - right
-     * cross (X-shaped) - bottom
-     * square - left
-     *
-     * For the older Logitech controllers:
-     * Y - top
-     * B - right
-     * A - bottom
-     * X - left
-     */
-
-    @Override
-    public void runOpMode() {
-
+    public void initialize() {
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
@@ -59,6 +41,28 @@ public class TwoPersonDrive extends LinearOpMode {
         rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    }
+
+    /**
+     * IMPORTANT NOTES:
+     *
+     * For the Double Shock controllers:
+     * triangle - top
+     * circle - right
+     * cross (X-shaped) - bottom
+     * square - left
+     *
+     * For the older Logitech controllers:
+     * Y - top
+     * B - right
+     * A - bottom
+     * X - left
+     */
+
+    @Override
+    public void runOpMode() {
+        initialize();
 
         waitForStart();
         while (opModeIsActive()) {
