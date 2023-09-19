@@ -11,10 +11,9 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class BackDropPipeline extends OpenCvPipeline {
+public class NotGoodBackDropPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
@@ -60,8 +59,8 @@ public class BackDropPipeline extends OpenCvPipeline {
 
         // Filter contours by area
         List<MatOfPoint> boundedContours = new ArrayList<>();
-        double minArea = 450;
-        double maxArea = 850;
+        double minArea = 200;//450;
+        double maxArea = 1000;//850;
 
         for (MatOfPoint contour : contours) {
             double area = Imgproc.contourArea(contour);

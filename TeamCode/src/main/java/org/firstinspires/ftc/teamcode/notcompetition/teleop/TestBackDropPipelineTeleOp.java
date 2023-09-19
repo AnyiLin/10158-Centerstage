@@ -4,17 +4,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.util.BackDropPipeline;
+import org.firstinspires.ftc.teamcode.util.TeamPropPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 @TeleOp
 public class TestBackDropPipelineTeleOp extends LinearOpMode {
     private OpenCvCamera camera;
 
-    private BackDropPipeline pipeline;
+    private TeamPropPipeline pipeline;
 
     @Override
     public void runOpMode() {
@@ -23,7 +22,7 @@ public class TestBackDropPipelineTeleOp extends LinearOpMode {
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "camera"), cameraMonitorViewId);
 
         // Set up pipeline
-        pipeline = new BackDropPipeline();
+        pipeline = new TeamPropPipeline();
         camera.setPipeline(pipeline);
 
         // Start camera streaming
