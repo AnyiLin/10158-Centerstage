@@ -5,46 +5,60 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 @TeleOp(name = "Two Person Drive", group = "Drive")
 public class TwoPersonDrive extends LinearOpMode {
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift;
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift, liftMotor;
 
-    private boolean liftInMotion;
+    private final int LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
+    LIFT_MAX = RobotConstants.LIFT_MAX,
+    FINE_ADJUST_LIFT_CHANGE = 100, // this is set to encoder ticks/second
+    REGULAR_LIFT_CHANGE = 290; // this is set to encoder ticks/second
 
-    private int lastLiftPosition;
+    private int liftTargetPosition;
 
-    private long liftStartTime;
-
-    private final int LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY;
-
-    private final long LIFT_TIME_OUT = 1000;
+    private float lastFrameTimeMillis, deltaTimeMillis;
 
     public void initialize() {
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-        //leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
-        //rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
+        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
+        liftMotor = leftLift; // set this to whatever is the lift motor with the encoder
+
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftTargetPosition = 0;
+        liftMotor.setTargetPosition(liftTargetPosition);
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftMotor.setVelocity(LIFT_VELOCITY);
+        if (liftMotor.equals(leftLift)) {
+            rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        } else {
+            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
     /**
@@ -68,7 +82,10 @@ public class TwoPersonDrive extends LinearOpMode {
         initialize();
 
         waitForStart();
+        lastFrameTimeMillis = System.currentTimeMillis();
         while (opModeIsActive()) {
+
+            updateFrameTime();
 
             double throttle = 0.2 + 0.8*gamepad1.right_trigger;
 
@@ -99,9 +116,22 @@ public class TwoPersonDrive extends LinearOpMode {
             rightFront.setPower(rightFrontPower);
             rightRear.setPower(rightRearPower);
 
-            // TODO: left trigger controls intake
+            // TODO: gamepad 1 left trigger controls intake
+
+            // TODO: some button on gamepad1 will also control intake virtual four bar
+
+            // TODO: make intake and claw not collide
 
             /*
+            any changes to slides is a change in the target position of pid
+            left stick controls slides
+            d pad is presets
+            left trigger is fine adjust slides down
+            right trigger is fine adjust slides up
+            right bumper releases claw closest to backdrop
+            left bumper releases claw farther from backdrop
+            right stick is fine adjust strafing only
+
             slides presets:
             dpad_up - top line
             dpad_left - middle line
@@ -109,52 +139,43 @@ public class TwoPersonDrive extends LinearOpMode {
             dpad_right - reset
             */
 
-            // TODO: maybe add force override of liftInMotion
+            // TODO: implement literally everything else, including lift passive pid control
 
-            if (liftInMotion) {
-                if (!leftLift.isBusy()&&!rightLift.isBusy()) {
-                    leftLift.setPower(0);
-                    leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    rightLift.setPower(0);
-                    rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    lastLiftPosition = leftLift.getCurrentPosition();
-                    liftInMotion = false;
-                }
-                if (System.currentTimeMillis()-liftStartTime>LIFT_TIME_OUT) {
-                    leftLift.setPower(0);
-                    leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    rightLift.setPower(0);
-                    rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    lastLiftPosition = leftLift.getCurrentPosition();
-                    liftInMotion = false;
-                }
+            if (gamepad2.left_trigger>0||gamepad2.right_trigger>0) {
+                liftTargetPosition += (gamepad2.right_trigger-gamepad2.left_trigger)*((deltaTimeMillis/1000.0)*FINE_ADJUST_LIFT_CHANGE);
             } else {
-                // TODO: implement literally everything else, including lift passive pid control
-
-                if (gamepad2.dpad_up) {
-                    // TODO: top line preset
-                }
-                if (gamepad2.dpad_left) {
-                    // TODO: middle line preset
-                }
-                if (gamepad2.dpad_down) {
-                    // TODO: bottom line preset
-                }
-                if (gamepad2.dpad_right) {
-                    // TODO: reset line preset
-                }
+                liftTargetPosition += (-gamepad2.left_stick_y)*((deltaTimeMillis/1000.0)*REGULAR_LIFT_CHANGE);
             }
+
+            if (gamepad2.dpad_up) {
+                // TODO: top line preset
+            }
+            if (gamepad2.dpad_left) {
+                // TODO: middle line preset
+            }
+            if (gamepad2.dpad_down) {
+                // TODO: bottom line preset
+            }
+            if (gamepad2.dpad_right) {
+                // TODO: reset preset
+            }
+
+            updateLiftTargetPosition();
         }
     }
 
     public void startPreset(int liftPosition) {
-        liftInMotion = true;
-        leftLift.setTargetPosition(liftPosition);
-        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftLift.setVelocity(LIFT_VELOCITY);
-        rightLift.setTargetPosition(liftPosition);
-        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightLift.setVelocity(LIFT_VELOCITY);
-        liftStartTime = System.currentTimeMillis();
+        liftTargetPosition = liftPosition;
+    }
+
+    public void updateLiftTargetPosition() {
+        if (liftTargetPosition < 0) liftTargetPosition = 0;
+        if (liftTargetPosition > LIFT_MAX) liftTargetPosition = LIFT_MAX;
+        liftMotor.setTargetPosition(liftTargetPosition);
+    }
+
+    public void updateFrameTime() {
+        deltaTimeMillis = System.currentTimeMillis()-lastFrameTimeMillis;
+        lastFrameTimeMillis = System.currentTimeMillis();
     }
 }
