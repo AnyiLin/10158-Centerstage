@@ -17,16 +17,16 @@ public class TeamPropPipeline extends OpenCvPipeline {
     private String navigation;
 
     public TeamPropPipeline() {
-        WIDTH = 4;
-        HEIGHT = 80;
-        GRAY_ERROR = 20;
-        COLOR = 0;
+        WIDTH = 50;
+        HEIGHT = 120;
+        GRAY_ERROR = 120;
+        COLOR = 2;
     }
 
     public TeamPropPipeline(int color) {
-        WIDTH = 4;
-        HEIGHT = 80;
-        GRAY_ERROR = 20;
+        WIDTH = 50;
+        HEIGHT = 120;
+        GRAY_ERROR = 120;
         this.COLOR = color;
     }
 
@@ -47,28 +47,36 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
         //left column
         leftTotal = 0;
-        for (int counter = output.height()- HEIGHT; counter < output.height(); counter++) {
-            for (int counter2 = 0; counter2 < WIDTH; counter2++) {
-                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR))
+        for (int counter = output.height()- HEIGHT; counter < output.height(); counter+=3) {
+            for (int counter2 = 0; counter2 < WIDTH; counter2+=2) {
+                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     leftTotal += (output.get(counter, counter2)[COLOR]);
+                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                }
             }
         }
 
         //middle column
         middleTotal = 0;
-        for (int counter = output.height()- HEIGHT; counter < output.height(); counter++) {
-            for (int counter2 = (int)(output.width()/2.0- WIDTH /2.0); counter2 < (int)(output.width()/2.0+ WIDTH /2.0); counter2++) {
-                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR))
+        for (int counter = output.height()- HEIGHT; counter < output.height(); counter+=3) {
+            for (int counter2 = (int)(output.width()/2.0- WIDTH /2.0); counter2 < (int)(output.width()/2.0+ WIDTH /2.0); counter2+=2) {
+                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     middleTotal += (output.get(counter, counter2)[COLOR]);
+
+                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                }
             }
         }
 
         //right column
         rightTotal = 0;
-        for (int counter = output.height()- HEIGHT; counter < output.height(); counter++) {
-            for (int counter2 = (int)(output.width()- WIDTH); counter2 < output.width(); counter2++) {
-                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR))
+        for (int counter = output.height()- HEIGHT; counter < output.height(); counter+=3) {
+            for (int counter2 = output.width()- WIDTH; counter2 < output.width(); counter2+=2) {
+                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     rightTotal += (output.get(counter, counter2)[COLOR]);
+
+                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                }
             }
         }
 
@@ -89,12 +97,12 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     public void writeOnScreen() {
         // writes left column total
-        Imgproc.putText(output, leftTotal+"", new Point(0,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0,0,255),1);
+        Imgproc.putText(output, leftTotal+"", new Point(0,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
         // writes middle column total
-        Imgproc.putText(output, middleTotal+"", new Point(output.width()/2,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0,0,255),1);
+        Imgproc.putText(output, middleTotal+"", new Point(output.width()/2,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
         // writes right column total
-        Imgproc.putText(output, rightTotal+"", new Point(output.width()-70,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0,0,255),1);
+        Imgproc.putText(output, rightTotal+"", new Point(output.width()-70,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
         // writes which area is the highest
-        Imgproc.putText(output, navigation, new Point(output.width()/2,output.height()-30), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0,0,255),1);
+        Imgproc.putText(output, navigation, new Point(output.width()/2,output.height()-30), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(0,0,0),1);
     }
 }

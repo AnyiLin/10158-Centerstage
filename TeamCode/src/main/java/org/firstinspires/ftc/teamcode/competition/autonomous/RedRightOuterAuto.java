@@ -13,7 +13,6 @@ public class RedRightOuterAuto extends LinearOpMode {
 
     private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift;
 
-    private final int LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY;
 
     // all spike mark locations since I'm lazy
     private Pose2d redLeftSideLeftSpikeMark = new Pose2d(-47.5,-36);
