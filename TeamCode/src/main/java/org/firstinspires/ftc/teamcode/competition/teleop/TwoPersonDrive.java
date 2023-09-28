@@ -12,13 +12,14 @@ import org.firstinspires.ftc.teamcode.util.RobotConstants;
 @TeleOp(name = "Two Person Drive", group = "Drive")
 public class TwoPersonDrive extends LinearOpMode {
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift, liftMotor, intake;
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift, intake;
 
     private Servo leftIntake, rightIntake, leftOuttake, rightOuttake, outerClaw, innerClaw;
 
     private final int
-    FINE_ADJUST_LIFT_CHANGE = 100, // this is set to encoder ticks/second
-    REGULAR_LIFT_CHANGE = 290, // this is set to encoder ticks/second
+            LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
+    FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
+    REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
     LIFT_MAX = RobotConstants.LIFT_MAX,
     TOP_LINE_POSITION = RobotConstants.TOP_LINE_POSITION,
     MIDDLE_LINE_POSITION = RobotConstants.MIDDLE_LINE_POSITION,
@@ -52,7 +53,7 @@ public class TwoPersonDrive extends LinearOpMode {
     private final long
     INTAKE_FULL_OUT_WAIT = RobotConstants.INTAKE_FULL_OUT_WAIT;
 
-    private boolean outtakeIn, intakeGoingOut;
+    private boolean outtakeIn, intakeGoingOut, fineAdjustLift;
 
     private int liftTargetPosition;
 
@@ -87,16 +88,13 @@ public class TwoPersonDrive extends LinearOpMode {
 
         intake.setVelocity(0);
 
-        liftMotor = leftLift; // set this to whatever is the lift motor with the encoder
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftTargetPosition = 0;
-        liftMotor.setTargetPosition(liftTargetPosition);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (liftMotor.equals(leftLift)) {
-            rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        } else {
-            leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        }
+        leftLift.setTargetPosition(liftTargetPosition);
+        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightLift.setTargetPosition(liftTargetPosition);
+        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftIntake = hardwareMap.get(Servo.class, "leftIntake");
         rightIntake = hardwareMap.get(Servo.class, "rightIntake");
@@ -198,10 +196,6 @@ public class TwoPersonDrive extends LinearOpMode {
                 rightIntake.setPosition(RIGHT_INTAKE_OUT_POSITION);
                 intakeGoingOut = false;
             }
-            telemetry.addData("intake timer", System.currentTimeMillis()-intakeOutStartTime);
-            telemetry.addData("intake out?", intakeGoingOut);
-            telemetry.addData("system time millis", System.currentTimeMillis());
-            telemetry.addData("intake start time", intakeOutStartTime);
 
             leftIntake.setPosition(leftIntake.getPosition()-gamepad1.right_stick_y*(deltaTimeNano /1000000000.0)*INTAKE_CHANGE*INTAKE_DEGREES_TO_SERVO);
             rightIntake.setPosition(1-leftIntake.getPosition()+RIGHT_INTAKE_OFFSET);
@@ -237,12 +231,20 @@ public class TwoPersonDrive extends LinearOpMode {
 
             if (gamepad2.left_trigger>0||gamepad2.right_trigger>0) {
                 liftTargetPosition += (gamepad2.right_trigger-gamepad2.left_trigger)*((deltaTimeNano /1000000000.0)*FINE_ADJUST_LIFT_CHANGE);
+                fineAdjustLift = true;
             } else {
                 liftTargetPosition += (-gamepad2.left_stick_y)*((deltaTimeNano /1000000000.0)*REGULAR_LIFT_CHANGE);
+                fineAdjustLift = false;
             }
             telemetry.addData("lift target position", liftTargetPosition);
+            telemetry.addData("left lift current position", leftLift.getCurrentPosition());
+            telemetry.addData("left lift target position", leftLift.getTargetPosition());
+            telemetry.addData("right lift current position", rightLift.getCurrentPosition());
+            telemetry.addData("right lift target position", rightLift.getTargetPosition());
             telemetry.addData("gamepad2 left stick y", -gamepad2.left_stick_y);
             telemetry.addData("delta time nano", deltaTimeNano);
+            telemetry.addData("left lift power", leftLift.getPower());
+            telemetry.addData("right lift power", rightLift.getPower());
 
             if (gamepad2.dpad_up) {
                 // TODO: top line preset
@@ -267,20 +269,15 @@ public class TwoPersonDrive extends LinearOpMode {
         liftTargetPosition = liftPosition;
     }
 
-    public void updateLiftTargetPosition() {
+    public void updateLiftMotors() {
         if (liftTargetPosition < 0) liftTargetPosition = 0;
         if (liftTargetPosition > LIFT_MAX) liftTargetPosition = LIFT_MAX;
-        liftMotor.setTargetPosition(liftTargetPosition);
-    }
-
-    public void updateLiftMotors() {
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        updateLiftTargetPosition();
-        if (liftMotor.equals(leftLift)) {
-            rightLift.setPower(leftLift.getPower());
-        } else {
-            leftLift.setPower(rightLift.getPower());
-        }
+        leftLift.setTargetPosition(liftTargetPosition);
+        rightLift.setTargetPosition(liftTargetPosition);
+        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftLift.setVelocity(LIFT_VELOCITY);
+        rightLift.setVelocity(LIFT_VELOCITY);
     }
 
     public void updateFrameTime() {
