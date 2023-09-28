@@ -16,6 +16,8 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private String navigation;
 
+    private boolean draw = true;
+
     public TeamPropPipeline() {
         WIDTH = 50;
         HEIGHT = 120;
@@ -51,7 +53,8 @@ public class TeamPropPipeline extends OpenCvPipeline {
             for (int counter2 = 0; counter2 < WIDTH; counter2+=2) {
                 if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     leftTotal += (output.get(counter, counter2)[COLOR]);
-                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+
+                    if(draw) Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
                 }
             }
         }
@@ -63,7 +66,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
                 if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     middleTotal += (output.get(counter, counter2)[COLOR]);
 
-                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                    if(draw) Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
                 }
             }
         }
@@ -75,7 +78,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
                 if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     rightTotal += (output.get(counter, counter2)[COLOR]);
 
-                    Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                    if(draw) Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
                 }
             }
         }
@@ -84,7 +87,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
         if (middleTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "middle";
         if (rightTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "right";
 
-        writeOnScreen();
+        if (draw) writeOnScreen();
 
         hsv.release();
 
