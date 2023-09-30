@@ -22,7 +22,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
         WIDTH = 50;
         HEIGHT = 120;
         GRAY_ERROR = 120;
-        COLOR = 2;
+        COLOR = 0;
     }
 
     public TeamPropPipeline(int color) {

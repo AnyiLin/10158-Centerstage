@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.competition.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 @TeleOp(name = "Two Person Drive", group = "Drive")
@@ -59,7 +62,11 @@ public class TwoPersonDrive extends LinearOpMode {
 
     private long intakeOutStartTime, lastFrameTimeNano, deltaTimeNano;
 
+    private Telemetry telemetryA;
+
     public void initialize() {
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
@@ -197,7 +204,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 intakeGoingOut = false;
             }
 
-            leftIntake.setPosition(leftIntake.getPosition()-gamepad1.right_stick_y*(deltaTimeNano /1000000000.0)*INTAKE_CHANGE*INTAKE_DEGREES_TO_SERVO);
+            leftIntake.setPosition(leftIntake.getPosition()+gamepad1.right_stick_y*(deltaTimeNano /1000000000.0)*INTAKE_CHANGE*INTAKE_DEGREES_TO_SERVO);
             rightIntake.setPosition(1-leftIntake.getPosition()+RIGHT_INTAKE_OFFSET);
             if (leftIntake.getPosition() > LEFT_INTAKE_OUT_POSITION) {
                 leftIntake.setPosition(LEFT_INTAKE_OUT_POSITION);
@@ -236,15 +243,15 @@ public class TwoPersonDrive extends LinearOpMode {
                 liftTargetPosition += (-gamepad2.left_stick_y)*((deltaTimeNano /1000000000.0)*REGULAR_LIFT_CHANGE);
                 fineAdjustLift = false;
             }
-            telemetry.addData("lift target position", liftTargetPosition);
-            telemetry.addData("left lift current position", leftLift.getCurrentPosition());
-            telemetry.addData("left lift target position", leftLift.getTargetPosition());
-            telemetry.addData("right lift current position", rightLift.getCurrentPosition());
-            telemetry.addData("right lift target position", rightLift.getTargetPosition());
-            telemetry.addData("gamepad2 left stick y", -gamepad2.left_stick_y);
-            telemetry.addData("delta time nano", deltaTimeNano);
-            telemetry.addData("left lift power", leftLift.getPower());
-            telemetry.addData("right lift power", rightLift.getPower());
+            telemetryA.addData("lift target position", liftTargetPosition);
+            telemetryA.addData("left lift current position", leftLift.getCurrentPosition());
+            telemetryA.addData("left lift target position", leftLift.getTargetPosition());
+            telemetryA.addData("right lift current position", rightLift.getCurrentPosition());
+            telemetryA.addData("right lift target position", rightLift.getTargetPosition());
+            telemetryA.addData("gamepad2 left stick y", -gamepad2.left_stick_y);
+            telemetryA.addData("delta time nano", deltaTimeNano);
+            telemetryA.addData("left lift power", leftLift.getPower());
+            telemetryA.addData("right lift power", rightLift.getPower());
 
             if (gamepad2.dpad_up) {
                 // TODO: top line preset
@@ -261,7 +268,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
             updateLiftMotors();
 
-            telemetry.update();
+            telemetryA.update();
         }
     }
 
