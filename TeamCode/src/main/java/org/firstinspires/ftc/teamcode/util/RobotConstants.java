@@ -6,45 +6,61 @@ public class RobotConstants {
     // gobilda 312 rpms apparently have 537.7 ppr at the output shaft and 28 counts on the actual motor shaft like most other motors
 
     // the slides are on a 4 to 1 gearbox, so their 28 encoder counts at end of motor are actually 28*4
-    // max lift extension should be around 640 encoder ticks, probably a bit less, so let's go with 620.
+    // absolute max lift extension is 508.
     public static final int
             LIFT_VELOCITY = 1200,
-    LIFT_MAX = 620,
-    TOP_LINE_POSITION = 0,
-    MIDDLE_LINE_POSITION = 0,
-    BOTTOM_LINE_POSITION = 0,
-    INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7;
+            LIFT_MAX = 500,
+            LIFT_TOLERANCE = 3,
+            LIFT_VELOCITY_TOLERANCE = 28*4 / 6,
+            TOP_LINE_POSITION = 0,
+            MIDDLE_LINE_POSITION = 0,
+            BOTTOM_LINE_POSITION = 0,
+            LIFT_GRAB_POSITION = 60,
+            INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
+            //TODO: set the intake and outtake servo positions as well as claw positions later
             RIGHT_INTAKE_OFFSET = 0.03,
-    //TODO: set the intake and outtake servo positions as well as claw positions later
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
             LEFT_INTAKE_OUT_PAUSE_POSITION = 0.83,
             RIGHT_INTAKE_OUT_PAUSE_POSITION = 1-LEFT_INTAKE_OUT_PAUSE_POSITION+RIGHT_INTAKE_OFFSET,
-    LEFT_INTAKE_IN_POSITION = 0.4,
-    RIGHT_INTAKE_IN_POSITION = 1-LEFT_INTAKE_IN_POSITION+RIGHT_INTAKE_OFFSET,
-    LEFT_INTAKE_DROP_POSITION = 0.4,
-    RIGHT_INTAKE_DROP_POSITION = 1-LEFT_INTAKE_DROP_POSITION+RIGHT_INTAKE_OFFSET,
-    // for the intake, 0.31 servo position change means 90 degrees forward change
-    // so, 0.00344444444 servo position change is a 1 degree change
+            LEFT_INTAKE_IN_POSITION = 0.3,
+            RIGHT_INTAKE_IN_POSITION = 1-LEFT_INTAKE_IN_POSITION+RIGHT_INTAKE_OFFSET,
+            LEFT_INTAKE_MIDDLE_POSITION = 0.5,
+            RIGHT_INTAKE_MIDDLE_POSITION = 1-LEFT_INTAKE_MIDDLE_POSITION+RIGHT_INTAKE_OFFSET,
+            LEFT_INTAKE_DROP_POSITION = 0.1,
+            RIGHT_INTAKE_DROP_POSITION = 1-LEFT_INTAKE_DROP_POSITION+RIGHT_INTAKE_OFFSET,
 
-    INTAKE_SERVO_TO_DEGREES = 1/0.003444444444444444444444444444444444444444,
-    INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
+            // for the intake, 0.31 servo position change means 90 degrees forward change
+            // so, 0.00344444444 servo position change is a 1 degree change
+            INTAKE_SERVO_TO_DEGREES = 1/0.003444444444444444444444444444444444444444,
+            INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
 
-    RIGHT_OUTTAKE_OFFSET = 0,
-    LEFT_OUTTAKE_OUT_POSITION = 0,
-    RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
-    LEFT_OUTTAKE_IN_POSITION= 0.5,
-    RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
-    LEFT_OUTTAKE_AVOID_POSITION = 0,
-    RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
+            RIGHT_OUTTAKE_OFFSET = 0,
+            LEFT_OUTTAKE_OUT_POSITION = 0.45,
+            RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
+            LEFT_OUTTAKE_IN_POSITION= 0.83,
+            RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
+            LEFT_OUTTAKE_GRAB_POSITION= 0.97,
+            RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
+            LEFT_OUTTAKE_AVOID_POSITION = 0.6,
+            RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
 
-    OUTER_CLAW_CLOSE_POSITION = 0.65,
-    INNER_CLAW_CLOSE_POSITION = 0.913,
-    OUTER_CLAW_OPEN_POSITION = 0.57,
-    INNER_CLAW_OPEN_POSITION = 0.943;
+            OUTER_CLAW_CLOSE_POSITION = 0.67,
+            INNER_CLAW_CLOSE_POSITION = 0.913,
+            OUTER_CLAW_OPEN_POSITION = 0.53,
+            INNER_CLAW_OPEN_POSITION = 1;
 
     public static final long
-    INTAKE_FULL_OUT_WAIT = 1400; // this is in milliseconds
+            INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
+            INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,
+            INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
+            INTAKE_IN_WAIT = 1000, // TODO: set this later
+            INTAKE_OBSTACLE_IN_WAIT = 500, // TODO: set this later
+            CLAW_GRAB_WAIT = 2000, // TODO: set this later
+            CLAW_ACTUALLY_GRAB_WAIT = 1000,
+            CLAW_CLOSE_WAIT = 1000,
+            CLAW_LIFT_WAIT = 1000,
+            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500; // TODO: set this later
 }

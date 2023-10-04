@@ -15,6 +15,10 @@ import java.util.List;
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
  *
+ * left on robot is y pos
+ *
+ * front of robot is x pos
+ *
  *    /--------------\
  *    |     ____     |
  *    |     ----     |
@@ -40,9 +44,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
-                new Pose2d((-7.358)/(25.4), LATERAL_DISTANCE / 2, 0), // left
-                new Pose2d((-7.358)/(25.4), -LATERAL_DISTANCE / 2, 0), // right
-                new Pose2d(FORWARD_OFFSET, (1.407)/(25.4),  Math.toRadians(90)) // front
+                new Pose2d((-7.358)/(25.4), LATERAL_DISTANCE / 2 + (13.57*25.4), 0), // left
+                new Pose2d((-7.358)/(25.4), -LATERAL_DISTANCE / 2 - (3.855*25.4), 0), // right
+                new Pose2d(FORWARD_OFFSET, (1.407-24)/(25.4),  Math.toRadians(90)) // front
         ));
 
         lastEncPositions = lastTrackingEncPositions;
