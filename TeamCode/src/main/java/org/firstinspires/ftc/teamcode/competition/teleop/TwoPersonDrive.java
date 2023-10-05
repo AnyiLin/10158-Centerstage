@@ -361,7 +361,6 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void resetPreset() {
-        // TODO: make reset
         resetInMotion = true;
 
         presetLifting = false;
