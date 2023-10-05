@@ -62,5 +62,8 @@ public class RobotConstants {
             CLAW_ACTUALLY_GRAB_WAIT = 1000,
             CLAW_CLOSE_WAIT = 1000,
             CLAW_LIFT_WAIT = 1000,
+            PRESET_TIMEOUT = 1500,
+            RESET_PIXEL_DROP_WAIT = 300,
+            RESET_FOLD_IN_WAIT = 1000,
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500; // TODO: set this later
 }
