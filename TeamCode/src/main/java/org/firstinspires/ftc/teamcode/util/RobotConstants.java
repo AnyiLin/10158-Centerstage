@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 public class RobotConstants {
     // Put all the constants we need across opmodes here. Don't forget to make them public and static!
 
@@ -11,7 +13,7 @@ public class RobotConstants {
             LIFT_VELOCITY = 1200,
             LIFT_MAX = 500,
             LIFT_TOLERANCE = 3,
-            LIFT_VELOCITY_TOLERANCE = 28*4 / 6,
+            LIFT_GRAB_TOLERANCE = 2,
             TOP_LINE_POSITION = 0,
             MIDDLE_LINE_POSITION = 0,
             BOTTOM_LINE_POSITION = 0,
@@ -46,6 +48,7 @@ public class RobotConstants {
             RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_AVOID_POSITION = 0.6,
             RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
+            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 120,
 
 
             // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
@@ -66,14 +69,20 @@ public class RobotConstants {
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,
             INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
-            INTAKE_IN_WAIT = 1000, // TODO: set this later
-            INTAKE_OBSTACLE_IN_WAIT = 500, // TODO: set this later
-            CLAW_GRAB_WAIT = 250, // TODO: set this later
+            INTAKE_IN_WAIT = 1000,
+            INTAKE_OBSTACLE_IN_WAIT = 500,
+            CLAW_GRAB_WAIT = 250, //
             CLAW_CLOSE_WAIT = 200,
             CLAW_LIFT_WAIT = 0,
-            LIFT_GO_WAIT = 250,
-            PRESET_TIMEOUT = 1500,
+            LIFT_GO_WAIT = 1000,
+            PRESET_TIMEOUT = 1000,
             RESET_PIXEL_DROP_WAIT = 300,
             RESET_FOLD_IN_WAIT = 1000,
-            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500; // TODO: set this later
+            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;
+
+    public static final PIDFCoefficients
+            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(21,3,2.5,0),
+            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(25,0,0,0),
+            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(10,3,0,0),
+            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(6,0,0,0);
 }
