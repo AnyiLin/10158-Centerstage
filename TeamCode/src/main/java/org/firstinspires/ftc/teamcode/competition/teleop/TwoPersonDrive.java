@@ -36,6 +36,7 @@ public class TwoPersonDrive extends LinearOpMode {
     private final double
             INTAKE_CHANGE = 40, // this is set to degrees/second
             OUTTAKE_CHANGE = 40, // this is set to degrees/second
+            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
             RIGHT_INTAKE_OFFSET = RobotConstants.RIGHT_INTAKE_OFFSET,
             LEFT_INTAKE_OUT_POSITION = RobotConstants.LEFT_INTAKE_OUT_POSITION,
             RIGHT_INTAKE_OUT_POSITION = RobotConstants.RIGHT_INTAKE_OUT_POSITION,
@@ -272,8 +273,8 @@ public class TwoPersonDrive extends LinearOpMode {
             d pad is presets
             left trigger is fine adjust slides down
             right trigger is fine adjust slides up
-            right bumper releases claw closest to backdrop
-            left bumper releases claw farther from backdrop
+            right bumper toggles claw closest to backdrop
+            left bumper toggles claw farther from backdrop
             right stick is fine adjust strafing on the x and fine adjust outtake on the y
 
             slides presets:
@@ -564,17 +565,19 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void fineAdjustOuttakeV4B() {
-        if (leftOuttake.getPosition() >= LEFT_OUTTAKE_AVOID_POSITION && leftOuttake.getPosition() <= LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
-            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
-            rightOuttake.setPosition(1 - rightOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
-        }
-        if (leftOuttake.getPosition() < LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO && -gamepad1.right_stick_y > 0) {
-            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
-            rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
-        }
-        if (leftOuttake.getPosition() > LEFT_OUTTAKE_AVOID_POSITION && -gamepad1.right_stick_y < 0) {
-            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
-            rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+        if (Math.abs(gamepad2.right_stick_y) >= OUTTAKE_FINE_ADJUST_DEAD_ZONE) {
+            if (leftOuttake.getPosition() >= LEFT_OUTTAKE_AVOID_POSITION && leftOuttake.getPosition() <= LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
+                leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+                rightOuttake.setPosition(1 - rightOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+            }
+            if (leftOuttake.getPosition() < LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO && -gamepad1.right_stick_y > 0) {
+                leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+                rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+            }
+            if (leftOuttake.getPosition() > LEFT_OUTTAKE_AVOID_POSITION && -gamepad1.right_stick_y < 0) {
+                leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+                rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+            }
         }
         if (leftOuttake.getPosition() > LEFT_OUTTAKE_AVOID_POSITION) {
             leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
