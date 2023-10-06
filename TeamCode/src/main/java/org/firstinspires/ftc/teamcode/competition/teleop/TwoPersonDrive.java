@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
@@ -34,6 +35,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     private final double
             INTAKE_CHANGE = 40, // this is set to degrees/second
+            OUTTAKE_CHANGE = 40, // this is set to degrees/second
             RIGHT_INTAKE_OFFSET = RobotConstants.RIGHT_INTAKE_OFFSET,
             LEFT_INTAKE_OUT_POSITION = RobotConstants.LEFT_INTAKE_OUT_POSITION,
             RIGHT_INTAKE_OUT_POSITION = RobotConstants.RIGHT_INTAKE_OUT_POSITION,
@@ -59,7 +61,9 @@ public class TwoPersonDrive extends LinearOpMode {
             OUTER_CLAW_OPEN_POSITION = RobotConstants.OUTER_CLAW_OPEN_POSITION,
             INNER_CLAW_OPEN_POSITION = RobotConstants.INNER_CLAW_OPEN_POSITION,
             INTAKE_SERVO_TO_DEGREES = RobotConstants.INTAKE_SERVO_TO_DEGREES,
-            INTAKE_DEGREES_TO_SERVO = RobotConstants.INTAKE_DEGREES_TO_SERVO;
+            INTAKE_DEGREES_TO_SERVO = RobotConstants.INTAKE_DEGREES_TO_SERVO,
+            OUTTAKE_SERVO_TO_DEGREES = RobotConstants.OUTTAKE_SERVO_TO_DEGREES,
+            OUTTAKE_DEGREES_TO_SERVO = RobotConstants.OUTTAKE_DEGREES_TO_SERVO;
 
     private final long
             INTAKE_IN_WAIT = RobotConstants.INTAKE_IN_WAIT,
@@ -68,15 +72,15 @@ public class TwoPersonDrive extends LinearOpMode {
             INTAKE_OBSTACLE_IN_WAIT = RobotConstants.INTAKE_OBSTACLE_IN_WAIT,
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = RobotConstants.OUTTAKE_OBSTACLE_FOLD_IN_WAIT,
             CLAW_GRAB_WAIT = RobotConstants.CLAW_GRAB_WAIT,
-            CLAW_ACTUALLY_GRAB_WAIT = RobotConstants.CLAW_ACTUALLY_GRAB_WAIT,
             CLAW_CLOSE_WAIT = RobotConstants.CLAW_CLOSE_WAIT,
             CLAW_LIFT_WAIT = RobotConstants.CLAW_LIFT_WAIT,
             PRESET_TIMEOUT = RobotConstants.PRESET_TIMEOUT,
             RESET_PIXEL_DROP_WAIT = RobotConstants.RESET_PIXEL_DROP_WAIT,
             RESET_FOLD_IN_WAIT = RobotConstants.RESET_FOLD_IN_WAIT,
+            LIFT_GO_WAIT = RobotConstants.LIFT_GO_WAIT,
             INTAKE_FULL_OUT_WAIT = RobotConstants.INTAKE_FULL_OUT_WAIT;
 
-    private boolean resetFoldIn, resetPixelDrop, liftInGrabbingPosition, resetInMotion, presetLifting, clawLifting, clawClosing, clawActuallyGrab, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
+    private boolean outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
 
     private int liftTargetPosition, rightLiftError, presetTargetPosition;
 
@@ -279,10 +283,36 @@ public class TwoPersonDrive extends LinearOpMode {
             dpad_right - reset
             */
 
+            // TODO: optimize preset lifting more
+
             if (!presetInMotion && !resetInMotion) {
-                if (gamepad2.right_bumper) outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
-                if (gamepad2.left_bumper) innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
+                if (gamepad2.right_bumper) {
+                    if (!outerClawButtonPressed) {
+                        outerClawButtonPressed = true;
+                        if (outerClaw.getPosition() == OUTER_CLAW_CLOSE_POSITION) {
+                            outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
+                        } else {
+                            outerClaw.setPosition(OUTER_CLAW_CLOSE_POSITION);
+                        }
+                    }
+                } else {
+                    outerClawButtonPressed = false;
+                }
+                if (gamepad2.left_bumper) {
+                    if (!innerClawButtonPressed) {
+                        innerClawButtonPressed = true;
+                        if (innerClaw.getPosition() == INNER_CLAW_CLOSE_POSITION) {
+                            innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
+                        } else {
+                            innerClaw.setPosition(INNER_CLAW_CLOSE_POSITION);
+                        }
+                    }
+                } else {
+                    innerClawButtonPressed = false;
+                }
             }
+
+            if (!presetInMotion && !resetInMotion) fineAdjustOuttakeV4B();
 
             if (!presetInMotion && !resetInMotion) {
                 if (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0) {
@@ -292,7 +322,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 }
             }
 
-            if (!resetInMotion && !resetInMotion) {
+            if (!resetInMotion) {
                 if (gamepad2.dpad_up) {
                     startPreset(TOP_LINE_POSITION);
                 }
@@ -314,13 +344,7 @@ public class TwoPersonDrive extends LinearOpMode {
             if (!presetInMotion && !resetInMotion) updateLiftMotors();
 
 
-            telemetryA.addData("lift target position", liftTargetPosition);
-            telemetryA.addData("left lift current position", leftLift.getCurrentPosition());
-            telemetryA.addData("left lift target position", leftLift.getTargetPosition());
-            telemetryA.addData("right lift current position", rightLift.getCurrentPosition());
-            telemetryA.addData("right lift target position", rightLift.getTargetPosition());
-            telemetryA.addData("delta time nano", deltaTimeNano);
-            telemetryA.update();
+            runTelemetry();
         }
     }
 
@@ -330,16 +354,13 @@ public class TwoPersonDrive extends LinearOpMode {
         presetTargetPosition = liftPosition;
         if (outtakeIn) { // if the outtake is in, grab and go
             if (!intakeIn) {
-                intakeIn = true;
                 if (!intakeGoingInObstacle && !intakeGoingInObstacleFoldUp) {
                     leftIntake.setPosition(LEFT_INTAKE_MIDDLE_POSITION);
                     rightIntake.setPosition(RIGHT_INTAKE_MIDDLE_POSITION);
                     intakeInObstacleStartTime = System.currentTimeMillis();
                     intakeGoingInObstacle = true;
-                    presetQueue = true;
-                } else {
-                    presetQueue = true;
                 }
+                presetQueue = true;
                 intakeGoingOut = false;
                 intakeGoingOutObstacle = false;
                 intakeGoingOutObstacleRetract = false;
@@ -352,7 +373,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 liftInGrabbingPosition = false;
             }
         } else { // if the outtake isnt in, then just go to the position specified
-            if (!liftInGrabbingPosition && !clawGrabbing && !clawActuallyGrab && !clawClosing && !clawLifting) {
+            if (liftInGrabbingPosition && !clawGrabbing && !clawClosing && !clawLifting && !liftGoing) {
                 presetLifting = true;
                 liftTargetPosition = presetTargetPosition;
                 updateLiftMotors();
@@ -371,8 +392,9 @@ public class TwoPersonDrive extends LinearOpMode {
         intakeGoingOut = false;
         intakeGoingOutObstacle = false;
         intakeGoingOutObstacleRetract = false;
+        liftInGrabbingPosition = true;
+        liftGoing = false;
         clawGrabbing = false;
-        clawActuallyGrab = false;
         clawClosing = false;
         clawLifting = false;
 
@@ -420,7 +442,9 @@ public class TwoPersonDrive extends LinearOpMode {
             resetPixelDrop = false;
             liftTargetPosition = 0;
             updateLiftMotors();
+            outtakeIn = true;
             if (!intakeIn) {
+                intakeIn = true;
                 leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
                 rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
                 leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
@@ -434,39 +458,38 @@ public class TwoPersonDrive extends LinearOpMode {
             }
         }
         if (resetFoldIn && (System.currentTimeMillis()-resetFoldInStartTime > RESET_FOLD_IN_WAIT)) {
-            resetFoldIn = true;
+            resetFoldIn = false;
             leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
             rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
             resetInMotion = false;
         }
 
-        if (!liftInGrabbingPosition && (leftLift.getCurrentPosition()<=LIFT_GRAB_POSITION+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=LIFT_GRAB_POSITION-LIFT_TOLERANCE)&&leftLift.getVelocity()<LIFT_VELOCITY_TOLERANCE) {
+        if (!liftInGrabbingPosition && (leftLift.getCurrentPosition()<=LIFT_GRAB_POSITION+LIFT_TOLERANCE-1&&leftLift.getCurrentPosition()>=LIFT_GRAB_POSITION-LIFT_TOLERANCE+1)) {
             liftInGrabbingPosition = true;
-            clawGrabbing = true;
             clawGrabbingStartTime = System.currentTimeMillis();
-        }
-        if (clawGrabbing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_GRAB_WAIT)) {
             leftOuttake.setPosition(LEFT_OUTTAKE_GRAB_POSITION);
             rightOuttake.setPosition(RIGHT_OUTTAKE_GRAB_POSITION);
-            clawGrabbing = false;
-            clawActuallyGrab = true;
+            clawGrabbing = true;
         }
-        if (clawActuallyGrab && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_ACTUALLY_GRAB_WAIT + CLAW_GRAB_WAIT)) {
+        if (clawGrabbing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_GRAB_WAIT)) {
             innerClaw.setPosition(INNER_CLAW_CLOSE_POSITION);
             outerClaw.setPosition(OUTER_CLAW_CLOSE_POSITION);
-            clawActuallyGrab = false;
+            clawGrabbing = false;
             clawClosing = true;
         }
-        if (clawClosing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_ACTUALLY_GRAB_WAIT + CLAW_GRAB_WAIT)) {
+        if (clawClosing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
             liftTargetPosition = 0;
             updateLiftMotors();
-            leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);
-            rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
             clawClosing = false;
             clawLifting = true;
         }
-        if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_ACTUALLY_GRAB_WAIT + CLAW_GRAB_WAIT)) {
+        if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
             clawLifting = false;
+            leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);
+            rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
+        }
+        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
+            liftGoing = false;
             startPreset(presetTargetPosition);
         }
 
@@ -510,31 +533,67 @@ public class TwoPersonDrive extends LinearOpMode {
             leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
             rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
             intakeGoingInObstacleFoldUp = false;
-            if (presetQueue) startPreset(presetTargetPosition);
+            if (presetQueue) {
+                intakeIn = true;
+                startPreset(presetTargetPosition);
+            }
         }
     }
 
     public void fineAdjustIntakeV4B() {
-            if (leftIntake.getPosition() >= LEFT_INTAKE_MIDDLE_POSITION && leftIntake.getPosition() <= LEFT_INTAKE_OUT_POSITION) {
-                leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
-                rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
-            }
-            if (leftIntake.getPosition() < LEFT_INTAKE_MIDDLE_POSITION && -gamepad1.right_stick_y < 0) {
-                leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
-                rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
-            }
-            if (leftIntake.getPosition() > LEFT_INTAKE_OUT_POSITION && -gamepad1.right_stick_y > 0) {
-                leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
-                rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
-            }
-            if (leftIntake.getPosition() > LEFT_INTAKE_OUT_POSITION) {
-                leftIntake.setPosition(LEFT_INTAKE_OUT_POSITION);
-                rightIntake.setPosition(RIGHT_INTAKE_OUT_POSITION);
-            }
-            if (leftIntake.getPosition() < LEFT_INTAKE_DROP_POSITION) {
-                leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
-                rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
-            }
+        if (leftIntake.getPosition() >= LEFT_INTAKE_MIDDLE_POSITION && leftIntake.getPosition() <= LEFT_INTAKE_OUT_POSITION) {
+            leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
+            rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
+        }
+        if (leftIntake.getPosition() < LEFT_INTAKE_MIDDLE_POSITION && -gamepad1.right_stick_y < 0) {
+            leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
+            rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
+        }
+        if (leftIntake.getPosition() > LEFT_INTAKE_OUT_POSITION && -gamepad1.right_stick_y > 0) {
+            leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
+            rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
+        }
+        if (leftIntake.getPosition() > LEFT_INTAKE_OUT_POSITION) {
+            leftIntake.setPosition(LEFT_INTAKE_OUT_POSITION);
+            rightIntake.setPosition(RIGHT_INTAKE_OUT_POSITION);
+        }
+        if (leftIntake.getPosition() < LEFT_INTAKE_DROP_POSITION) {
+            leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
+            rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
+        }
+    }
+
+    public void fineAdjustOuttakeV4B() {
+        if (leftOuttake.getPosition() >= LEFT_OUTTAKE_AVOID_POSITION && leftOuttake.getPosition() <= LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
+            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+            rightOuttake.setPosition(1 - rightOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+        }
+        if (leftOuttake.getPosition() < LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO && -gamepad1.right_stick_y > 0) {
+            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+            rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+        }
+        if (leftOuttake.getPosition() > LEFT_OUTTAKE_AVOID_POSITION && -gamepad1.right_stick_y < 0) {
+            leftOuttake.setPosition(leftOuttake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
+            rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
+        }
+        if (leftOuttake.getPosition() > LEFT_OUTTAKE_AVOID_POSITION) {
+            leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
+            rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+        }
+        if (leftOuttake.getPosition() < LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
+            leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO);
+            rightOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO);
+        }
+    }
+
+    public void runTelemetry() {
+        telemetryA.addData("lift target position", liftTargetPosition);
+        telemetryA.addData("left lift current position", leftLift.getCurrentPosition());
+        telemetryA.addData("left lift target position", leftLift.getTargetPosition());
+        telemetryA.addData("right lift current position", rightLift.getCurrentPosition());
+        telemetryA.addData("right lift target position", rightLift.getTargetPosition());
+        telemetryA.addData("delta time nano", deltaTimeNano);
+        telemetryA.update();
     }
 
     public void updateFrameTime() {

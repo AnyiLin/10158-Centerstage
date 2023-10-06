@@ -15,7 +15,7 @@ public class RobotConstants {
             TOP_LINE_POSITION = 0,
             MIDDLE_LINE_POSITION = 0,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 60,
+            LIFT_GRAB_POSITION = 43,
             INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
@@ -47,10 +47,20 @@ public class RobotConstants {
             LEFT_OUTTAKE_AVOID_POSITION = 0.6,
             RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
 
-            OUTER_CLAW_CLOSE_POSITION = 0.67,
-            INNER_CLAW_CLOSE_POSITION = 0.913,
-            OUTER_CLAW_OPEN_POSITION = 0.53,
-            INNER_CLAW_OPEN_POSITION = 1;
+
+            // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
+            // so, 0.003703703704 servo units is equal to one degree
+            OUTTAKE_SERVO_TO_DEGREES = 1/0.003703703704,
+            OUTTAKE_DEGREES_TO_SERVO = 0.003703703704,
+
+
+            //Claw Close positions
+            INNER_CLAW_CLOSE_POSITION = 0.45,
+            OUTER_CLAW_CLOSE_POSITION = 0.85,
+
+            //Claw Open Positions
+            INNER_CLAW_OPEN_POSITION = 0.3,
+            OUTER_CLAW_OPEN_POSITION = 1;
 
     public static final long
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
@@ -58,10 +68,10 @@ public class RobotConstants {
             INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
             INTAKE_IN_WAIT = 1000, // TODO: set this later
             INTAKE_OBSTACLE_IN_WAIT = 500, // TODO: set this later
-            CLAW_GRAB_WAIT = 2000, // TODO: set this later
-            CLAW_ACTUALLY_GRAB_WAIT = 1000,
-            CLAW_CLOSE_WAIT = 1000,
-            CLAW_LIFT_WAIT = 1000,
+            CLAW_GRAB_WAIT = 250, // TODO: set this later
+            CLAW_CLOSE_WAIT = 200,
+            CLAW_LIFT_WAIT = 0,
+            LIFT_GO_WAIT = 250,
             PRESET_TIMEOUT = 1500,
             RESET_PIXEL_DROP_WAIT = 300,
             RESET_FOLD_IN_WAIT = 1000,
