@@ -135,12 +135,10 @@ public class ClassCompOneAutoRed extends LinearOpMode {
             }
         });
         while (!isStarted() && !isStopRequested()) {
-            // TODO: use camera to detect team prop
             navigation = teamPropPipeline.getNavigation();
             telemetry.addData("Navigation:", navigation);
             telemetry.update();
         }
-        // TODO: don't forget to turn off camera once done!
         camera.stopStreaming();
 
         if (isStopRequested()) return;
