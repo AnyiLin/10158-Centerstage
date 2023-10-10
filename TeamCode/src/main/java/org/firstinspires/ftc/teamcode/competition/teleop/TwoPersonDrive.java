@@ -27,6 +27,7 @@ public class TwoPersonDrive extends LinearOpMode {
     private final int
             LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
             LIFT_GRAB_TOLERANCE = RobotConstants.LIFT_GRAB_TOLERANCE,
+            LIFT_VELOCITY_TOLERANCE = RobotConstants.LIFT_VELOCITY_TOLERANCE,
             FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
             REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
             LIFT_MAX = RobotConstants.LIFT_MAX,
@@ -431,7 +432,7 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void detectPresetEnd() {
-        if (presetLifting && ((leftLift.getCurrentPosition()<=liftTargetPosition+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=liftTargetPosition-LIFT_TOLERANCE))) {
+        if (presetLifting && ((leftLift.getCurrentPosition()<=liftTargetPosition+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=liftTargetPosition-LIFT_TOLERANCE)) && liftGoing) {
             presetInMotion = false;
             presetLifting = false;
         } else if (System.currentTimeMillis()-presetStartTime > PRESET_TIMEOUT) {
@@ -443,7 +444,8 @@ public class TwoPersonDrive extends LinearOpMode {
     public void updateLiftMotors() {
         if (liftTargetPosition < 0) liftTargetPosition = 0;
         if (liftTargetPosition > LIFT_MAX) liftTargetPosition = LIFT_MAX;
-        //correctLiftError(); TODO: check to see if robot kills itself when this is commented out
+        correctLiftError();
+        correctLiftCurrentDraw();
         if (liftTargetPosition >= leftLift.getCurrentPosition()) {
             leftLift.setVelocityPIDFCoefficients(LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.p,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.i,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.d,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.f);
             rightLift.setVelocityPIDFCoefficients(LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.p,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.i,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.d,LIFT_UP_VELOCITY_PIDF_COEFFICIENTS.f);
@@ -456,18 +458,27 @@ public class TwoPersonDrive extends LinearOpMode {
             rightLift.setPositionPIDFCoefficients(LIFT_DOWN_POSITION_PIDF_COEFFICIENTS.p);
         }
         leftLift.setTargetPosition(liftTargetPosition);
-        rightLift.setTargetPosition(liftTargetPosition-rightLiftError);
+        rightLift.setTargetPosition(rightLiftError);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftLift.setTargetPosition(liftTargetPosition);
-        rightLift.setTargetPosition(liftTargetPosition-rightLiftError);
+        rightLift.setTargetPosition(rightLiftError);
         leftLift.setVelocity(LIFT_VELOCITY);
         rightLift.setVelocity(LIFT_VELOCITY);
     }
 
     public void correctLiftError() {
-        if ((leftLift.getCurrentPosition()<=liftTargetPosition+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=liftTargetPosition-LIFT_TOLERANCE)) {
-            rightLiftError = leftLift.getCurrentPosition()-rightLift.getCurrentPosition();
+        if ((leftLift.getCurrentPosition()<=liftTargetPosition+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=liftTargetPosition-LIFT_TOLERANCE)) {// && leftLift.getVelocity() < LIFT_VELOCITY_TOLERANCE) {
+            rightLiftError = rightLift.getCurrentPosition()+liftTargetPosition-leftLift.getCurrentPosition();
+        }
+    }
+
+    public void correctLiftCurrentDraw() {
+        if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
+            liftTargetPosition -= (leftLift.getTargetPosition()-leftLift.getCurrentPosition())/(Math.abs(leftLift.getTargetPosition()-leftLift.getCurrentPosition()));
+        }
+        if (rightLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
+            rightLiftError -= (rightLift.getTargetPosition()-rightLift.getCurrentPosition())/(Math.abs(rightLift.getTargetPosition()-rightLift.getCurrentPosition()));
         }
     }
 
@@ -523,7 +534,7 @@ public class TwoPersonDrive extends LinearOpMode {
             liftGoing = true;
         }
         if (outtakeSlowPickup && ((System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT) && (System.currentTimeMillis()-clawGrabbingStartTime < LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT))) {
-            if (leftOuttake.getPosition() <= LEFT_OUTTAKE_OUT_POSITION) {
+            if (leftOuttake.getPosition() >= LEFT_OUTTAKE_OUT_POSITION) {
                 leftOuttake.setPosition(leftOuttake.getPosition() - (deltaTimeNano / 1000000000.0) * OUTTAKE_PICK_UP_DEGREES_PER_SECOND * OUTTAKE_DEGREES_TO_SERVO);
                 rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
             } else {
