@@ -95,7 +95,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     private boolean outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
 
-    private int liftTargetPosition, rightLiftError, presetTargetPosition;
+    private int liftTargetPosition, rightLiftError, presetTargetPosition, leftLiftCurrentAdjust = 0, rightLiftCurrentAdjust = 0;
 
     private long resetFoldInStartTime, resetPixelDropStartTime, presetStartTime, clawGrabbingStartTime, intakeOutStartTime, intakeInObstacleStartTime, intakeInStartTime, intakeOutObstacleStartTime, lastFrameTimeNano, deltaTimeNano;
 
@@ -457,12 +457,12 @@ public class TwoPersonDrive extends LinearOpMode {
             leftLift.setPositionPIDFCoefficients(LIFT_DOWN_POSITION_PIDF_COEFFICIENTS.p);
             rightLift.setPositionPIDFCoefficients(LIFT_DOWN_POSITION_PIDF_COEFFICIENTS.p);
         }
-        leftLift.setTargetPosition(liftTargetPosition);
-        rightLift.setTargetPosition(rightLiftError);
+        leftLift.setTargetPosition(liftTargetPosition + leftLiftCurrentAdjust);
+        rightLift.setTargetPosition(rightLiftError + rightLiftCurrentAdjust);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftLift.setTargetPosition(liftTargetPosition);
-        rightLift.setTargetPosition(rightLiftError);
+        leftLift.setTargetPosition(liftTargetPosition + leftLiftCurrentAdjust);
+        rightLift.setTargetPosition(rightLiftError + rightLiftCurrentAdjust);
         leftLift.setVelocity(LIFT_VELOCITY);
         rightLift.setVelocity(LIFT_VELOCITY);
     }
@@ -475,10 +475,14 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public void correctLiftCurrentDraw() {
         if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
-            liftTargetPosition -= (leftLift.getTargetPosition()-leftLift.getCurrentPosition())/(Math.abs(leftLift.getTargetPosition()-leftLift.getCurrentPosition()));
+            leftLiftCurrentAdjust -= (leftLift.getTargetPosition()-leftLift.getCurrentPosition())/(Math.abs(leftLift.getTargetPosition()-leftLift.getCurrentPosition()));
+        } else if (leftLiftCurrentAdjust != 0) {
+            leftLiftCurrentAdjust -= leftLiftCurrentAdjust/Math.abs(leftLiftCurrentAdjust);
         }
         if (rightLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
-            rightLiftError -= (rightLift.getTargetPosition()-rightLift.getCurrentPosition())/(Math.abs(rightLift.getTargetPosition()-rightLift.getCurrentPosition()));
+            rightLiftCurrentAdjust -= (rightLift.getTargetPosition()-rightLift.getCurrentPosition())/(Math.abs(rightLift.getTargetPosition()-rightLift.getCurrentPosition()));
+        } else if (rightLiftCurrentAdjust != 0) {
+            rightLiftCurrentAdjust -= rightLiftCurrentAdjust/Math.abs(rightLiftCurrentAdjust);
         }
     }
 
@@ -645,9 +649,11 @@ public class TwoPersonDrive extends LinearOpMode {
         telemetryA.addData("left lift current position", leftLift.getCurrentPosition());
         telemetryA.addData("left lift target position", leftLift.getTargetPosition());
         telemetryA.addData("left lift current draw", leftLift.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetryA.addData("left lift current adjust", leftLiftCurrentAdjust);
         telemetryA.addData("right lift current position", rightLift.getCurrentPosition());
         telemetryA.addData("right lift target position", rightLift.getTargetPosition());
         telemetryA.addData("right lift current draw", rightLift.getCurrent(CurrentUnit.MILLIAMPS));
+        telemetryA.addData("right lift current adjust", rightLiftCurrentAdjust);
         telemetryA.addData("delta time nano", deltaTimeNano);
         telemetryA.addData("preset in motion", presetInMotion);
         telemetryA.addData("left lift pidf rtp", leftLift.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION));
