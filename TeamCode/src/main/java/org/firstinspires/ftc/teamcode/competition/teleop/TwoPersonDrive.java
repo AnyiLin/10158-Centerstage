@@ -138,7 +138,7 @@ public class TwoPersonDrive extends LinearOpMode {
         rightLiftError = 0;
         leftLift.setTargetPosition(liftTargetPosition);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightLift.setTargetPosition(liftTargetPosition);
+        rightLift.setTargetPosition(rightLiftError);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftIntake = hardwareMap.get(Servo.class, "leftIntake");
@@ -187,7 +187,7 @@ public class TwoPersonDrive extends LinearOpMode {
         initialize();
 
         waitForStart();
-        lastFrameTimeNano = System.currentTimeMillis();
+        lastFrameTimeNano = System.nanoTime();
         while (opModeIsActive()) {
 
             updateFrameTime();
@@ -363,6 +363,11 @@ public class TwoPersonDrive extends LinearOpMode {
 
             if (!presetInMotion && !resetInMotion) updateLiftMotors();
 
+            if (!presetInMotion && !resetInMotion && gamepad2.right_stick_button) {
+                leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                updateLiftMotors();
+            }
 
             runTelemetry();
         }
@@ -468,19 +473,25 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void correctLiftError() {
-        if ((leftLift.getCurrentPosition()<=liftTargetPosition+LIFT_TOLERANCE&&leftLift.getCurrentPosition()>=liftTargetPosition-LIFT_TOLERANCE)) {// && leftLift.getVelocity() < LIFT_VELOCITY_TOLERANCE) {
-            rightLiftError = rightLift.getCurrentPosition()+liftTargetPosition-leftLift.getCurrentPosition();
-        }
+        rightLiftError = rightLift.getCurrentPosition()+liftTargetPosition-leftLift.getCurrentPosition();
     }
 
     public void correctLiftCurrentDraw() {
-        if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
-            leftLiftCurrentAdjust -= (leftLift.getTargetPosition()-leftLift.getCurrentPosition())/(Math.abs(leftLift.getTargetPosition()-leftLift.getCurrentPosition()));
+        if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>5000) {
+            if (leftLift.getTargetPosition()-leftLift.getCurrentPosition()>0) {
+                leftLiftCurrentAdjust--;
+            } else {
+                leftLiftCurrentAdjust++;
+            }
         } else if (leftLiftCurrentAdjust != 0) {
             leftLiftCurrentAdjust -= leftLiftCurrentAdjust/Math.abs(leftLiftCurrentAdjust);
         }
-        if (rightLift.getCurrent(CurrentUnit.MILLIAMPS)>4000) {
-            rightLiftCurrentAdjust -= (rightLift.getTargetPosition()-rightLift.getCurrentPosition())/(Math.abs(rightLift.getTargetPosition()-rightLift.getCurrentPosition()));
+        if (rightLift.getCurrent(CurrentUnit.MILLIAMPS)>5000) {
+            if (rightLift.getTargetPosition()-rightLift.getCurrentPosition()>0) {
+                rightLiftCurrentAdjust--;
+            } else {
+                rightLiftCurrentAdjust++;
+            }
         } else if (rightLiftCurrentAdjust != 0) {
             rightLiftCurrentAdjust -= rightLiftCurrentAdjust/Math.abs(rightLiftCurrentAdjust);
         }
@@ -566,7 +577,6 @@ public class TwoPersonDrive extends LinearOpMode {
             intakeGoingOutObstacle = false;
             intakeGoingOutObstacleRetract = true;
         }
-
         if (intakeGoingOutObstacleRetract && (System.currentTimeMillis()-intakeOutObstacleStartTime > INTAKE_OBSTACLE_OUT_RETRACT_WAIT + INTAKE_OBSTACLE_OUT_WAIT)) {
             leftIntake.setPosition(LEFT_INTAKE_OUT_POSITION);
             rightIntake.setPosition(RIGHT_INTAKE_OUT_POSITION);
@@ -607,7 +617,7 @@ public class TwoPersonDrive extends LinearOpMode {
             leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
             rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
         }
-        if (leftIntake.getPosition() < LEFT_INTAKE_MIDDLE_POSITION && -gamepad1.right_stick_y < 0) {
+        if ((leftIntake.getPosition() < LEFT_INTAKE_MIDDLE_POSITION && leftIntake.getPosition() > LEFT_INTAKE_IN_POSITION) && -gamepad1.right_stick_y < 0) {
             leftIntake.setPosition(leftIntake.getPosition() + gamepad1.right_stick_y * (deltaTimeNano / 1000000000.0) * INTAKE_CHANGE * INTAKE_DEGREES_TO_SERVO);
             rightIntake.setPosition(1 - leftIntake.getPosition() + RIGHT_INTAKE_OFFSET);
         }

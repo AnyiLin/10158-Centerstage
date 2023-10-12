@@ -11,10 +11,10 @@ public class RobotConstants {
     // absolute max lift extension is 508.
     public static final int
             LIFT_VELOCITY = 1200,
-            LIFT_MAX = 500,
-            LIFT_TOLERANCE = 3,
+            LIFT_MAX = 520,
+            LIFT_TOLERANCE = 4,
             LIFT_VELOCITY_TOLERANCE = 28*4/6,
-            LIFT_GRAB_TOLERANCE = 2,
+            LIFT_GRAB_TOLERANCE = 4,
             TOP_LINE_POSITION = 0,
             MIDDLE_LINE_POSITION = 0,
             BOTTOM_LINE_POSITION = 0,
@@ -22,7 +22,6 @@ public class RobotConstants {
             INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
-            //TODO: set the intake and outtake servo positions as well as claw positions later
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
@@ -82,8 +81,8 @@ public class RobotConstants {
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;
 
     public static final PIDFCoefficients
-            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(21,3,2.5,0),
-            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(25,0,0,0),
+            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(16.5,3.25,0,6.75),
+            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(20,0,0,0),
             LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(10,3,0,0),
             LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(6,0,0,0);
 }
