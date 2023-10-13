@@ -22,6 +22,8 @@ public class RobotConstants {
             INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
+            ROBOT_FRONT_LENGTH = 9,
+            ROBOT_BACK_LENGTH = 11,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
@@ -66,6 +68,7 @@ public class RobotConstants {
             OUTER_CLAW_OPEN_POSITION = 1;
 
     public static final long
+            LIFT_GRAB_TIMEOUT = 500,
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,
             INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
@@ -75,7 +78,7 @@ public class RobotConstants {
             CLAW_CLOSE_WAIT = 200,
             CLAW_LIFT_WAIT = 0,
             LIFT_GO_WAIT = 1000,
-            PRESET_TIMEOUT = 1000,
+            PRESET_TIMEOUT = 700,
             RESET_PIXEL_DROP_WAIT = 300,
             RESET_FOLD_IN_WAIT = 1000,
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;

@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegm
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegment.TrajectorySegment;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.sequencesegment.WaitSegment;
+import org.firstinspires.ftc.teamcode.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LogFiles;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.*;
 
@@ -48,7 +49,7 @@ public class TrajectorySequenceRunner {
 
     private final NanoClock clock;
 
-    private org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence currentTrajectorySequence;
+    private TrajectorySequence currentTrajectorySequence;
     private double currentSegmentStartTime;
     private int currentSegmentIndex;
     private int lastSegmentIndex;
@@ -86,7 +87,7 @@ public class TrajectorySequenceRunner {
         dashboard.setTelemetryTransmissionInterval(25);
     }
 
-    public void followTrajectorySequenceAsync(org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence trajectorySequence) {
+    public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
         currentTrajectorySequence = trajectorySequence;
         currentSegmentStartTime = clock.seconds();
         currentSegmentIndex = 0;
@@ -234,7 +235,7 @@ public class TrajectorySequenceRunner {
 
     private void draw(
             Canvas fieldOverlay,
-            org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence sequence, SequenceSegment currentSegment,
+            TrajectorySequence sequence, SequenceSegment currentSegment,
             Pose2d targetPose, Pose2d poseEstimate
     ) {
         if (sequence != null) {
@@ -245,7 +246,7 @@ public class TrajectorySequenceRunner {
                     fieldOverlay.setStrokeWidth(1);
                     fieldOverlay.setStroke(COLOR_INACTIVE_TRAJECTORY);
 
-                    org.firstinspires.ftc.teamcode.util.DashboardUtil.drawSampledPath(fieldOverlay, ((TrajectorySegment) segment).getTrajectory().getPath());
+                    DashboardUtil.drawSampledPath(fieldOverlay, ((TrajectorySegment) segment).getTrajectory().getPath());
                 } else if (segment instanceof TurnSegment) {
                     Pose2d pose = segment.getStartPose();
 
@@ -268,7 +269,7 @@ public class TrajectorySequenceRunner {
                 fieldOverlay.setStrokeWidth(1);
                 fieldOverlay.setStroke(COLOR_ACTIVE_TRAJECTORY);
 
-                org.firstinspires.ftc.teamcode.util.DashboardUtil.drawSampledPath(fieldOverlay, currentTrajectory.getPath());
+                DashboardUtil.drawSampledPath(fieldOverlay, currentTrajectory.getPath());
             } else if (currentSegment instanceof TurnSegment) {
                 Pose2d pose = currentSegment.getStartPose();
 
@@ -286,14 +287,14 @@ public class TrajectorySequenceRunner {
         if (targetPose != null) {
             fieldOverlay.setStrokeWidth(1);
             fieldOverlay.setStroke("#4CAF50");
-            org.firstinspires.ftc.teamcode.util.DashboardUtil.drawRobot(fieldOverlay, targetPose);
+            DashboardUtil.drawRobot(fieldOverlay, targetPose);
         }
 
         fieldOverlay.setStroke("#3F51B5");
-        org.firstinspires.ftc.teamcode.util.DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
+        DashboardUtil.drawPoseHistory(fieldOverlay, poseHistory);
 
         fieldOverlay.setStroke("#3F51B5");
-        org.firstinspires.ftc.teamcode.util.DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
+        DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
     }
 
     public Pose2d getLastPoseError() {

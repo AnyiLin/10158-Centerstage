@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.competition.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -16,15 +20,19 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "Red Right Outer Auto", group = "Autonomous")
-public class RedRightOuterAuto extends LinearOpMode {
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftLift, rightLift, intake;
+@Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
+public class RedRightInnerAuto extends LinearOpMode {
 
-    private Servo leftIntake, rightIntake, leftOuttake, rightOuttake, outerClaw, innerClaw;
+    private TwoPersonDrive twoPersonDrive = new TwoPersonDrive();
+
+    private DcMotorEx leftFront = twoPersonDrive.leftFront, leftRear = twoPersonDrive.leftRear, rightFront = twoPersonDrive.rightFront, rightRear = twoPersonDrive.rightRear, leftLift = twoPersonDrive.leftFront, rightLift = twoPersonDrive.rightLift, intake = twoPersonDrive.intake;
+
+    private Servo leftIntake = twoPersonDrive.leftIntake, rightIntake = twoPersonDrive.rightIntake, leftOuttake = twoPersonDrive.leftOuttake, rightOuttake = twoPersonDrive.rightOuttake, outerClaw = twoPersonDrive.outerClaw, innerClaw = twoPersonDrive.innerClaw;
 
     private final int
             LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
             LIFT_GRAB_TOLERANCE = RobotConstants.LIFT_GRAB_TOLERANCE,
+            LIFT_VELOCITY_TOLERANCE = RobotConstants.LIFT_VELOCITY_TOLERANCE,
             FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
             REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
             LIFT_MAX = RobotConstants.LIFT_MAX,
@@ -36,6 +44,8 @@ public class RedRightOuterAuto extends LinearOpMode {
             INTAKE_VELOCITY = RobotConstants.INTAKE_VELOCITY;
 
     private final double
+            ROBOT_FRONT_LENGTH = RobotConstants.ROBOT_FRONT_LENGTH,
+            ROBOT_BACK_LENGTH = RobotConstants.ROBOT_BACK_LENGTH,
             INTAKE_CHANGE = 40, // this is set to degrees/second
             OUTTAKE_CHANGE = 40, // this is set to degrees/second
             OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
@@ -70,6 +80,7 @@ public class RedRightOuterAuto extends LinearOpMode {
             OUTTAKE_PICK_UP_DEGREES_PER_SECOND = RobotConstants.OUTTAKE_PICK_UP_DEGREES_PER_SECOND;
 
     private final long
+            LIFT_GRAB_TIMEOUT = RobotConstants.LIFT_GRAB_TIMEOUT,
             INTAKE_IN_WAIT = RobotConstants.INTAKE_IN_WAIT,
             INTAKE_OBSTACLE_OUT_WAIT = RobotConstants.INTAKE_OBSTACLE_OUT_WAIT,
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = RobotConstants.INTAKE_OBSTACLE_OUT_RETRACT_WAIT,
@@ -90,11 +101,11 @@ public class RedRightOuterAuto extends LinearOpMode {
             LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS,
             LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_POSITION_PIDF_COEFFICIENTS;
 
-    private boolean outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
+    private boolean outtakeSlowPickup = twoPersonDrive.outtakeSlowPickup, outerClawButtonPressed = twoPersonDrive.outerClawButtonPressed, innerClawButtonPressed = twoPersonDrive.innerClawButtonPressed, liftGoing = twoPersonDrive.liftGoing, resetFoldIn = twoPersonDrive.resetFoldIn, resetPixelDrop = twoPersonDrive.resetPixelDrop, liftInGrabbingPosition = twoPersonDrive.liftInGrabbingPosition, resetInMotion = twoPersonDrive.resetInMotion, presetLifting = twoPersonDrive.presetLifting, clawLifting = twoPersonDrive.clawLifting, clawClosing = twoPersonDrive.clawClosing, outtakeIn = twoPersonDrive.outtakeIn, intakeIn = twoPersonDrive.intakeIn, intakeGoingOut = twoPersonDrive.intakeGoingOut, intakeGoingInObstacle = twoPersonDrive.intakeGoingInObstacle, intakeGoingInObstacleFoldUp = twoPersonDrive.intakeGoingInObstacleFoldUp, intakeGoingIn = twoPersonDrive.intakeGoingIn, intakeGoingOutObstacle = twoPersonDrive.intakeGoingOutObstacle, intakeGoingOutObstacleRetract = twoPersonDrive.intakeGoingOutObstacleRetract, clawGrabbing = twoPersonDrive.clawGrabbing, presetInMotion = twoPersonDrive.presetInMotion, presetQueue = twoPersonDrive.presetQueue;
 
-    private int liftTargetPosition, rightLiftError, presetTargetPosition;
+    private int leftLiftTargetPosition = twoPersonDrive.leftLiftTargetPosition, rightLiftTargetPosition = twoPersonDrive.rightLiftTargetPosition, presetTargetPosition = twoPersonDrive.presetTargetPosition, leftLiftCurrentAdjust = twoPersonDrive.leftLiftCurrentAdjust, rightLiftCurrentAdjust = twoPersonDrive.rightLiftCurrentAdjust;
 
-    private long resetFoldInStartTime, resetPixelDropStartTime, presetStartTime, clawGrabbingStartTime, intakeOutStartTime, intakeInObstacleStartTime, intakeInStartTime, intakeOutObstacleStartTime, lastFrameTimeNano, deltaTimeNano;
+    private long liftGrabStartTime = twoPersonDrive.liftGrabStartTime, resetFoldInStartTime = twoPersonDrive.resetFoldInStartTime, resetPixelDropStartTime = twoPersonDrive.resetPixelDropStartTime, presetStartTime = twoPersonDrive.presetStartTime, clawGrabbingStartTime = twoPersonDrive.clawGrabbingStartTime, intakeOutStartTime = twoPersonDrive.intakeOutStartTime, intakeInObstacleStartTime = twoPersonDrive.intakeInObstacleStartTime, intakeInStartTime = twoPersonDrive.intakeInStartTime, intakeOutObstacleStartTime = twoPersonDrive.intakeOutObstacleStartTime, lastFrameTimeNano = twoPersonDrive.lastFrameTimeNano, deltaTimeNano = twoPersonDrive.deltaTimeNano;
 
     private OpenCvCamera camera;
 
@@ -124,13 +135,54 @@ public class RedRightOuterAuto extends LinearOpMode {
     private Pose2d redMiddleBackdrop = new Pose2d(60.75, -72+22.5+12.75);
     private Pose2d redRightBackdrop = new Pose2d(60.75, -72+22.5+6.625);
 
+    private Pose2d spikeMarkGoalPose, backdropGoalPose;
+
     // TODO: adjust this for each auto
-    private Pose2d startPose = new Pose2d(-48+12,-72+8.25, Math.toRadians(90)); // TODO: angle may or may not be right
+    private Pose2d startPose = new Pose2d(12,-72+8.25, Math.toRadians(0)); // TODO: angle may or may not be right
+
+    private SampleMecanumDrive drive;
+
+    private TrajectorySequence scoreSpikeMark;
+
+    public void setBackdropGoalPose() {
+        switch (navigation) {
+            case "left":
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
+                backdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, redLeftBackdrop.getY(), Math.toRadians(180));
+                break;
+            case "middle":
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH, Math.toRadians(90));
+                backdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, redMiddleBackdrop.getY(), Math.toRadians(180));
+                break;
+            case "right":
+                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
+                backdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, redRightBackdrop.getY(), Math.toRadians(180));
+                break;
+        }
+    }
 
     public void buildTrajectories() {
+        drive = new SampleMecanumDrive(hardwareMap);
+
+        drive.setPoseEstimate(startPose);
+
+        // this does the scoring on the spike mark at the start of auto
+        scoreSpikeMark = drive.trajectorySequenceBuilder(startPose)
+                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.innerClaw.setPosition(INNER_CLAW_CLOSE_POSITION)) // close inner claw
+                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_CLOSE_POSITION)) // close outer claw
+                .lineToConstantHeading(new Vector2d(12, -36-11.5))
+                .lineToLinearHeading(spikeMarkGoalPose) // goes to the red spike mark location
+                /**.lineToConstantHeading(new Vector2d(12, -36-11.5))
+                .splineTo(new Vector2d(40, -24), Math.toRadians(180))
+                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0))
+                .splineToLinearHeading(backdropGoalPose, backdropGoalPose.getHeading())
+                 **/
+                .build();
     }
 
     public void initialize() {
+        twoPersonDrive.hardwareMap = hardwareMap;
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "camera"), cameraMonitorViewId);
@@ -151,77 +203,15 @@ public class RedRightOuterAuto extends LinearOpMode {
             }
         });
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-        leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
-        rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
-
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        intake.setVelocity(0);
-
-        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftTargetPosition = 0;
-        rightLiftError = 0;
-        leftLift.setTargetPosition(liftTargetPosition);
-        leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightLift.setTargetPosition(liftTargetPosition);
-        rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        leftIntake = hardwareMap.get(Servo.class, "leftIntake");
-        rightIntake = hardwareMap.get(Servo.class, "rightIntake");
-        leftOuttake = hardwareMap.get(Servo.class, "leftOuttake");
-        rightOuttake = hardwareMap.get(Servo.class, "rightOuttake");
-        outerClaw = hardwareMap.get(Servo.class, "outerClaw");
-        innerClaw = hardwareMap.get(Servo.class, "innerClaw");
-
-        leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
-        rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
-        outtakeIn = true;
-        intakeIn = true;
-
-        sleep(500);
-
-        leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
-        rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
-        outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
-        innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
-
-        sleep(1500);
-
-        leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
-        rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
-
-
+        twoPersonDrive.initialize();
     }
 
     public void autonomous() {
-
+        drive.followTrajectorySequence(scoreSpikeMark );
     }
 
     @Override
     public void runOpMode() {
-        buildTrajectories();
 
         initialize();
 
@@ -231,6 +221,8 @@ public class RedRightOuterAuto extends LinearOpMode {
             telemetry.update();
         }
         camera.stopStreaming();
+        setBackdropGoalPose();
+        buildTrajectories();
 
         if (isStopRequested()) return;
         if (!isStopRequested()) autonomous(); // can't be too sure that we need to stop!

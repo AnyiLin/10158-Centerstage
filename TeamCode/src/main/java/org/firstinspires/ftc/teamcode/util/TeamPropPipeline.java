@@ -14,7 +14,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private int leftTotal, middleTotal, rightTotal;
 
-    private String navigation;
+    private String navigation = "middle";
 
     private boolean draw = true;
 
