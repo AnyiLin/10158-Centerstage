@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.competition.autonomous;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.profile.VelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -21,13 +27,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
-public class RedRightInnerAuto extends LinearOpMode {
+public class RedRightInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive = new TwoPersonDrive();
-
-    private DcMotorEx leftFront = twoPersonDrive.leftFront, leftRear = twoPersonDrive.leftRear, rightFront = twoPersonDrive.rightFront, rightRear = twoPersonDrive.rightRear, leftLift = twoPersonDrive.leftFront, rightLift = twoPersonDrive.rightLift, intake = twoPersonDrive.intake;
-
-    private Servo leftIntake = twoPersonDrive.leftIntake, rightIntake = twoPersonDrive.rightIntake, leftOuttake = twoPersonDrive.leftOuttake, rightOuttake = twoPersonDrive.rightOuttake, outerClaw = twoPersonDrive.outerClaw, innerClaw = twoPersonDrive.innerClaw;
 
     private final int
             LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
@@ -101,12 +103,6 @@ public class RedRightInnerAuto extends LinearOpMode {
             LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS,
             LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_POSITION_PIDF_COEFFICIENTS;
 
-    private boolean outtakeSlowPickup = twoPersonDrive.outtakeSlowPickup, outerClawButtonPressed = twoPersonDrive.outerClawButtonPressed, innerClawButtonPressed = twoPersonDrive.innerClawButtonPressed, liftGoing = twoPersonDrive.liftGoing, resetFoldIn = twoPersonDrive.resetFoldIn, resetPixelDrop = twoPersonDrive.resetPixelDrop, liftInGrabbingPosition = twoPersonDrive.liftInGrabbingPosition, resetInMotion = twoPersonDrive.resetInMotion, presetLifting = twoPersonDrive.presetLifting, clawLifting = twoPersonDrive.clawLifting, clawClosing = twoPersonDrive.clawClosing, outtakeIn = twoPersonDrive.outtakeIn, intakeIn = twoPersonDrive.intakeIn, intakeGoingOut = twoPersonDrive.intakeGoingOut, intakeGoingInObstacle = twoPersonDrive.intakeGoingInObstacle, intakeGoingInObstacleFoldUp = twoPersonDrive.intakeGoingInObstacleFoldUp, intakeGoingIn = twoPersonDrive.intakeGoingIn, intakeGoingOutObstacle = twoPersonDrive.intakeGoingOutObstacle, intakeGoingOutObstacleRetract = twoPersonDrive.intakeGoingOutObstacleRetract, clawGrabbing = twoPersonDrive.clawGrabbing, presetInMotion = twoPersonDrive.presetInMotion, presetQueue = twoPersonDrive.presetQueue;
-
-    private int leftLiftTargetPosition = twoPersonDrive.leftLiftTargetPosition, rightLiftTargetPosition = twoPersonDrive.rightLiftTargetPosition, presetTargetPosition = twoPersonDrive.presetTargetPosition, leftLiftCurrentAdjust = twoPersonDrive.leftLiftCurrentAdjust, rightLiftCurrentAdjust = twoPersonDrive.rightLiftCurrentAdjust;
-
-    private long liftGrabStartTime = twoPersonDrive.liftGrabStartTime, resetFoldInStartTime = twoPersonDrive.resetFoldInStartTime, resetPixelDropStartTime = twoPersonDrive.resetPixelDropStartTime, presetStartTime = twoPersonDrive.presetStartTime, clawGrabbingStartTime = twoPersonDrive.clawGrabbingStartTime, intakeOutStartTime = twoPersonDrive.intakeOutStartTime, intakeInObstacleStartTime = twoPersonDrive.intakeInObstacleStartTime, intakeInStartTime = twoPersonDrive.intakeInStartTime, intakeOutObstacleStartTime = twoPersonDrive.intakeOutObstacleStartTime, lastFrameTimeNano = twoPersonDrive.lastFrameTimeNano, deltaTimeNano = twoPersonDrive.deltaTimeNano;
-
     private OpenCvCamera camera;
 
     private TeamPropPipeline teamPropPipeline;
@@ -138,24 +134,33 @@ public class RedRightInnerAuto extends LinearOpMode {
     private Pose2d spikeMarkGoalPose, backdropGoalPose;
 
     // TODO: adjust this for each auto
-    private Pose2d startPose = new Pose2d(12,-72+8.25, Math.toRadians(0)); // TODO: angle may or may not be right
+    private Pose2d startPose = new Pose2d(12,-72+8.25, Math.toRadians(90));
 
     private SampleMecanumDrive drive;
 
-    private TrajectorySequence scoreSpikeMark;
+    private TrajectorySequence scoreSpikeMark, park;
+
+    // these are auto specific timings and booleans
+    private boolean atBackdrop, runningTrajectory;
+
+    private long atBackdropStartTime;
+
+    private final long BACKDROP_WAIT_TIME = 1500;
+
+    private int trajectoryNumber;
 
     public void setBackdropGoalPose() {
         switch (navigation) {
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), 1+redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
                 backdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, redLeftBackdrop.getY(), Math.toRadians(180));
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH, Math.toRadians(90));
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), 1+redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1, Math.toRadians(90));
                 backdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, redMiddleBackdrop.getY(), Math.toRadians(180));
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
+                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), -1+redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
                 backdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, redRightBackdrop.getY(), Math.toRadians(180));
                 break;
         }
@@ -168,15 +173,20 @@ public class RedRightInnerAuto extends LinearOpMode {
 
         // this does the scoring on the spike mark at the start of auto
         scoreSpikeMark = drive.trajectorySequenceBuilder(startPose)
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.innerClaw.setPosition(INNER_CLAW_CLOSE_POSITION)) // close inner claw
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_CLOSE_POSITION)) // close outer claw
+                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
+                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
                 .lineToConstantHeading(new Vector2d(12, -36-11.5))
+                .resetConstraints()
                 .lineToLinearHeading(spikeMarkGoalPose) // goes to the red spike mark location
-                /**.lineToConstantHeading(new Vector2d(12, -36-11.5))
-                .splineTo(new Vector2d(40, -24), Math.toRadians(180))
+                .lineToConstantHeading(new Vector2d(12, -36-11.5))
+                .lineToLinearHeading(new Pose2d(12, -56, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(40, -56, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0))
-                .splineToLinearHeading(backdropGoalPose, backdropGoalPose.getHeading())
-                 **/
+                .lineToLinearHeading(backdropGoalPose)
+                .build();
+
+        park = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
+                .lineToConstantHeading(new Vector2d(46, -62))
                 .build();
     }
 
@@ -206,26 +216,61 @@ public class RedRightInnerAuto extends LinearOpMode {
         twoPersonDrive.initialize();
     }
 
-    public void autonomous() {
-        drive.followTrajectorySequence(scoreSpikeMark );
+    @Override
+    public void loop() {
+        drive.update();
+        twoPersonDrive.asyncTimers();
+
+        if (!drive.isBusy() && trajectoryNumber == 0) {
+            atBackdrop = true;
+            atBackdropStartTime = System.currentTimeMillis();
+        }
+        if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
+            if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
+        }
+        if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+500) {
+            // after scoring on the backdrop, do something else
+            drive.followTrajectorySequenceAsync(park);
+            atBackdrop = false;
+        }
+
+        if (!drive.isBusy() && runningTrajectory) {
+            runningTrajectory = false;
+            trajectoryNumber++;
+        }
     }
 
     @Override
-    public void runOpMode() {
-
+    public void init() {
         initialize();
+    }
 
-        while (!isStarted() && !isStopRequested()) {
-            navigation = teamPropPipeline.getNavigation();
-            telemetry.addData("Navigation:", navigation);
-            telemetry.update();
-        }
+    @Override
+    public void init_loop() {
+        super.init_loop();
+        navigation = teamPropPipeline.getNavigation();
+        telemetry.addData("Navigation:", navigation);
+        telemetry.update();
+
+    }
+
+    @Override
+    public void start() {
+        super.start();
         camera.stopStreaming();
         setBackdropGoalPose();
         buildTrajectories();
+        drive.followTrajectorySequenceAsync(scoreSpikeMark);
+        runningTrajectory = true;
+    }
 
-        if (isStopRequested()) return;
-        if (!isStopRequested()) autonomous(); // can't be too sure that we need to stop!
-
+    @Override
+    public void stop() {
+        super.stop();
+        if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
     }
 }
+
+/**
+ * 8==D
+ */

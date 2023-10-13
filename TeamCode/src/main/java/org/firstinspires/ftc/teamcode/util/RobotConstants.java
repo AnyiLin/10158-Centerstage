@@ -18,12 +18,12 @@ public class RobotConstants {
             TOP_LINE_POSITION = 0,
             MIDDLE_LINE_POSITION = 0,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 43,
+            LIFT_GRAB_POSITION = 60,
             INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
             ROBOT_FRONT_LENGTH = 9,
-            ROBOT_BACK_LENGTH = 11,
+            ROBOT_BACK_LENGTH = 10,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
@@ -42,15 +42,15 @@ public class RobotConstants {
             INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
 
             RIGHT_OUTTAKE_OFFSET = 0,
-            LEFT_OUTTAKE_OUT_POSITION = 0.45,
+            LEFT_OUTTAKE_OUT_POSITION = 0.4,
             RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_IN_POSITION= 0.83,
             RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
-            LEFT_OUTTAKE_GRAB_POSITION= 0.97,
+            LEFT_OUTTAKE_GRAB_POSITION= 0.965,
             RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_AVOID_POSITION = 0.6,
             RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 140,
+            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 150,
 
 
             // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
@@ -84,8 +84,8 @@ public class RobotConstants {
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;
 
     public static final PIDFCoefficients
-            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(16.5,3.25,0,6.75),
+            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(16.5,2,0,7),
             LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(20,0,0,0),
-            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(10,3,0,0),
-            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(6,0,0,0);
+            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(20,2,0,-10),
+            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(8,0,0,0);
 }

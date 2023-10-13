@@ -38,7 +38,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public final double
             INTAKE_CHANGE = 40, // this is set to degrees/second
-            OUTTAKE_CHANGE = 40, // this is set to degrees/second
+            OUTTAKE_CHANGE = 60, // this is set to degrees/second
             OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
             RIGHT_INTAKE_OFFSET = RobotConstants.RIGHT_INTAKE_OFFSET,
             LEFT_INTAKE_OUT_POSITION = RobotConstants.LEFT_INTAKE_OUT_POSITION,
@@ -131,6 +131,8 @@ public class TwoPersonDrive extends LinearOpMode {
 
         intake.setVelocity(0);
 
+        leftLift.setTargetPositionTolerance(LIFT_TOLERANCE);
+        rightLift.setTargetPositionTolerance(LIFT_TOLERANCE);
         leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftLiftTargetPosition = 0;
@@ -439,7 +441,7 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void updateLiftMotors() {
-        if (leftLiftTargetPosition < 0) leftLiftTargetPosition = 0;
+        if (leftLiftTargetPosition < 0 && !presetInMotion) leftLiftTargetPosition = 0;
         if (leftLiftTargetPosition > LIFT_MAX) leftLiftTargetPosition = LIFT_MAX;
         correctLiftError();
         correctLiftCurrentDraw();
@@ -458,6 +460,8 @@ public class TwoPersonDrive extends LinearOpMode {
         rightLift.setTargetPosition(rightLiftTargetPosition + rightLiftCurrentAdjust);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftLift.setTargetPositionTolerance(LIFT_TOLERANCE);
+        rightLift.setTargetPositionTolerance(LIFT_TOLERANCE);
         leftLift.setTargetPosition(leftLiftTargetPosition + leftLiftCurrentAdjust);
         rightLift.setTargetPosition(rightLiftTargetPosition + rightLiftCurrentAdjust);
         leftLift.setVelocity(LIFT_VELOCITY);
@@ -530,12 +534,12 @@ public class TwoPersonDrive extends LinearOpMode {
             clawClosing = true;
         }
         if (clawClosing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = 0;
-            updateLiftMotors();
             clawClosing = false;
             clawLifting = true;
         }
         if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
+            leftLiftTargetPosition = -40;
+            updateLiftMotors();
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;
