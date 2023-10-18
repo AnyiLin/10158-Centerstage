@@ -31,6 +31,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.roadrunner.util.LynxModuleUtil;
 
 import java.util.ArrayList;
@@ -54,16 +55,16 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.6);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(16, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(15, 0.65, 0.5);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(15, 1, 2.25);
 
-    public static double LATERAL_MULTIPLIER = 6;
+    public static double LATERAL_MULTIPLIER = 1;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 3;
+    public static double OMEGA_WEIGHT = 1;
 
-    private org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner trajectorySequenceRunner;
+    private TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);

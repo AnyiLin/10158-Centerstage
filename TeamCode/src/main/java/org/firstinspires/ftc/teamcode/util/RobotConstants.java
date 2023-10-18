@@ -15,14 +15,14 @@ public class RobotConstants {
             LIFT_TOLERANCE = 4,
             LIFT_VELOCITY_TOLERANCE = 28*4/6,
             LIFT_GRAB_TOLERANCE = 4,
-            TOP_LINE_POSITION = 0,
-            MIDDLE_LINE_POSITION = 0,
+            TOP_LINE_POSITION = 190,
+            MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
             LIFT_GRAB_POSITION = 60,
             INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
 
     public static final double
-            ROBOT_FRONT_LENGTH = 9,
+            ROBOT_FRONT_LENGTH = 8,
             ROBOT_BACK_LENGTH = 10,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
@@ -42,7 +42,7 @@ public class RobotConstants {
             INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
 
             RIGHT_OUTTAKE_OFFSET = 0,
-            LEFT_OUTTAKE_OUT_POSITION = 0.4,
+            LEFT_OUTTAKE_OUT_POSITION = 0.43,
             RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_IN_POSITION= 0.83,
             RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
@@ -65,7 +65,10 @@ public class RobotConstants {
 
             //Claw Open Positions
             INNER_CLAW_OPEN_POSITION = 0.3,
-            OUTER_CLAW_OPEN_POSITION = 1;
+            OUTER_CLAW_OPEN_POSITION = 1,
+
+            PLANE_LAUNCHER_LAUNCH = 0.05,
+            PLANE_LAUNCHER_HOLD = 0.2;
 
     public static final long
             LIFT_GRAB_TIMEOUT = 500,
@@ -84,8 +87,8 @@ public class RobotConstants {
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;
 
     public static final PIDFCoefficients
-            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(16.5,2,0,7),
-            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(20,0,0,0),
-            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(20,2,0,-10),
-            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(8,0,0,0);
+            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(9,6,0,4),
+            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(10,0,0,0),
+            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(10,2,0,-4.5),
+            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(5,0,0,0);
 }
