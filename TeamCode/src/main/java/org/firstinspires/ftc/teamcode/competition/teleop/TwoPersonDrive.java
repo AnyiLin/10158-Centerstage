@@ -194,9 +194,9 @@ public class TwoPersonDrive extends LinearOpMode {
             if (gamepad2.right_stick_x!=0) {
                 x = gamepad2.right_stick_x*0.5/throttle;
             } else if (gamepad1.left_bumper) {
-                x = -1;
-            } else if (gamepad1.right_bumper) {
                 x = 1;
+            } else if (gamepad1.right_bumper) {
+                x = -1;
             }
 
             double rx = 0;
@@ -250,6 +250,7 @@ public class TwoPersonDrive extends LinearOpMode {
                     }
                 } else if (gamepad1.a || gamepad1.cross) {
                     if (intakeIn) {
+                        resetPreset();
                         intakeIn = false;
                         if (outtakeIn) {
                             if (!intakeGoingOutObstacle && !intakeGoingOutObstacleRetract) {
@@ -418,6 +419,7 @@ public class TwoPersonDrive extends LinearOpMode {
         presetQueue = false;
         presetLifting = false;
         presetInMotion = false;
+        /*
         intakeGoingInObstacle = false;
         intakeGoingInObstacleFoldUp = false;
         intakeGoingIn = false;
@@ -425,6 +427,7 @@ public class TwoPersonDrive extends LinearOpMode {
         intakeGoingOutObstacle = false;
         intakeGoingOutObstacleRetract = false;
         liftInGrabbingPosition = true;
+         */
         liftGoing = false;
         clawGrabbing = false;
         clawClosing = false;
@@ -434,6 +437,8 @@ public class TwoPersonDrive extends LinearOpMode {
             innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
             outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
         }
+
+        outtakeIn = true;
 
         resetPixelDrop = true;
         resetPixelDropStartTime = System.currentTimeMillis();
@@ -477,6 +482,8 @@ public class TwoPersonDrive extends LinearOpMode {
         rightLift.setTargetPositionTolerance(LIFT_TOLERANCE);
         leftLift.setVelocity(LIFT_VELOCITY);
         rightLift.setVelocity(LIFT_VELOCITY);
+        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void correctLiftError() {
@@ -509,15 +516,19 @@ public class TwoPersonDrive extends LinearOpMode {
             resetPixelDrop = false;
             leftLiftTargetPosition = 0;
             updateLiftMotors();
-            outtakeIn = true;
+            //outtakeIn = true;
             if (!intakeIn) {
                 intakeIn = true;
                 leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
                 rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
                 leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
                 rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+                /*
                 resetFoldIn = true;
                 resetFoldInStartTime = System.currentTimeMillis();
+                 */
+                resetInMotion = false;
+                adjustingLiftZero = true;
             } else {
                 leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
                 rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
@@ -525,6 +536,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 adjustingLiftZero = true;
             }
         }
+        /*
         if (resetFoldIn && (System.currentTimeMillis()-resetFoldInStartTime > RESET_FOLD_IN_WAIT)) {
             resetFoldIn = false;
             leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
@@ -532,19 +544,45 @@ public class TwoPersonDrive extends LinearOpMode {
             resetInMotion = false;
             adjustingLiftZero = true;
         }
-        if (adjustingLiftZero && ((leftLift.getCurrentPosition()<=0) || leftLift.getMode().equals(DcMotor.RunMode.RUN_WITHOUT_ENCODER))) {
+         */
+        if (adjustingLiftZero && ((leftLift.getCurrentPosition()<=0) || leftLift.getMode().equals(DcMotor.RunMode.RUN_WITHOUT_ENCODER)||leftLift.getMode().equals(DcMotor.RunMode.STOP_AND_RESET_ENCODER))) {
+            if (leftLift.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
+                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                leftLift.setPower(-0.2);
+                rightLift.setPower(-0.2);
+                leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            }
             leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>1000){
-                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                leftLift.setPower(-0.1);
-                rightLift.setPower(-0.1);
+            if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>800){
+                if (leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
+                    leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    leftLift.setPower(0.2);
+                    rightLift.setPower(0.2);
+                    leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                } else {
+                    if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>1000) adjustingLiftZero = false;
+                }
             } else {
-                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                leftLift.setPower(0.3);
-                rightLift.setPower(0.3);
+                if (leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
+                    leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    leftLift.setPower(-0.2);
+                    rightLift.setPower(-0.2);
+                    leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                    rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                } else {
+                    leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    leftLift.setPower(0.2);
+                    rightLift.setPower(0.2);
+                    leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                }
             }
         }
 
@@ -565,9 +603,9 @@ public class TwoPersonDrive extends LinearOpMode {
             clawClosing = false;
             clawLifting = true;
         }
-        if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = -40;
-            //updateLiftMotors();
+        if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
+            leftLiftTargetPosition = -60;
+            updateLiftMotors();
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;
@@ -581,7 +619,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
             }
         }
-        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
+        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
             liftGoing = false;
             outtakeSlowPickup = false;
             leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);

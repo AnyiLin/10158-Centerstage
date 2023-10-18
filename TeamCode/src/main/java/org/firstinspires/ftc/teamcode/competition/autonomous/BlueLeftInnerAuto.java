@@ -123,7 +123,7 @@ public class BlueLeftInnerAuto extends OpMode {
     private Pose2d redMiddleBackdrop = new Pose2d(60.75, -72+22.5+12.75);
     private Pose2d redRightBackdrop = new Pose2d(60.75, -72+22.5+6.625);
 
-    private Pose2d spikeMarkGoalPose, backdropGoalPose;
+    private Pose2d spikeMarkGoalPose, backdropGoalPose, spikeMarkReturnPosition;
 
     // TODO: adjust this for each auto
     private Pose2d startPose = new Pose2d(12,72-8.25, Math.toRadians(270));
@@ -145,15 +145,18 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             case "left":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), blueLeftSideLeftSpikeMark.getY()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(360-45));
-                backdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 2+blueLeftBackdrop.getY(), Math.toRadians(180));
+                backdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 1.25+blueLeftBackdrop.getY(), Math.toRadians(180));
+                spikeMarkReturnPosition = new Pose2d(14, 36+11.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX(), 1+blueLeftSideMiddleSpikeMark.getY()+ROBOT_FRONT_LENGTH+1, Math.toRadians(270));
-                backdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 2+blueMiddleBackdrop.getY(), Math.toRadians(180));
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX(), blueLeftSideMiddleSpikeMark.getY()+ROBOT_FRONT_LENGTH+1.5, Math.toRadians(270));
+                backdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 1.25+blueMiddleBackdrop.getY(), Math.toRadians(180));
+                spikeMarkReturnPosition = new Pose2d(12, 36+11.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), blueLeftSideRightSpikeMark.getY()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(360-135));
-                backdropGoalPose = new Pose2d(blueRightBackdrop.getX()-ROBOT_BACK_LENGTH, -2+blueRightBackdrop.getY(), Math.toRadians(180));
+                backdropGoalPose = new Pose2d(blueRightBackdrop.getX()-ROBOT_BACK_LENGTH, -1.25+blueRightBackdrop.getY(), Math.toRadians(180));
+                spikeMarkReturnPosition = new Pose2d(12, 36+11.5);
                 break;
         }
     }
@@ -168,10 +171,10 @@ public class BlueLeftInnerAuto extends OpMode {
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
                 .lineToConstantHeading(new Vector2d(12, 36+11.5))
-                .resetConstraints()
                 .lineToLinearHeading(spikeMarkGoalPose) // goes to the blue spike mark location
-                .lineToConstantHeading(new Vector2d(12, 36+11.5))
-                .lineToLinearHeading(new Pose2d(12, 56, Math.toRadians(270)))
+                .resetConstraints()
+                .lineToConstantHeading(new Vector2d(spikeMarkReturnPosition.getX(), spikeMarkReturnPosition.getY()))
+                .lineToLinearHeading(new Pose2d(16, 56, Math.toRadians(270)))
                 .lineToLinearHeading(new Pose2d(40, 56, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0))
                 .lineToLinearHeading(backdropGoalPose)
@@ -179,7 +182,7 @@ public class BlueLeftInnerAuto extends OpMode {
 
         park = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
                 .lineToConstantHeading(new Vector2d(46, blueMiddleBackdrop.getY()))
-                .lineToConstantHeading(new Vector2d(46, 62))
+                .lineToConstantHeading(new Vector2d(46, 60))
                 .build();
     }
 
