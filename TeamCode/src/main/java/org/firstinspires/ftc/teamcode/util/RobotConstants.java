@@ -50,7 +50,7 @@ public class RobotConstants {
             RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_AVOID_POSITION = 0.6,
             RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 70,
+            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 170,
 
 
             // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]

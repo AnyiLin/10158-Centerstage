@@ -427,6 +427,7 @@ public class TwoPersonDrive extends LinearOpMode {
         intakeGoingOutObstacle = false;
         intakeGoingOutObstacleRetract = false;
          */
+        resetFoldIn = false;
         liftInGrabbingPosition = true;
         liftGoing = false;
         clawGrabbing = false;
@@ -455,7 +456,7 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void updateLiftMotors() {
-        if (leftLiftTargetPosition < 0 && !presetInMotion) leftLiftTargetPosition = 0;
+        if (leftLiftTargetPosition < 0 && !presetInMotion && !liftGoing) leftLiftTargetPosition = 0;
         if (leftLiftTargetPosition > LIFT_MAX) leftLiftTargetPosition = LIFT_MAX;
         correctLiftError();
         correctLiftCurrentDraw();
@@ -518,15 +519,15 @@ public class TwoPersonDrive extends LinearOpMode {
             updateLiftMotors();
             //outtakeIn = true;
             if (intakeGoingInObstacle || intakeGoingInObstacleFoldUp || intakeGoingIn || intakeGoingOut || intakeGoingOutObstacle || intakeGoingOutObstacleRetract) {
+                /*
                 intakeIn = true;
                 leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
                 rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
-                leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
-                rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
-                /*
                 resetFoldIn = true;
                 resetFoldInStartTime = System.currentTimeMillis();
                  */
+                leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
+                rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
                 resetInMotion = false;
                 adjustingLiftZero = true;
             } else {
@@ -549,8 +550,8 @@ public class TwoPersonDrive extends LinearOpMode {
             if (leftLift.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
                 leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                leftLift.setPower(-0.2);
-                rightLift.setPower(-0.2);
+                leftLift.setPower(-0.3);
+                rightLift.setPower(-0.3);
                 leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             }
@@ -560,8 +561,8 @@ public class TwoPersonDrive extends LinearOpMode {
                 if (leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
                     leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    leftLift.setPower(0.2);
-                    rightLift.setPower(0.2);
+                    leftLift.setPower(0.3);
+                    rightLift.setPower(0.3);
                     leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 } else {
@@ -571,15 +572,15 @@ public class TwoPersonDrive extends LinearOpMode {
                 if (leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
                     leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    leftLift.setPower(-0.2);
-                    rightLift.setPower(-0.2);
+                    leftLift.setPower(-0.3);
+                    rightLift.setPower(-0.3);
                     leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                     rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 } else {
                     leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    leftLift.setPower(0.2);
-                    rightLift.setPower(0.2);
+                    leftLift.setPower(0.3);
+                    rightLift.setPower(0.3);
                     leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 }
@@ -604,11 +605,11 @@ public class TwoPersonDrive extends LinearOpMode {
             clawLifting = true;
         }
         if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = -60;
-            updateLiftMotors();
+            leftLiftTargetPosition = -100;
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;
+            updateLiftMotors();
         }
         if (outtakeSlowPickup && ((System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT) && (System.currentTimeMillis()-clawGrabbingStartTime < LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT))) {
             if (leftOuttake.getPosition() >= LEFT_OUTTAKE_OUT_POSITION) {
