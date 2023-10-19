@@ -426,8 +426,8 @@ public class TwoPersonDrive extends LinearOpMode {
         intakeGoingOut = false;
         intakeGoingOutObstacle = false;
         intakeGoingOutObstacleRetract = false;
-        liftInGrabbingPosition = true;
          */
+        liftInGrabbingPosition = true;
         liftGoing = false;
         clawGrabbing = false;
         clawClosing = false;
@@ -517,7 +517,7 @@ public class TwoPersonDrive extends LinearOpMode {
             leftLiftTargetPosition = 0;
             updateLiftMotors();
             //outtakeIn = true;
-            if (!intakeIn) {
+            if (intakeGoingInObstacle || intakeGoingInObstacleFoldUp || intakeGoingIn || intakeGoingOut || intakeGoingOutObstacle || intakeGoingOutObstacleRetract) {
                 intakeIn = true;
                 leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
                 rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
@@ -631,6 +631,12 @@ public class TwoPersonDrive extends LinearOpMode {
             leftIntake.setPosition(LEFT_INTAKE_OUT_POSITION);
             rightIntake.setPosition(RIGHT_INTAKE_OUT_POSITION);
             intakeGoingOut = false;
+
+            if (resetFoldIn) {
+                resetFoldIn = false;
+                leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
+                rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
+            }
         }
 
         if (intakeGoingOutObstacle && (System.currentTimeMillis()-intakeOutObstacleStartTime > INTAKE_OBSTACLE_OUT_WAIT)) {
@@ -651,6 +657,12 @@ public class TwoPersonDrive extends LinearOpMode {
             leftIntake.setPosition(LEFT_INTAKE_DROP_POSITION);
             rightIntake.setPosition(RIGHT_INTAKE_DROP_POSITION);
             intakeGoingIn = false;
+
+            if (resetFoldIn) {
+                resetFoldIn = false;
+                leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
+                rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
+            }
         }
 
         if (intakeGoingInObstacle && (System.currentTimeMillis()-intakeInObstacleStartTime>INTAKE_OBSTACLE_IN_WAIT)) {
