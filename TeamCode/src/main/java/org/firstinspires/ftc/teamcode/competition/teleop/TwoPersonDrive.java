@@ -518,12 +518,11 @@ public class TwoPersonDrive extends LinearOpMode {
             if (intakeGoingInObstacle || intakeGoingInObstacleFoldUp || intakeGoingIn || intakeGoingOut || intakeGoingOutObstacle || intakeGoingOutObstacleRetract) {
                 leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
                 rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
-                resetInMotion = false;
             } else {
                 leftOuttake.setPosition(LEFT_OUTTAKE_IN_POSITION);
                 rightOuttake.setPosition(RIGHT_OUTTAKE_IN_POSITION);
-                resetInMotion = false;
             }
+            resetInMotion = false;
         }
         if (adjustingLiftZero && ((leftLift.getCurrentPosition()<=0) || leftLift.getMode().equals(DcMotor.RunMode.RUN_WITHOUT_ENCODER)||leftLift.getMode().equals(DcMotor.RunMode.STOP_AND_RESET_ENCODER))) {
             if (leftLift.getMode().equals(DcMotor.RunMode.RUN_TO_POSITION)) {
