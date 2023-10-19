@@ -19,7 +19,9 @@ public class RobotConstants {
             MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
             LIFT_GRAB_POSITION = 30,
-            INTAKE_VELOCITY = 2790; // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
+            INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
+            DRIVETRAIN_CURRENT_LIMIT = 10000*10,
+            DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
 
     public static final double
             ROBOT_FRONT_LENGTH = 8,
@@ -50,7 +52,7 @@ public class RobotConstants {
             RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_AVOID_POSITION = 0.6,
             RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 170,
+            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 110,
 
 
             // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
@@ -79,7 +81,7 @@ public class RobotConstants {
             INTAKE_OBSTACLE_IN_WAIT = 500,
             CLAW_GRAB_WAIT = 250, //
             CLAW_CLOSE_WAIT = 200,
-            CLAW_LIFT_WAIT = 100,
+            CLAW_LIFT_WAIT = 0,
             LIFT_GO_WAIT = 1000,
             PRESET_TIMEOUT = 700,
             RESET_PIXEL_DROP_WAIT = 300,
