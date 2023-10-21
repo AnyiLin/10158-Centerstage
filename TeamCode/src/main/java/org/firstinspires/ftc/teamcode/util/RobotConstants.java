@@ -18,14 +18,14 @@ public class RobotConstants {
             TOP_LINE_POSITION = 190,
             MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 30,
+            LIFT_GRAB_POSITION = 45,
             INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
             DRIVETRAIN_CURRENT_LIMIT = 10000*10,
             DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
 
     public static final double
             ROBOT_FRONT_LENGTH = 8,
-            ROBOT_BACK_LENGTH = 10,
+            ROBOT_BACK_LENGTH = 8.75,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,

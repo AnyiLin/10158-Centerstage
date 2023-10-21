@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.util.opencv;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
