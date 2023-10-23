@@ -17,8 +17,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "Blue Left Inner Auto", group = "Autonomous")
-public class BlueLeftInnerAuto extends OpMode {
+@Autonomous(name = "Old Blue Left Inner Auto", group = "Autonomous")
+public class OldBlueLeftInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive = new TwoPersonDrive(true);
 

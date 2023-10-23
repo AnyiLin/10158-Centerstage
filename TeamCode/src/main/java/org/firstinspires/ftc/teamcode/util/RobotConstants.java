@@ -26,6 +26,7 @@ public class RobotConstants {
     public static final double
             ROBOT_FRONT_LENGTH = 8,
             ROBOT_BACK_LENGTH = 8.75,
+            ROBOT_INTAKE_LENGTH = 11.25,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
@@ -42,6 +43,8 @@ public class RobotConstants {
             // so, 0.00344444444 servo position change is a 1 degree change
             INTAKE_SERVO_TO_DEGREES = 1/0.003444444444444444444444444444444444444444,
             INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
+
+            INTAKE_STACK_TOP_POSITION = 0.805,
 
             RIGHT_OUTTAKE_OFFSET = 0,
             LEFT_OUTTAKE_OUT_POSITION = 0.43,
@@ -69,7 +72,7 @@ public class RobotConstants {
             INNER_CLAW_OPEN_POSITION = 0.3,
             OUTER_CLAW_OPEN_POSITION = 1,
 
-            PLANE_LAUNCHER_LAUNCH = 0.05,
+            PLANE_LAUNCHER_LAUNCH = 0,
             PLANE_LAUNCHER_HOLD = 0.2;
 
     public static final long
@@ -86,7 +89,8 @@ public class RobotConstants {
             PRESET_TIMEOUT = 700,
             RESET_PIXEL_DROP_WAIT = 300,
             RESET_FOLD_IN_WAIT = 1000,
-            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500;
+            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500,
+            INTAKE_BURST_TIME = 300;
 
     public static final PIDFCoefficients
             LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(9,6,0,4),

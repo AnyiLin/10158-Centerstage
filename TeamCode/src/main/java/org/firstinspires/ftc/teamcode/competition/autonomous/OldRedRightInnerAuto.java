@@ -1,24 +1,26 @@
 package org.firstinspires.ftc.teamcode.competition.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.opencv.TeamPropPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
-public class RedRightInnerAuto extends OpMode {
+@Autonomous(name = "Old Red Right Inner Auto", group = "Autonomous")
+public class OldRedRightInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive = new TwoPersonDrive(true);
 
@@ -39,8 +41,6 @@ public class RedRightInnerAuto extends OpMode {
     private final double
             ROBOT_FRONT_LENGTH = RobotConstants.ROBOT_FRONT_LENGTH,
             ROBOT_BACK_LENGTH = RobotConstants.ROBOT_BACK_LENGTH,
-            ROBOT_INTAKE_LENGTH = RobotConstants.ROBOT_INTAKE_LENGTH,
-            INTAKE_STACK_TOP_POSITION = RobotConstants.INTAKE_STACK_TOP_POSITION,
             INTAKE_CHANGE = 40, // this is set to degrees/second
             OUTTAKE_CHANGE = 40, // this is set to degrees/second
             OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
@@ -88,8 +88,7 @@ public class RedRightInnerAuto extends OpMode {
             RESET_PIXEL_DROP_WAIT = RobotConstants.RESET_PIXEL_DROP_WAIT,
             RESET_FOLD_IN_WAIT = RobotConstants.RESET_FOLD_IN_WAIT,
             LIFT_GO_WAIT = RobotConstants.LIFT_GO_WAIT,
-            INTAKE_FULL_OUT_WAIT = RobotConstants.INTAKE_FULL_OUT_WAIT,
-            INTAKE_BURST_TIME = RobotConstants.INTAKE_BURST_TIME;
+            INTAKE_FULL_OUT_WAIT = RobotConstants.INTAKE_FULL_OUT_WAIT;
 
     private final PIDFCoefficients
             LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_UP_VELOCITY_PIDF_COEFFICIENTS,
@@ -125,29 +124,21 @@ public class RedRightInnerAuto extends OpMode {
     private Pose2d redMiddleBackdrop = new Pose2d(60.75, -72+22.5+12.75);
     private Pose2d redRightBackdrop = new Pose2d(60.75, -72+22.5+6.625);
 
-    // white pixel stack locations
-    private Pose2d redOuterStack = new Pose2d(-72, -72+36);
-    private Pose2d redMiddleStack = new Pose2d(-72, -72+48);
-    private Pose2d redInnerStack = new Pose2d(-72, -72+60);
-    private Pose2d blueInnerStack = new Pose2d(-72, 72-60);
-    private Pose2d blueMiddleStack = new Pose2d(-72, 72-48);
-    private Pose2d blueOuterStack = new Pose2d(-72, 72-36);
-
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstCycleFirstBackdropGoalPose, firstCycleSecondBackdropGoalPose, spikeMarkReturnPosition;
+    private Pose2d spikeMarkGoalPose, backdropGoalPose, spikeMarkReturnPosition;
 
     // TODO: adjust this for each auto
     private Pose2d startPose = new Pose2d(12,-72+8.25, Math.toRadians(90));
 
     private SampleMecanumDrive drive;
 
-    private TrajectorySequence scoreSpikeMark, getStackPixels, scoreFirstStackFirstPixel, scoreFirstStackSecondPixel, park;
+    private TrajectorySequence scoreSpikeMark, park;
 
     // these are auto specific timings and booleans
-    private boolean atBackdrop, runningTrajectory, atStack;
+    private boolean atBackdrop, runningTrajectory;
 
-    private long atBackdropStartTime, atStackStartTime;
+    private long atBackdropStartTime;
 
-    private final long BACKDROP_WAIT_TIME = 1000, SCORE_WAIT_TIME = 500, INTAKE_INTAKING_TIME = 3000;
+    private final long BACKDROP_WAIT_TIME = 1500;
 
     private int trajectoryNumber;
 
@@ -155,24 +146,18 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             case "left":
                 spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 2+redLeftBackdrop.getY(), Math.toRadians(180));
+                backdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 1.25-1.5+redLeftBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(12, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 2+redMiddleBackdrop.getY(), Math.toRadians(180));
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.5, Math.toRadians(90));
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redMiddleBackdrop.getY(), Math.toRadians(180));
+                backdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -1-1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(12, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redLeftBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 2+redRightBackdrop.getY(), Math.toRadians(180));
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redRightBackdrop.getY(), Math.toRadians(180));
+                backdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, -1.25-1.5+redRightBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(14, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 2+redMiddleBackdrop.getY(), Math.toRadians(180));
                 break;
         }
     }
@@ -191,46 +176,15 @@ public class RedRightInnerAuto extends OpMode {
                 .resetConstraints()
                 .lineToConstantHeading(new Vector2d(spikeMarkReturnPosition.getX(), spikeMarkReturnPosition.getY()))
                 .lineToLinearHeading(new Pose2d(16, -56, Math.toRadians(90)))
-                //.lineToLinearHeading(new Pose2d(40, -56, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(40, -56, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
-                .lineToLinearHeading(new Pose2d(40, initialBackdropGoalPose.getY(), Math.toRadians(180)))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(initialBackdropGoalPose)
+                .lineToLinearHeading(backdropGoalPose)
                 .resetConstraints()
                 .build();
 
-        getStackPixels = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
-                .lineToLinearHeading(new Pose2d(24, -12, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+4, redInnerStack.getY(), Math.toRadians(180)))
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, redInnerStack.getY(), Math.toRadians(180)))
-                .resetConstraints()
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.setCustomIntakeOutPosition(INTAKE_STACK_TOP_POSITION))
-                .UNSTABLE_addTemporalMarkerOffset(1,()-> twoPersonDrive.intake.setVelocity(INTAKE_VELOCITY))
-                .build();
-
-        scoreFirstStackFirstPixel = drive.trajectorySequenceBuilder(getStackPixels.end())
-                .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(180)))
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0))
-                .lineToLinearHeading(new Pose2d(40, firstCycleFirstBackdropGoalPose.getY(), Math.toRadians(180)))
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(firstCycleFirstBackdropGoalPose)
-                .resetConstraints()
-                .build();
-
-        scoreFirstStackSecondPixel = drive.trajectorySequenceBuilder(scoreFirstStackFirstPixel.end())
-                .lineToLinearHeading(new Pose2d(40, firstCycleFirstBackdropGoalPose.getY(), Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(40, firstCycleSecondBackdropGoalPose.getY(), Math.toRadians(180)))
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(firstCycleSecondBackdropGoalPose)
-                .resetConstraints()
-                .build();
-
-        park = drive.trajectorySequenceBuilder(scoreFirstStackSecondPixel.end())
+        park = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
                 .lineToConstantHeading(new Vector2d(46, redMiddleBackdrop.getY()))
                 .lineToConstantHeading(new Vector2d(46, -60))
                 .build();
@@ -277,64 +231,14 @@ public class RedRightInnerAuto extends OpMode {
         if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
         }
-        if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
+        if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+500) {
             // after scoring on the backdrop, do something else
-            runningTrajectory = true;
-            drive.followTrajectorySequenceAsync(getStackPixels);
+            drive.followTrajectorySequenceAsync(park);
             atBackdrop = false;
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
         }
 
         if (!drive.isBusy() && trajectoryNumber == 1 && !atBackdrop) {
-            atStack = true;
-            atStackStartTime = System.currentTimeMillis();
-        }
-        if (atStack && System.currentTimeMillis()-atStackStartTime<INTAKE_INTAKING_TIME) {
-            if (!twoPersonDrive.intaking) {
-                twoPersonDrive.intakingStartTime = System.currentTimeMillis();
-            }
-            twoPersonDrive.intaking = true;
-            twoPersonDrive.updateIntake(1);
-        }
-        if (atStack && System.currentTimeMillis()-atStackStartTime>INTAKE_INTAKING_TIME) {
-            twoPersonDrive.intaking = false;
-            twoPersonDrive.updateIntake(0);
-            atStack = false;
-            if (trajectoryNumber == 2) {
-                runningTrajectory = true;
-                drive.followTrajectorySequenceAsync(scoreFirstStackFirstPixel);
-            }
-            if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
-        }
-
-        if (!drive.isBusy() && trajectoryNumber == 2 && !atStack) {
-            atBackdrop = true;
-            atBackdropStartTime = System.currentTimeMillis();
-        }
-        if (trajectoryNumber == 3 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
-            twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
-        }
-        if (trajectoryNumber == 3 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
-            atBackdrop = false;
-            runningTrajectory = true;
-            drive.followTrajectorySequenceAsync(scoreFirstStackSecondPixel);
-        }
-
-        if (!drive.isBusy() && trajectoryNumber == 3 && !atBackdrop) {
-            atBackdrop = true;
-            atBackdropStartTime = System.currentTimeMillis();
-        }
-        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
-            twoPersonDrive.outerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
-        }
-        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
-            atBackdrop = false;
-            runningTrajectory = true;
-            drive.followTrajectorySequenceAsync(park);
-            if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
-        }
-
-        if (!drive.isBusy() && trajectoryNumber == 5 && !atBackdrop) {
             requestOpModeStop();
         }
 
