@@ -39,7 +39,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public final double
             INTAKE_CHANGE = 40, // this is set to degrees/second
-            OUTTAKE_CHANGE = 90, // this is set to degrees/second
+            OUTTAKE_CHANGE = 120, // this is set to degrees/second
             OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
             RIGHT_INTAKE_OFFSET = RobotConstants.RIGHT_INTAKE_OFFSET,
             LEFT_INTAKE_OUT_POSITION = RobotConstants.LEFT_INTAKE_OUT_POSITION,
@@ -96,7 +96,7 @@ public class TwoPersonDrive extends LinearOpMode {
             LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS,
             LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_POSITION_PIDF_COEFFICIENTS;
 
-    public boolean burstToggleButtonPressed, intaking, burstIntake, setCustomIntakeOutPosition, useInnerClaw = true, autonomous, adjustingLiftZero, outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
+    public boolean burstToggleButtonPressed, intaking, burstIntake = true, setCustomIntakeOutPosition, useInnerClaw = true, autonomous, adjustingLiftZero, outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
 
     public double customIntakeOutPosition;
 
@@ -205,7 +205,7 @@ public class TwoPersonDrive extends LinearOpMode {
             double y = -gamepad1.left_stick_y; // Remember, this is reversed!
             double x = 0; // this is strafing
 
-            if (gamepad2.right_stick_x!=0) {
+            if (Math.abs(gamepad2.right_stick_x)>0.5) {
                 x = gamepad2.right_stick_x*0.5/throttle;
             } else if (gamepad1.left_bumper) {
                 x = 1;
@@ -759,26 +759,32 @@ public class TwoPersonDrive extends LinearOpMode {
     public void setCustomIntakeOutPosition(double setPosition) {
         setCustomIntakeOutPosition = true;
         customIntakeOutPosition = setPosition;
-        if (!intakeIn) {
-            intakeIn = true;
+        if (intakeIn) {
+            intakeIn = false;
             if (outtakeIn) {
-                if (!intakeGoingInObstacle && !intakeGoingInObstacleFoldUp) {
-                    leftIntake.setPosition(LEFT_INTAKE_MIDDLE_POSITION);
-                    rightIntake.setPosition(RIGHT_INTAKE_MIDDLE_POSITION);
-                    intakeInObstacleStartTime = System.currentTimeMillis();
-                    intakeGoingInObstacle = true;
+                if (!intakeGoingOutObstacle && !intakeGoingOutObstacleRetract) {
+                    leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
+                    rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+                    intakeGoingOutObstacle = true;
+                    intakeOutObstacleStartTime = System.currentTimeMillis();
                 }
             } else {
-                if (!intakeGoingIn) {
-                    leftIntake.setPosition(LEFT_INTAKE_IN_POSITION);
-                    rightIntake.setPosition(RIGHT_INTAKE_IN_POSITION);
-                    intakeGoingIn = true;
-                    intakeInStartTime = System.currentTimeMillis();
+                if (!intakeGoingOut) {
+                    leftIntake.setPosition(LEFT_INTAKE_OUT_PAUSE_POSITION);
+                    rightIntake.setPosition(RIGHT_INTAKE_OUT_PAUSE_POSITION);
+                    intakeOutStartTime = System.currentTimeMillis();
+                    intakeGoingOut = true;
                 }
             }
-            intakeGoingOut = false;
-            intakeGoingOutObstacle = false;
-            intakeGoingOutObstacleRetract = false;
+            intakeGoingInObstacle = false;
+            intakeGoingInObstacleFoldUp = false;
+            intakeGoingIn = false;
+        } else {
+            if (!intakeGoingOutObstacle && !intakeGoingOutObstacleRetract && !intakeGoingOut) {
+                leftIntake.setPosition(customIntakeOutPosition);
+                rightIntake.setPosition(1-customIntakeOutPosition+RIGHT_INTAKE_OFFSET);
+                setCustomIntakeOutPosition = false;
+            }
         }
     }
 

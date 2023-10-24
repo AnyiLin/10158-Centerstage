@@ -25,8 +25,8 @@ public class RobotConstants {
 
     public static final double
             ROBOT_FRONT_LENGTH = 8,
-            ROBOT_BACK_LENGTH = 8.75,
-            ROBOT_INTAKE_LENGTH = 11.25,
+            ROBOT_BACK_LENGTH = 7.25,
+            ROBOT_INTAKE_LENGTH = 16.5,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
@@ -47,7 +47,7 @@ public class RobotConstants {
             INTAKE_STACK_TOP_POSITION = 0.805,
 
             RIGHT_OUTTAKE_OFFSET = 0,
-            LEFT_OUTTAKE_OUT_POSITION = 0.43,
+            LEFT_OUTTAKE_OUT_POSITION = 0.38,
             RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_IN_POSITION= 0.83,
             RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
@@ -90,7 +90,7 @@ public class RobotConstants {
             RESET_PIXEL_DROP_WAIT = 300,
             RESET_FOLD_IN_WAIT = 1000,
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500,
-            INTAKE_BURST_TIME = 300;
+            INTAKE_BURST_TIME = 250;
 
     public static final PIDFCoefficients
             LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(9,6,0,4),
