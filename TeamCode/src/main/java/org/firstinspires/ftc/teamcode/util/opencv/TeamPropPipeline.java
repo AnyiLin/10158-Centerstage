@@ -8,7 +8,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class TeamPropPipeline extends OpenCvPipeline {
 
-    private Mat output, hsv;
+    private Mat output = new Mat(), hsv = new Mat();
 
     private final int WIDTH, HEIGHT, GRAY_ERROR, COLOR;
 
@@ -62,7 +62,6 @@ public class TeamPropPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         output = input.clone();
 
-        hsv = output.clone();
         Imgproc.cvtColor(output, hsv, Imgproc.COLOR_RGB2HSV);
 
         //middle column
@@ -114,8 +113,6 @@ public class TeamPropPipeline extends OpenCvPipeline {
         if (rightTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "right";*/
 
         if (draw) writeOnScreen();
-
-        hsv.release();
 
         return output;
     }

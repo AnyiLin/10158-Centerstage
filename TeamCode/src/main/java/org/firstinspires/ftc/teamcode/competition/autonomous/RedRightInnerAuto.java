@@ -134,7 +134,7 @@ public class RedRightInnerAuto extends OpMode {
     private Pose2d blueMiddleStack = new Pose2d(-72, 72-48);
     private Pose2d blueOuterStack = new Pose2d(-72, 72-36);
 
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstCycleFirstBackdropGoalPose, firstCycleSecondBackdropGoalPose, spikeMarkReturnPosition;
+    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstStackPose, firstCycleFirstBackdropGoalPose, firstCycleSecondBackdropGoalPose, spikeMarkReturnPosition;
 
     // TODO: adjust this for each auto
     private Pose2d startPose = new Pose2d(12,-72+9, Math.toRadians(90));
@@ -158,22 +158,25 @@ public class RedRightInnerAuto extends OpMode {
                 spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
                 initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 1.5-2.5+redLeftBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(12, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5-3+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 1.5-3+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -1.5-2.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.75, 1.5-1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, redInnerStack.getY()-2);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.5, Math.toRadians(90));
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redMiddleBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(12, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redLeftBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2.75+redLeftBackdrop.getY(), Math.toRadians(180));
+                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -2+redLeftBackdrop.getY(), Math.toRadians(180));
+                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.75, -2.75+redLeftBackdrop.getY(), Math.toRadians(180));
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-0.5, redInnerStack.getY()-0.25);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+redRightBackdrop.getY(), Math.toRadians(180));
                 spikeMarkReturnPosition = new Pose2d(14, -36-11.5);
-                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstCycleFirstBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstCycleSecondBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.75, 1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, redInnerStack.getY());
                 break;
         }
     }
@@ -203,12 +206,12 @@ public class RedRightInnerAuto extends OpMode {
 
         getStackPixels = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
                 .lineToLinearHeading(new Pose2d(24, -12, Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+4, 1+redInnerStack.getY()-0.0001, Math.toRadians(180)))
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
+                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+4, firstStackPose.getY()-0.0001, Math.toRadians(180)))
+                //.setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
+                //.setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
                 .UNSTABLE_addTemporalMarkerOffset(-1,()-> twoPersonDrive.setCustomIntakeOutPosition(INTAKE_STACK_TOP_POSITION))
-                .lineToLinearHeading(new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, 1+redInnerStack.getY(), Math.toRadians(180)))
-                .resetConstraints()
+                .lineToLinearHeading(new Pose2d(firstStackPose.getX(), firstStackPose.getY(), Math.toRadians(180)))
+                //.resetConstraints()
                 .build();
 
         scoreFirstStackFirstPixel = drive.trajectorySequenceBuilder(getStackPixels.end())
@@ -359,7 +362,7 @@ public class RedRightInnerAuto extends OpMode {
     @Override
     public void init_loop() {
         super.init_loop();
-        if (System.currentTimeMillis()-initializationSlideResetStartTime>1000) twoPersonDrive.asyncTimers();
+        if (System.currentTimeMillis()-initializationSlideResetStartTime>1500) twoPersonDrive.asyncTimers();
         navigation = teamPropPipeline.getNavigation();
         telemetry.addData("Navigation:", navigation);
         telemetry.update();
