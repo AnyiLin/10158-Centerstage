@@ -114,6 +114,8 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
         if (draw) writeOnScreen();
 
+        hsv.release();
+
         return output;
     }
 

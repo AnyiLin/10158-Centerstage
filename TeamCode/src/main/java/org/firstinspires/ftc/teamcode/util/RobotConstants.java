@@ -26,7 +26,7 @@ public class RobotConstants {
     public static final double
             ROBOT_FRONT_LENGTH = 8,
             ROBOT_BACK_LENGTH = 7.75,
-            ROBOT_INTAKE_LENGTH = 14.75,
+            ROBOT_INTAKE_LENGTH = 16.75,
             RIGHT_INTAKE_OFFSET = 0.03,
             LEFT_INTAKE_OUT_POSITION = 0.858,
             RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
