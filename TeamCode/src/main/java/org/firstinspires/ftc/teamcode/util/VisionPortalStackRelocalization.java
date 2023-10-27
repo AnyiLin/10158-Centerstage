@@ -1,6 +1,9 @@
-package org.firstinspires.ftc.teamcode.util.opencv;
+package org.firstinspires.ftc.teamcode.util;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import android.graphics.Canvas;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -16,7 +19,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-public class StackRelocalization extends OpenCvPipeline {
+public class VisionPortalStackRelocalization implements VisionProcessor {
 
     private Mat output = new Mat(), hls = new Mat(), mask = new Mat(), dots = new Mat(), cameraMatrix, optimalCameraMatrix;
 
@@ -46,11 +49,10 @@ public class StackRelocalization extends OpenCvPipeline {
 
     private double biggestBoxX = CENTER;
 
-    public StackRelocalization() {
+    public VisionPortalStackRelocalization() {
         constructCameraMatrices();
     }
 
-    @Override
     public Mat processFrame(Mat input) {
         output.release();
         Imgproc.resize(input, output, input.size());
@@ -150,4 +152,18 @@ public class StackRelocalization extends OpenCvPipeline {
         optimalCameraMatrix = Calib3d.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, new Size(320, 240), 1);
     }
 
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+
+    }
+
+    @Override
+    public Object processFrame(Mat frame, long captureTimeNanos) {
+        return processFrame(frame);
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
+    }
 }
