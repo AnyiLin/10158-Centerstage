@@ -23,14 +23,14 @@ public class TeamPropPipeline extends OpenCvPipeline {
     private boolean draw = true;
 
     public TeamPropPipeline() {
-        WIDTH = 50;
-        HEIGHT = 60;
+        WIDTH = 50 * 2;
+        HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
-        rightLeftBound = 200;
-        rightTopBound = 110;
-        middleLeftBound = 50;
-        middleTopBound = 110;
-        minDetected = 15000;
+        rightLeftBound = 200 * 2;
+        rightTopBound = 110 * 2;
+        middleLeftBound = 50 * 2;
+        middleTopBound = 110 * 2;
+        minDetected = 15000 * 2;
 
         COLOR = 0;
     }
@@ -38,15 +38,15 @@ public class TeamPropPipeline extends OpenCvPipeline {
     public int temp;
 
     public TeamPropPipeline(int color) {
-        WIDTH = 50;
-        HEIGHT = 60;
+        WIDTH = 50 * 2;
+        HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
         this.COLOR = color;
-        rightLeftBound = 200;
-        rightTopBound = 100;
-        middleLeftBound = 50;
-        middleTopBound = 110;
-        minDetected = 10000;
+        rightLeftBound = 200 * 2;
+        rightTopBound = 100 * 2;
+        middleLeftBound = 50 * 2;
+        middleTopBound = 110 * 2;
+        minDetected = 10000 * 2;
 
     }
 
@@ -60,6 +60,10 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        return actualProcessFrame(input);
+    }
+
+    public Mat actualProcessFrame(Mat input) {
         output = input.clone();
 
         Imgproc.cvtColor(output, hsv, Imgproc.COLOR_RGB2HSV);

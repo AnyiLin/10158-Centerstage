@@ -287,11 +287,11 @@ public class ExperimentalRedRightInnerAuto extends OpMode {
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "camera"), cameraMonitorViewId);
 
-        camera.setPipeline(teamPropPipeline);
+        camera.setPipeline(stackRelocalization);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -427,6 +427,9 @@ public class ExperimentalRedRightInnerAuto extends OpMode {
         if (System.currentTimeMillis()-initializationSlideResetStartTime>1500) twoPersonDrive.asyncTimers();
         navigation = teamPropPipeline.getNavigation();
         telemetry.addData("Navigation:", navigation);
+
+        telemetry.addData("x error", stackRelocalization.getXErrorInches());
+        telemetry.addData("bounding boxes size", stackRelocalization.boundingBoxes.size());
         telemetry.update();
         setBackdropGoalPose();
         buildTrajectories();

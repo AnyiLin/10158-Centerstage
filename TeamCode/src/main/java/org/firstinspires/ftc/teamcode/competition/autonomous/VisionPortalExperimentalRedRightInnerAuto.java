@@ -15,13 +15,8 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.VisionPortalStackRelocalization;
-import org.firstinspires.ftc.teamcode.util.opencv.StackRelocalization;
-import org.firstinspires.ftc.teamcode.util.opencv.TeamPropPipeline;
-import org.firstinspires.ftc.teamcode.util.opencv.VisionPortalTeamPropPipeline;
+import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(name = "Vision Portal Experimental Red Right Inner Auto", group = "Autonomous")
 public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
@@ -155,7 +150,7 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
 
     private long scanningStackStartTime, initializationSlideResetStartTime, atBackdropStartTime, atStackStartTime;
 
-    private final long BACKDROP_WAIT_TIME = 1000, SCORE_WAIT_TIME = 500, INTAKE_INTAKING_TIME = 2000;
+    private final long BACKDROP_WAIT_TIME = 0*1000, SCORE_WAIT_TIME = 500, INTAKE_INTAKING_TIME = 2000;
 
     private int trajectoryNumber;
 
@@ -202,7 +197,6 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
                 .resetConstraints()
                 .lineToConstantHeading(new Vector2d(spikeMarkReturnPosition.getX(), spikeMarkReturnPosition.getY()))
                 .lineToLinearHeading(new Pose2d(16, -56, Math.toRadians(90)))
-                //.lineToLinearHeading(new Pose2d(40, -56, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
                 .lineToLinearHeading(new Pose2d(40, initialBackdropGoalPose.getY(), Math.toRadians(180)))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
@@ -213,12 +207,12 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
 
         getStackPixels = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
                 .lineToLinearHeading(new Pose2d(24, -12, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+6, firstStackPose.getY()-0.0001, Math.toRadians(180)))
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+6, firstStackPose.getY()-0.0001, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(-2,()-> visionPortal.resumeStreaming())
                 .UNSTABLE_addTemporalMarkerOffset(-2,()-> visionPortal.setProcessorEnabled(teamPropPipeline, false))
-                .UNSTABLE_addTemporalMarkerOffset(-2,()-> visionPortal.setProcessorEnabled(stackRelocalization, false))
+                .UNSTABLE_addTemporalMarkerOffset(-2,()-> visionPortal.setProcessorEnabled(stackRelocalization, true))
                 .lineToLinearHeading(new Pose2d(firstStackPose.getX()+4, firstStackPose.getY(), Math.toRadians(180)))
                 .resetConstraints()
                 .build();
@@ -290,11 +284,10 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "camera"))
-                .addProcessor(teamPropPipeline)
-                .addProcessor(stackRelocalization)
-                .setCameraResolution(new Size(320, 240))
+                .addProcessors(stackRelocalization, teamPropPipeline)
+                .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
-                //.enableCameraMonitoring(true)
+                .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .build();
         visionPortal.setProcessorEnabled(stackRelocalization, false);
@@ -336,7 +329,7 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
             scanningStackStartTime = System.currentTimeMillis();
         }
         if (scanningStack && System.currentTimeMillis()-scanningStackStartTime>500) {
-            firstStackPose = new Pose2d(firstStackPose.getX(), firstStackPose.getY()-stackRelocalization.getXErrorInches());
+            firstStackPose = new Pose2d(firstStackPose.getX(), drive.getPoseEstimate().getY()+stackRelocalization.getXErrorInches());
             stackAdjustTrajectories();
             twoPersonDrive.setCustomIntakeOutPosition(INTAKE_STACK_TOP_POSITION);
             visionPortal.stopStreaming();
@@ -371,14 +364,14 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
         }
 
-        if (!drive.isBusy() && trajectoryNumber == 5 && !atStack) {
+        if (!drive.isBusy() && trajectoryNumber == 4 && !atBackdrop) {
             atBackdrop = true;
             atBackdropStartTime = System.currentTimeMillis();
         }
-        if (trajectoryNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
+        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
             twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
         }
-        if (trajectoryNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
+        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
             twoPersonDrive.leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
             twoPersonDrive.rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
             atBackdrop = false;
@@ -386,31 +379,31 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
             drive.followTrajectorySequenceAsync(scoreFirstStackSecondPixel);
         }
 
-        if (!drive.isBusy() && trajectoryNumber == 6 && !atBackdrop) {
+        if (!drive.isBusy() && trajectoryNumber == 5 && !atBackdrop) {
             atBackdrop = true;
             atBackdropStartTime = System.currentTimeMillis();
         }
-        if (trajectoryNumber == 6 && atBackdrop) {
+        if (trajectoryNumber == 5 && atBackdrop) {
             twoPersonDrive.leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);
             twoPersonDrive.rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
         }
-        if (trajectoryNumber == 6 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
+        if (trajectoryNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME) {
             twoPersonDrive.innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
         }
-        if (trajectoryNumber == 6 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
+        if (trajectoryNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
             atBackdrop = false;
             runningTrajectory = true;
             drive.followTrajectorySequenceAsync(park);
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
         }
 
-        if (!drive.isBusy() && trajectoryNumber == 7 && !atBackdrop) {
+        if (!drive.isBusy() && trajectoryNumber == 6 && !atBackdrop) {
             requestOpModeStop();
         }
 
         telemetry.addData("x error", stackRelocalization.getXErrorInches());
-        telemetry.addData("bounding boxes size", stackRelocalization.boundingBoxes.size());
         telemetry.addData("trajectory #", trajectoryNumber);
+        telemetry.update();
     }
 
     @Override
@@ -435,7 +428,7 @@ public class VisionPortalExperimentalRedRightInnerAuto extends OpMode {
     @Override
     public void start() {
         super.start();
-        visionPortal.stopStreaming();
+        //visionPortal.stopStreaming();
         drive.followTrajectorySequenceAsync(scoreSpikeMark);
         runningTrajectory = true;
         twoPersonDrive.lastFrameTimeNano = System.nanoTime();

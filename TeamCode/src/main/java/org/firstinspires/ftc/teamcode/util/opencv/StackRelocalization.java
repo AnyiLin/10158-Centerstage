@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.util.opencv;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -15,10 +14,11 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class StackRelocalization extends OpenCvPipeline {
 
-    private Mat output = new Mat(), hls = new Mat(), mask = new Mat(), dots = new Mat(), cameraMatrix, optimalCameraMatrix;
+    public Mat output = new Mat(), hls = new Mat(), mask = new Mat(), dots = new Mat(), undistorted = new Mat(), cameraMatrix, optimalCameraMatrix;
 
     private MatOfDouble distCoeffs = new MatOfDouble(new double[]{-0.0449369, 1.17277, 0, 0, -3.63244, 0, 0, 0});
 
@@ -35,9 +35,11 @@ public class StackRelocalization extends OpenCvPipeline {
 
     private Rect biggestBox = new Rect();
 
-    private final int CENTER = 73, SEARCH_AREA_X = 160, SEARCH_AREA_UPPER_Y = -5, SEARCH_AREA_LOWER_Y = 80, H_LOWER = 0, L_LOWER = 195, S_LOWER = 0, H_UPPER = 255, L_UPPER = 255, S_UPPER = 255;
+    private final int CENTER = 180, SEARCH_AREA_X = 160*2, SEARCH_AREA_UPPER_Y = -5*2, SEARCH_AREA_LOWER_Y = 80*2, H_LOWER = 0, L_LOWER = 195, S_LOWER = 0, H_UPPER = 255, L_UPPER = 255, S_UPPER = 255;
 
-    private final double PIXEL_TO_INCH = 1/10;//1/22.5;
+    private final double PIXEL_OBJECT_WIDTH_INCHES = 3.34646;
+
+    private double pixelToInch = (double)1/20;//1/22.5;
 
     private final Scalar LOWER = new Scalar(H_LOWER,L_LOWER,S_LOWER);
     private final Scalar UPPER = new Scalar(H_UPPER,L_UPPER,S_UPPER);
@@ -52,6 +54,10 @@ public class StackRelocalization extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        return actualProcessFrame(input);
+    }
+
+    public Mat actualProcessFrame(Mat input) {
         output.release();
         Imgproc.resize(input, output, input.size());
 
@@ -83,6 +89,7 @@ public class StackRelocalization extends OpenCvPipeline {
         contours.clear();
         boundingBoxes.clear();
         mask.release();
+        undistorted.release();
 
         return output;
     }
@@ -95,6 +102,7 @@ public class StackRelocalization extends OpenCvPipeline {
         if (!boundingBoxes.isEmpty()) Imgproc.rectangle(output, biggestBox, new Scalar(255, 255, 0));
         Imgproc.line(output, new Point(CENTER, 0), new Point(CENTER, output.height()), new Scalar(0,0,0));
         Imgproc.putText(output, "error: "+getXError(), new Point(0,120), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
+        if (!boundingBoxes.isEmpty()) Imgproc.putText(output, "box width: "+biggestBox.width, new Point(0,180), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
     }
 
     public void getBiggestBoundingBoxX() {
@@ -117,11 +125,18 @@ public class StackRelocalization extends OpenCvPipeline {
     }
 
     public double getXErrorInches() {
-        return getXError()*PIXEL_TO_INCH;
+        if (!biggestBox.empty()) pixelToInch = 1.0/(biggestBox.width/PIXEL_OBJECT_WIDTH_INCHES);
+        return getXError()* pixelToInch;
     }
 
     public void undistortImage() {
-        Calib3d.undistort(output, output, cameraMatrix, distCoeffs, optimalCameraMatrix);
+        Calib3d.undistort(output, undistorted, cameraMatrix, distCoeffs, optimalCameraMatrix);
+        Imgproc.resize(undistorted, output, undistorted.size());
+    }
+
+    public String getCenterHue(){
+        return Arrays.toString(hls.get(hls.height()/2,CENTER));
+
     }
 
     public void constructCameraMatrices() {
