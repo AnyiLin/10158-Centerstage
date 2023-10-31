@@ -84,7 +84,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(1.0)), 0.75);
+                new Pose2d(0.5, 0.5, Math.toRadians(3.0)), 0.75);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -136,7 +136,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // TODO: if desired, use setLocalizer() to change the localization method
         setLocalizer(new org.firstinspires.ftc.teamcode.roadrunner.drive.StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
 
-        trajectorySequenceRunner = new org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner(
+        trajectorySequenceRunner = new TrajectorySequenceRunner(
                 follower, HEADING_PID, batteryVoltageSensor,
                 lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
         );
@@ -318,4 +318,5 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void breakFollowing() {
         trajectorySequenceRunner.breakFollowing();
     }
+
 }

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class VisionPortalStackRelocalization implements VisionProcessor {
 
-    private StackRelocalization stackRelocalization;
+    public StackRelocalization stackRelocalization;
 
     public VisionPortalStackRelocalization() {
         stackRelocalization = new StackRelocalization();

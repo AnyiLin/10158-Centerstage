@@ -10,7 +10,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private Mat output = new Mat(), hsv = new Mat();
 
-    private final int WIDTH, HEIGHT, GRAY_ERROR, COLOR;
+    private int WIDTH, HEIGHT, GRAY_ERROR, COLOR;
 
     private int middleTotal, rightTotal;
 
@@ -23,31 +23,26 @@ public class TeamPropPipeline extends OpenCvPipeline {
     private boolean draw = true;
 
     public TeamPropPipeline() {
-        WIDTH = 50 * 2;
-        HEIGHT = 60 * 2;
-        GRAY_ERROR = 120;
-        rightLeftBound = 200 * 2;
-        rightTopBound = 110 * 2;
-        middleLeftBound = 50 * 2;
-        middleTopBound = 110 * 2;
-        minDetected = 15000 * 2;
-
+        defaultSetup();
         COLOR = 0;
     }
 
     public int temp;
 
     public TeamPropPipeline(int color) {
+        defaultSetup();
+        this.COLOR = color;
+    }
+
+    public void defaultSetup() {
         WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
-        this.COLOR = color;
-        rightLeftBound = 200 * 2;
-        rightTopBound = 100 * 2;
-        middleLeftBound = 50 * 2;
-        middleTopBound = 110 * 2;
-        minDetected = 10000 * 2;
-
+        rightLeftBound = 470;
+        rightTopBound = 225;
+        middleLeftBound = 160;
+        middleTopBound = 220;
+        minDetected = 40000;
     }
 
     // color corresponds with RGB values, with 0 being red, 1 being green, and 2 being blue
