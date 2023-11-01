@@ -5,10 +5,10 @@ public class Point {
      * IMPORTANT NOTE: theta is defined in radians
      */
     // these are the values of the coordinate defined by this Point, in both polar and Cartesian systems
-    private double r, theta, x,y;
+    private double r, theta, x, y;
 
     // these are used for ease of changing/setting identification
-    public final int POLAR = 0, CARTESIAN = 1;
+    public static final int POLAR = 0, CARTESIAN = 1;
 
 
     /**
@@ -48,6 +48,16 @@ public class Point {
                 y = setOtherCoordinates[1];
                 break;
         }
+    }
+
+    /**
+     * Calculates the distance between this point and some other specified point
+     *
+     * @param otherPoint the other specified point
+     * @return returns the distance between the two
+     */
+    public double distanceFrom(Point otherPoint) {
+        return Math.sqrt((otherPoint.getX()-x)*(otherPoint.getX()-x) + (otherPoint.getY()-y)*(otherPoint.getY()-y));
     }
 
     /**
