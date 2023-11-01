@@ -139,7 +139,7 @@ public class BlueLeftInnerAuto extends OpMode {
     private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstStackPose, firstCycleBackdropGoalPose;
 
     // TODO: adjust this for each auto
-    private Pose2d startPose = new Pose2d(12,72-9, Math.toRadians(90));
+    private Pose2d startPose = new Pose2d(12,72-9, Math.toRadians(270));
 
     private SampleMecanumDrive drive;
 
@@ -158,7 +158,7 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             case "left":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), blueLeftSideLeftSpikeMark.getY()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(360-45));
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+2.5+redLeftBackdrop.getY(), Math.toRadians(180));
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+2.5+blueLeftBackdrop.getY(), Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, 1.5+2.5+blueMiddleBackdrop.getY(), Math.toRadians(180));
                 firstStackPose = new Pose2d(blueInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, blueInnerStack.getY()+1.5);
                 break;
@@ -282,6 +282,7 @@ public class BlueLeftInnerAuto extends OpMode {
         }
         if (trajectoryNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
             // after scoring on the backdrop, do something else
+            requestOpModeStop();
             runningTrajectory = true;
             drive.followTrajectorySequenceAsync(getStackPixels);
             atBackdrop = false;
