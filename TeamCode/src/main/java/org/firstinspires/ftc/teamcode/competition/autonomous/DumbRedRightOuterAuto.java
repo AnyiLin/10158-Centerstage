@@ -178,7 +178,7 @@ public class DumbRedRightOuterAuto extends OpMode {
                 .splineTo(new Vector2d(-36,-48), Math.toRadians(90))
                 .splineToSplineHeading(spikeMarkGoalPose, spikeMarkGoalPose.getHeading())
                 .lineToConstantHeading(new Vector2d(-36,-48))
-                .lineToLinearHeading(new Pose2d(-36, -60, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-39, -60, Math.toRadians(180)))
                 .lineToLinearHeading(new Pose2d(36, -60, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
                 .lineToLinearHeading(new Pose2d(40, initialBackdropGoalPose.getY(), Math.toRadians(180)))

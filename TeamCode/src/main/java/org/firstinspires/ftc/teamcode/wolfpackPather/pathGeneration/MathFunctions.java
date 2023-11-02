@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.lupinePather.pathGeneration;
+package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 public class MathFunctions {
     /**
@@ -31,6 +31,7 @@ public class MathFunctions {
      *
      * @param one the first point
      * @param two the second point
+     * @return returns the sum of the two points
      */
     public static Point addPoints(Point one, Point two) {
         return new Point(one.getX() + two.getX(), one.getY() + two.getY(), Point.CARTESIAN);
@@ -42,9 +43,32 @@ public class MathFunctions {
      *
      * @param one the first point
      * @param two the second point
+     * @return returns the difference of the two points
      */
     public static Point subtractPoints(Point one, Point two) {
         return new Point(one.getX() - two.getX(), one.getY() - two.getY(), Point.CARTESIAN);
+    }
+
+    /**
+     * This multiplies a point by a scalar and returns the result as a point
+     *
+     * @param point the point being multiplied
+     * @param scalar the scalar multiplying into the point
+     * @return returns the scaled point
+     */
+    public static Point scalarMultiplyPoint(Point point, double scalar) {
+        return new Point(point.getX()*scalar, point.getY()*scalar, Point.CARTESIAN);
+    }
+
+    /**
+     * This multiplies a vector by a scalar and returns the result as a vector
+     *
+     * @param vector the vector being multiplied
+     * @param scalar the scalar multiplying into the vector
+     * @return returns the scaled vector
+     */
+    public static Vector scalarMultiplyVector(Vector vector, double scalar) {
+        return new Vector(vector.getMagnitude()*scalar, vector.getTheta());
     }
 
     /**

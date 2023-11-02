@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.lupinePather.pathGeneration;
+package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 public class Vector {
     /**
@@ -49,6 +49,15 @@ public class Vector {
      */
     public void setTheta(double theta) {
         setComponents(magnitude, theta);
+    }
+
+    /**
+     * This rotates the vector by an angle theta
+     *
+     * @param theta the angle to be added
+     */
+    public void rotateVector(double theta) {
+        setTheta(this.theta+theta);
     }
 
     /**
