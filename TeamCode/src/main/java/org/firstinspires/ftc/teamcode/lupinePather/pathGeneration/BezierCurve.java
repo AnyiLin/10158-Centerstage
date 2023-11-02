@@ -82,6 +82,12 @@ public class BezierCurve {
         return new Point(xCoordinate, yCoordinate, Point.CARTESIAN);
     }
 
+    /**
+     * This returns the curvature of the Bezier curve at a specified time point
+     *
+     * @param t the parametric time input
+     * @return returns the curvature
+     */
     public double getCurvature(double t) {
         if (t < 0) t = 0;
         if (t > 1) t = 1;
