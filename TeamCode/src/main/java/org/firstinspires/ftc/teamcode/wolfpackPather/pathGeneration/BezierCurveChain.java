@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.lupinePather.pathGeneration;
+package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 import java.util.ArrayList;
 
@@ -17,10 +17,10 @@ public class BezierCurveChain {
             chain.add(curve);
             if (chain.size()>1) {
                 // Gets important points along the previous and current curves
-                Point prevSecondLast = chain.get(chain.size()-2).getControlPoints().get(chain.get(chain.size()-2).getControlPoints().size() - 2);
-                Point prevLast = chain.get(chain.size()-2).getControlPoints().get(chain.get(chain.size()-2).getControlPoints().size() - 1);
-                Point currentFirst = chain.get(chain.size()-1).getControlPoints().get(0);
-                Point currentSecond = chain.get(chain.size()-1).getControlPoints().get(1);
+                Point prevSecondLast = chain.get(chain.size()-2).getSecondToLastControlPoint();
+                Point prevLast = chain.get(chain.size()-2).getLastControlPoint();
+                Point currentFirst = chain.get(chain.size()-1).getFirstControlPoint();
+                Point currentSecond = chain.get(chain.size()-1).getSecondControlPoint();
 
                 // Checks if start/end points are the same
                 if (!(prevLast.getX() == currentFirst.getX() && prevLast.getY() == currentFirst.getY())) {
@@ -54,10 +54,10 @@ public class BezierCurveChain {
         for (int i = 0; i < curves.size() - 1; i++) {
 
             // Gets important points along the previous and current curves
-            Point prevSecondLast = chain.get(i).getControlPoints().get(chain.get(i).getControlPoints().size() - 2);
-            Point prevLast = chain.get(i).getControlPoints().get(chain.get(i).getControlPoints().size() - 1);
-            Point currentFirst = chain.get(i + 1).getControlPoints().get(0);
-            Point currentSecond = chain.get(i + 1).getControlPoints().get(1);
+            Point prevSecondLast = chain.get(i).getSecondToLastControlPoint();
+            Point prevLast = chain.get(i).getLastControlPoint();
+            Point currentFirst = chain.get(i + 1).getFirstControlPoint();
+            Point currentSecond = chain.get(i + 1).getSecondControlPoint();
 
             // Checks if start/end points are the same
             if (!(prevLast.getX() == currentFirst.getX() && prevLast.getY() == currentFirst.getY())) {
@@ -71,12 +71,31 @@ public class BezierCurveChain {
         }
     }
 
+    /**
+     * This returns the ArrayList of BezierCurve containing the chain
+     *
+     * @return returns the ArrayList
+     */
     public ArrayList<BezierCurve> getChain(){
         return chain;
     }
 
+    /**
+     * This returns the BezierCurve at index i in the chain
+     *
+     * @param i The index of the curve we want
+     * @return returns the BezierCurve
+     */
     public BezierCurve getCurve(int i){
         return chain.get(i);
     }
 
+    /**
+     * This returns the size of the BezierCurve chain
+     *
+     * @return returns the size
+     */
+    public int getChainSize() {
+        return chain.size();
+    }
 }

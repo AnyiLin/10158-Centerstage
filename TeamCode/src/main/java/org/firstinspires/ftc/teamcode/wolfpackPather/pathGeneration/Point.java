@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.lupinePather.pathGeneration;
+package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 public class Point {
     /**

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.lupinePather.pathGeneration;
+package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 import java.util.ArrayList;
 
@@ -152,6 +152,42 @@ public class BezierCurve {
      */
     public ArrayList<Point> getControlPoints() {
         return controlPoints;
+    }
+
+    /**
+     * Returns the first control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getFirstControlPoint() {
+        return controlPoints.get(0);
+    }
+
+    /**
+     * Returns the second control point, or the one after the start, for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getSecondControlPoint() {
+        return controlPoints.get(1);
+    }
+
+    /**
+     * Returns the second to last control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getSecondToLastControlPoint() {
+        return controlPoints.get(controlPoints.size()-2);
+    }
+
+    /**
+     * Returns the last control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getLastControlPoint() {
+        return controlPoints.get(controlPoints.size()-1);
     }
 
     /**

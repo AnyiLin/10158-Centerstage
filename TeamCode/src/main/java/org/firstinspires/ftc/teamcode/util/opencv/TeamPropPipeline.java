@@ -27,8 +27,6 @@ public class TeamPropPipeline extends OpenCvPipeline {
         COLOR = 0;
     }
 
-    public int temp;
-
     public TeamPropPipeline(int color) {
         defaultSetup();
         this.COLOR = color;

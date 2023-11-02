@@ -195,7 +195,7 @@ public class TwoPersonDrive extends LinearOpMode {
     public void runOpMode() {
         initialize();
 
-        adjustingLiftZero = true;
+        burstIntake = false;
 
         long initStartTime = System.currentTimeMillis();
         while (!isStarted() && !isStopRequested()) {
