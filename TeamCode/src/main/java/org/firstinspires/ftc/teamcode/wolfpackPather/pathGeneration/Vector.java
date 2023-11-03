@@ -26,8 +26,13 @@ public class Vector {
      */
     public void setComponents(double magnitude, double theta) {
         double[] orthogonalComponents;
-        this.magnitude = magnitude;
-        this.theta = theta;
+        if (magnitude<0) {
+            this.magnitude = -magnitude;
+            this.theta = MathFunctions.normalizeAngle(theta+Math.PI);
+        } else {
+            this.magnitude = magnitude;
+            this.theta = MathFunctions.normalizeAngle(theta);
+        }
         orthogonalComponents = Point.polarToCartesian(magnitude, theta);
         xComponent = orthogonalComponents[0];
         yComponent = orthogonalComponents[1];

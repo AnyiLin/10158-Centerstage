@@ -41,8 +41,13 @@ public class Point {
                 theta = setOtherCoordinates[1];
                 break;
             default:
-                r = rOrX;
-                theta = thetaOrY;
+                if (rOrX<0) {
+                    r = -rOrX;
+                    theta = MathFunctions.normalizeAngle(thetaOrY+Math.PI);
+                } else {
+                    r = rOrX;
+                    theta = MathFunctions.normalizeAngle(thetaOrY);
+                }
                 setOtherCoordinates = polarToCartesian(r, theta);
                 x = setOtherCoordinates[0];
                 y = setOtherCoordinates[1];
@@ -79,6 +84,7 @@ public class Point {
      * @return this returns an array of doubles of length 2 with the r and theta values in that order in it
      */
     public static double[] cartesianToPolar(double x, double y) {
+        if (x < 0) return new double[] {x*x+y*y, Math.PI+Math.atan(y/x)};
         return new double[] {x*x+y*y, Math.atan(y/x)};
     }
 

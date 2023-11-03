@@ -27,6 +27,21 @@ public class MathFunctions {
     }
 
     /**
+     * This normalizes an angle to be between 0 and 2pi radians, inclusive
+     *
+     * IMPORTANT NOTE: This method operates in radians
+     *
+     * @param angleRadians the angle to be normalized
+     * @return returns the normalized angle
+     */
+    public static double normalizeAngle(double angleRadians) {
+        double angle = angleRadians;
+        while (angle<0) angle += 2*Math.PI;
+        while (angle>2*Math.PI) angle -= 2*Math.PI;
+        return angle;
+    }
+
+    /**
      * This returns a point that is the sum of the two input points
      *
      * @param one the first point
@@ -69,6 +84,21 @@ public class MathFunctions {
      */
     public static Vector scalarMultiplyVector(Vector vector, double scalar) {
         return new Vector(vector.getMagnitude()*scalar, vector.getTheta());
+    }
+
+    /**
+     * This normalizes a vector to be of magnitude 1, unless the vector is the zero vector
+     * In that case, it just returns back the original vector but with a different memory location
+     *
+     * @param vector the vector being normalized
+     * @return returns the normalized (or zero) vector
+     */
+    public static Vector normalizeVector(Vector vector) {
+        if (vector.getMagnitude() == 0) {
+            return new Vector(0.0, vector.getTheta());
+        } else {
+            return new Vector(vector.getMagnitude()/Math.abs(vector.getMagnitude()), vector.getTheta());
+        }
     }
 
     /**
