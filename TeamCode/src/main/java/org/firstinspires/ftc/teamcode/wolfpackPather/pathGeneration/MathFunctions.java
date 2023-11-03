@@ -26,6 +26,12 @@ public class MathFunctions {
         return num/denom;
     }
 
+    public static double clamp(double num, double lower, double upper) {
+        if (num < lower) return lower;
+        if (num > upper) return upper;
+        return num;
+    }
+
     /**
      * This normalizes an angle to be between 0 and 2pi radians, inclusive
      *

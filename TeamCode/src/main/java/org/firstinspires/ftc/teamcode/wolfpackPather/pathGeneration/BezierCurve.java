@@ -65,8 +65,7 @@ public class BezierCurve {
      * @return this returns the point requested
      */
     public Point getPoint(double t) {
-        if (t < 0) t = 0;
-        if (t > 1) t = 1;
+        t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
 
@@ -89,8 +88,7 @@ public class BezierCurve {
      * @return returns the curvature
      */
     public double getCurvature(double t) {
-        if (t < 0) t = 0;
-        if (t > 1) t = 1;
+        t = MathFunctions.clamp(t, 0, 1);
         Vector derivative = new Vector(getDerivative(t).getR(), getDerivative(t).getTheta());
         Vector secondDerivative =  new Vector(getSecondDerivative(t).getR(), getSecondDerivative(t).getTheta());
 
@@ -104,8 +102,7 @@ public class BezierCurve {
      * @return this returns the derivative requested
      */
     public Point getDerivative(double t) {
-        if (t < 0) t = 0;
-        if (t > 1) t = 1;
+        t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
 
@@ -128,8 +125,7 @@ public class BezierCurve {
      * @return this returns the second derivative requested
      */
     public Point getSecondDerivative(double t) {
-        if (t < 0) t = 0;
-        if (t > 1) t = 1;
+        t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
 

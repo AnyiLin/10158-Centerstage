@@ -158,21 +158,21 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             case "left":
                 spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 1.5-2.5+redLeftBackdrop.getY(), Math.toRadians(180));
+                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH, 2.5-2.5+redLeftBackdrop.getY(), Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -1.5-2.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, redInnerStack.getY()-1.5);
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-0.5, redInnerStack.getY()-3);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.25, Math.toRadians(90));
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, -2+redMiddleBackdrop.getY(), Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -2+redLeftBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-0.5, redInnerStack.getY()-1.5);
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-0.5, redInnerStack.getY()-2);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+redRightBackdrop.getY(), Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH, redInnerStack.getY()-1.5);
+                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-0.5, redInnerStack.getY()-2);
                 break;
         }
     }
@@ -186,7 +186,7 @@ public class RedRightInnerAuto extends OpMode {
                 .splineTo(new Vector2d(12,-48), Math.toRadians(90))
                 .splineToSplineHeading(spikeMarkGoalPose, spikeMarkGoalPose.getHeading())
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(14,-48), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(15,-48), Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
                 .splineToSplineHeading(new Pose2d(30, -56, Math.toRadians(180)), Math.toRadians(0))
                 .splineToLinearHeading(new Pose2d(40, initialBackdropGoalPose.getY(), Math.toRadians(180.00001)), Math.toRadians(90))
@@ -197,6 +197,7 @@ public class RedRightInnerAuto extends OpMode {
 
         getStackPixels = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
                 .splineToLinearHeading(new Pose2d(24, -12, Math.toRadians(180)), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+8, firstStackPose.getY()+0.0001, Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.resumeStreaming())
                 .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.setProcessorEnabled(teamPropPipeline, false))
                 .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.setProcessorEnabled(stackRelocalization, true))
@@ -223,8 +224,9 @@ public class RedRightInnerAuto extends OpMode {
                 .build();
 
         scoreFirstStackPixels = drive.trajectorySequenceBuilder(getStackPixels2.end())
+                .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(180)))
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(36, -12, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(30, -12, Math.toRadians(180)), Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(50))
                 .splineToLinearHeading(new Pose2d(40, firstCycleBackdropGoalPose.getY(), Math.toRadians(180)), Math.toRadians(180))
                 .setReversed(false)
@@ -338,10 +340,10 @@ public class RedRightInnerAuto extends OpMode {
             atBackdrop = true;
             atBackdropStartTime = System.currentTimeMillis();
         }
-        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME) {
+        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME+200) {
             twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
         }
-        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*2) {
+        if (trajectoryNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*2+200) {
             twoPersonDrive.leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
             twoPersonDrive.rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
         }
