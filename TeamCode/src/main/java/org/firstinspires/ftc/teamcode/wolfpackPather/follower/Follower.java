@@ -2,11 +2,16 @@ package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
+
 public class Follower {
     private HardwareMap hardwareMap;
+    private DriveVectorScaler driveVectorScaler;
 
     public Follower(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
+        driveVectorScaler = new DriveVectorScaler(FollowerConstants.frontLeftVector);
     }
 
     /**
@@ -16,9 +21,6 @@ public class Follower {
     // TODO: increment along the path by some fixed amount to determine which point is closest to the robot
     // do this by incrementing along the path until the distance from the robot is getting greater
     // also make sure we're not going backwards along the path somehow
-
-    // TODO: make drive power scaling
-    // corrective power first, then heading power, then drive power
 
     // TODO: make heading pid
     // pretty self explanatory

@@ -26,6 +26,14 @@ public class MathFunctions {
         return num/denom;
     }
 
+    /**
+     * This clamps down a value to between the lower and upper bounds
+     *
+     * @param num the number to be clamped
+     * @param lower the lower bound
+     * @param upper the upper bound
+     * @return returns the clamped number
+     */
     public static double clamp(double num, double lower, double upper) {
         if (num < lower) return lower;
         if (num > upper) return upper;
@@ -79,6 +87,26 @@ public class MathFunctions {
      */
     public static Point scalarMultiplyPoint(Point point, double scalar) {
         return new Point(point.getX()*scalar, point.getY()*scalar, Point.CARTESIAN);
+    }
+
+    /**
+     * Copies a Point, but with a different reference location in the memory
+     *
+     * @param point point to be deep copied
+     * @return returns the copied point
+     */
+    public static Point copyPoint(Point point) {
+        return new Point(point.getX(), point.getY(), Point.CARTESIAN);
+    }
+
+    /**
+     * Copies a Vector, but with a different reference location in the memory
+     *
+     * @param vector vector to be deep copied
+     * @return returns the copied vector
+     */
+    public static Vector copyVector(Vector vector) {
+        return new Vector(vector.getMagnitude(), vector.getTheta());
     }
 
     /**
