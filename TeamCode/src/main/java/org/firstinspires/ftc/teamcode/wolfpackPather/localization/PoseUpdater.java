@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,11 @@ public class PoseUpdater {
         return previousPose;
     }
 
-    public double getVelocity() {
-        return MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime-previousPoseTime)/Math.pow(10.0, 9));
+    public Vector getVelocity() {
+        Vector velocity = new Vector(0,0);
+        velocity.setOrthogonalComponents(getPose().getX() - previousPose.getX(), getPose().getY() - previousPose.getY());
+        velocity.setMagnitude(MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime-previousPoseTime)/Math.pow(10.0, 9)));
+        return velocity;
     }
 
     public void resetHeadingToIMU() {

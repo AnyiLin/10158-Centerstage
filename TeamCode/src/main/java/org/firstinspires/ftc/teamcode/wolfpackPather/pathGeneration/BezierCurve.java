@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
+
 import java.util.ArrayList;
 
 public class BezierCurve {
@@ -7,7 +8,7 @@ public class BezierCurve {
     private ArrayList<BezierCurveCoefficients> pointCoefficients = new ArrayList<>();
 
     // This contains the control points for the Bezier curve
-    private ArrayList<Point> controlPoints;
+    private ArrayList<Point> controlPoints = new ArrayList<Point>();
 
     private final int APPROXIMATION_STEPS = 100;
 
@@ -22,9 +23,36 @@ public class BezierCurve {
      */
     public BezierCurve(ArrayList<Point> controlPoints) {
         if (controlPoints.size()<3) {
-            //TODO: throw some sort of error
+            try {
+                throw new Exception("Too few control points");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         this.controlPoints = controlPoints;
+        generateBezierCurve();
+        length = approximateLength();
+        UNIT_TO_TIME = 1/length;
+    }
+
+    /**
+     * This creates a new Bezier curve with some specified control points and generates the curve
+     * IMPORTANT NOTE: The order of the control points is important. That's the order the code will
+     * process them in, with the 0 index being the start point and the final index being the end point
+     *
+     * @param controlPoints This is the specified control points that define the Bezier curve
+     */
+    public BezierCurve(Point... controlPoints) {
+        for (Point controlPoint : controlPoints) {
+            this.controlPoints.add(controlPoint);
+        }
+        if (this.controlPoints.size()<3) {
+            try {
+                throw new Exception("Too few control points");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         generateBezierCurve();
         length = approximateLength();
         UNIT_TO_TIME = 1/length;

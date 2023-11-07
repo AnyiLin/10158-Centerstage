@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
+
 public class Path {
     private BezierCurve curve;
 
@@ -65,6 +67,10 @@ public class Path {
         return closestPointCurvature;
     }
 
+    public Vector getClosestPointTangentVector() {
+        return MathFunctions.copyVector(closestPointTangentVector);
+    }
+
     public double getClosestPointHeadingGoal() {
         if (isTangentHeadingInterpolation) {
             return closestPointTangentVector.getTheta();
@@ -89,7 +95,7 @@ public class Path {
     }
 
     public boolean isAtEnd() {
-        if (closestPointTValue >= 0.999) return true;
+        if (closestPointTValue >= FollowerConstants.pathEndTValue) return true;
         return false;
     }
 }

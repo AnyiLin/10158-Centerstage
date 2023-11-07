@@ -46,6 +46,11 @@ public class Follower {
             headingPIDF = new PIDFController(FollowerConstants.headingPIDFCoefficients),
             drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
 
+    /**
+     * This creates a new follower given a hardware map
+     *
+     * @param hardwareMap hardware map required
+     */
     public Follower(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
         driveVectorScaler = new DriveVectorScaler(FollowerConstants.frontLeftVector);
@@ -72,10 +77,30 @@ public class Follower {
         }
     }
 
+    /**
+     * This returns the current pose
+     *
+     * @return returns the pose
+     */
+    public Pose2d getPose() {
+        return poseUpdater.getPose();
+    }
+
+    /**
+     * This sets the starting pose. Do not run this after moving at all.
+     *
+     * @param pose the pose to set the starting pose to
+     */
     public void setStartingPose(Pose2d pose) {
         poseUpdater.setStartingPose(pose);
     }
 
+
+    /**
+     * This follows a path
+     *
+     * @param path the path to follow
+     */
     public void followPath(Path path) {
         isBusy = true;
         followingPathChain = false;
@@ -83,6 +108,11 @@ public class Follower {
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
     }
 
+    /**
+     * This follows a path chain and only slows down at the end of the path chain
+     *
+     * @param pathChain the path chain to follow
+     */
     public void followPathChain(PathChain pathChain) {
         isBusy = true;
         followingPathChain = true;
@@ -92,6 +122,9 @@ public class Follower {
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
     }
 
+    /**
+     * Updates the robot's position and drive powers
+     */
     public void update() {
         poseUpdater.update();
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
@@ -103,17 +136,26 @@ public class Follower {
             } else {
                 // At last path, run some end detection stuff
                 // set isBusy to false if at end
-                // TODO: end detection
+                if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity) {
+                    isBusy = false;
+                }
             }
         }
 
-        drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector());
+        if (isBusy) {
+            drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector());
 
-        for (int i = 0; i < motors.size(); i++) {
-            motors.get(i).setPower(drivePowers[i]);
+            for (int i = 0; i < motors.size(); i++) {
+                motors.get(i).setPower(drivePowers[i]);
+            }
         }
     }
 
+    /**
+     * This returns if the follower is currently following a path or a path chain
+     *
+     * @return returns if the follower is busy
+     */
     public boolean isBusy() {
         return isBusy;
     }
@@ -139,7 +181,7 @@ public class Follower {
      * @return returns the projected distance
      */
     public double getZeroPowerDistance() {
-        return -Math.pow(poseUpdater.getVelocity(), 2) / 2 * FollowerConstants.zeroPowerAcceleration;
+        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / 2 * FollowerConstants.zeroPowerAcceleration;
     }
 
     /**
@@ -164,7 +206,9 @@ public class Follower {
      * @return returns the corrective vector
      */
     public Vector getCorrectiveVector() {
-        return null;
+        Vector centripetal = getCentripetalForceCorrection();
+        Vector translational = getTranslationalCorrection();
+        return MathFunctions.addVectors(centripetal, MathFunctions.scalarMultiplyVector(translational, driveVectorScaler.findNormalizingScaling(centripetal, translational)));
     }
 
     /**
@@ -193,28 +237,6 @@ public class Follower {
      */
     public Vector getCentripetalForceCorrection() {
         double curvature = currentPath.getClosestPointCurvature();
-        return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(poseUpdater.getVelocity(), 2) * curvature,0,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
+        return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,0,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
     }
-
-    /**
-     * IN A SOMEWHAT ORDERED LIST, HERE ARE THE TODOS
-     */
-
-    // TODO: make correctional vector
-    // combine the translational and centripetal vectors
-
-    // TODO: make centripetal force correction
-    // do this by finding the curvature, then using the physics formula to find the force necessary and scaling that to a motor power
-
-
-    // TODO: measure the deceleration of the drivetrain at 0 power and create the glide-into-position stopping system
-    // do this by measuring if the distance from the drivetrain stopping is greater than the path end position
-    // then, use a translational pid to move the projected end point onto the actual end point
-
-    // TODO: alternate stopping mechanism?
-    // still measure the deceleration, but now measure when the stopping distance is greater
-    // than the path end position in terms of arc length
-    // then, cut forward drive power, but keep correctional pids
-    // alternatively, use a pid to slow down, so when stop distance exceeds arc length remaining,
-    // correct backwards, and vice versa
 }

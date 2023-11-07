@@ -1,0 +1,124 @@
+package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.wolfpackPather.localization.PoseUpdater;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@Config
+@Autonomous (name = "Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
+public class ZeroPowerAccelerationTuner extends OpMode {
+    private ArrayList<Double> accelerations = new ArrayList<Double>();
+
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
+    private List<DcMotorEx> motors;
+
+    private PoseUpdater poseUpdater;
+
+    public static double VELOCITY = 10;
+
+    private double previousVelocity;
+
+    private long previousTimeNano;
+
+    private Telemetry telemetry;
+
+    private boolean stopping, end;
+
+    @Override
+    public void init() {
+        poseUpdater = new PoseUpdater(hardwareMap);
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
+        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second");
+        telemetry.addLine("Make sure you have enough room");
+        telemetry.addLine("Press cross or A to stop");
+        telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+    }
+
+    @Override
+    public void start() {
+        for (DcMotorEx motor : motors) {
+            motor.setPower(1);
+        }
+    }
+
+    @Override
+    public void loop() {
+        if (gamepad1.cross || gamepad1.a) {
+            requestOpModeStop();
+        }
+
+        poseUpdater.update();
+        if (!end) {
+            if (!stopping) {
+                if (poseUpdater.getVelocity().getMagnitude() > VELOCITY) {
+                    previousVelocity = poseUpdater.getVelocity().getMagnitude();
+                    previousTimeNano = System.nanoTime();
+                    stopping = true;
+                    for (DcMotorEx motor : motors) {
+                        motor.setPower(0);
+                    }
+                }
+            } else {
+                double currentVelocity = poseUpdater.getVelocity().getMagnitude();
+                accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) * Math.pow(10.0, 9))));
+                previousVelocity = currentVelocity;
+                previousTimeNano = System.nanoTime();
+                if (currentVelocity < FollowerConstants.pathEndVelocity) {
+                    end = true;
+                }
+            }
+        } else {
+            double average = 0;
+            for (Double acceleration : accelerations) {
+                average += acceleration.doubleValue();
+            }
+            average /= (double)accelerations.size();
+
+            telemetry.addData("average acceleration:", average);
+            telemetry.update();
+        }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+    }
+}
