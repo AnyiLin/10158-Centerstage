@@ -1,64 +1,83 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.localization;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Config
-public class PoseUpdater extends MecanumDrive {
-    private List<Integer> lastEncPositions = new ArrayList<>();
-    private List<Integer> lastEncVels = new ArrayList<>();
+public class PoseUpdater {
+    private HardwareMap hardwareMap;
 
     private IMU imu;
 
+    private ThreeWheelLocalizer localizer;
+
+    private Pose2d startingPose = new Pose2d(0,0,0);
+
+    private Pose2d previousPose = startingPose;
+
+    private long previousPoseTime, currentPoseTime;
+
     public PoseUpdater(HardwareMap hardwareMap) {
-        super(0, 0, 0, 0, 0, 0);
+        this.hardwareMap = hardwareMap;
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
+
+        // TODO: change this when new robot is built
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        imu.initialize(parameters);
+
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();
-
-        // TODO: if desired, use setLocalizer() to change the localization method
-        setLocalizer(new ThreeWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
+        localizer = new ThreeWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels);
     }
 
     public void update() {
-        updatePoseEstimate();
+        previousPose = localizer.getPoseEstimate();
+        previousPoseTime = currentPoseTime;
+        currentPoseTime = System.nanoTime();
+        localizer.update();
     }
 
-    @Override
-    public List<Double> getWheelVelocities() {
-        List returnList = new ArrayList<Double>();
-        return returnList;
+    public void setStartingPose(Pose2d set) {
+        startingPose = set;
+        previousPose = startingPose;
+        previousPoseTime = System.nanoTime();
+        currentPoseTime = System.nanoTime();
     }
 
-    @Override
-    public void setMotorPowers(double v, double v1, double v2, double v3) {
+    public Pose2d getPose() {
+        return localizer.getPoseEstimate();
     }
 
-    @Override
-    public double getRawExternalHeading() {
-        return 0.0;//return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    public void setPose(Pose2d set) {
+        localizer.setPoseEstimate(set);
     }
 
-    @Override
-    public Double getExternalHeadingVelocity() {
-        return 0.0;//return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+    public Pose2d getPreviousPose() {
+        return previousPose;
     }
 
-    @NonNull
-    @Override
-    public List<Double> getWheelPositions() {
-        List returnList = new ArrayList<Double>();
-        return returnList;
+    public double getVelocity() {
+        return MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime-previousPoseTime)/Math.pow(10.0, 9));
+    }
+
+    public void resetHeadingToIMU() {
+        localizer.resetHeading(getNormalizedIMUHeading() + startingPose.getHeading());
+    }
+
+    public double getNormalizedIMUHeading() {
+        return MathFunctions.normalizeAngle(-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
     }
 }

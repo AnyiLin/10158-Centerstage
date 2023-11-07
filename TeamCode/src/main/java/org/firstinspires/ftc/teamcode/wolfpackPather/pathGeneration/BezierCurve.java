@@ -9,7 +9,7 @@ public class BezierCurve {
     // This contains the control points for the Bezier curve
     private ArrayList<Point> controlPoints;
 
-    private final int APPROXIMATION_STEPS = 20;
+    private final int APPROXIMATION_STEPS = 100;
 
     private double UNIT_TO_TIME, length;
 
@@ -89,9 +89,10 @@ public class BezierCurve {
      */
     public double getCurvature(double t) {
         t = MathFunctions.clamp(t, 0, 1);
-        Vector derivative = new Vector(getDerivative(t).getR(), getDerivative(t).getTheta());
-        Vector secondDerivative =  new Vector(getSecondDerivative(t).getR(), getSecondDerivative(t).getTheta());
+        Vector derivative = getDerivative(t);
+        Vector secondDerivative = getSecondDerivative(t);
 
+        if (derivative.getMagnitude() == 0) return 0;
         return (MathFunctions.crossProduct(derivative, secondDerivative))/Math.pow(derivative.getMagnitude(),3);
     }
 
@@ -101,10 +102,11 @@ public class BezierCurve {
      * @param t this is the t value of the parametric curve. t is clamped to be between 0 and 1 inclusive
      * @return this returns the derivative requested
      */
-    public Point getDerivative(double t) {
+    public Vector getDerivative(double t) {
         t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
+        Vector returnVector = new Vector(0,0);
 
         // calculates the x coordinate of the point requested
         for (int i = 0; i < controlPoints.size()-1; i++) {
@@ -115,7 +117,10 @@ public class BezierCurve {
         for (int i = 0; i < controlPoints.size()-1; i++) {;
             yCoordinate += pointCoefficients.get(i).getDerivativeValue(t) * (MathFunctions.subtractPoints(controlPoints.get(i+1), controlPoints.get(i)).getY());
         }
-        return new Point(xCoordinate, yCoordinate, Point.CARTESIAN);
+
+        returnVector.setOrthogonalComponents(xCoordinate, yCoordinate);
+
+        return returnVector;
     }
 
     /**
@@ -124,10 +129,11 @@ public class BezierCurve {
      * @param t this is the t value of the parametric curve. t is clamped to be between 0 and 1 inclusive
      * @return this returns the second derivative requested
      */
-    public Point getSecondDerivative(double t) {
+    public Vector getSecondDerivative(double t) {
         t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
+        Vector returnVector = new Vector(0,0);
 
         // calculates the x coordinate of the point requested
         for (int i = 0; i < controlPoints.size()-2; i++) {
@@ -138,7 +144,10 @@ public class BezierCurve {
         for (int i = 0; i < controlPoints.size()-2; i++) {
             yCoordinate += pointCoefficients.get(i).getSecondDerivativeValue(t) * (MathFunctions.addPoints(MathFunctions.subtractPoints(controlPoints.get(i+2), new Point(2*controlPoints.get(i+1).getX(), 2*controlPoints.get(i+1).getY(), Point.CARTESIAN)), controlPoints.get(i)).getY());
         }
-        return new Point(xCoordinate, yCoordinate, Point.CARTESIAN);
+
+        returnVector.setOrthogonalComponents(xCoordinate, yCoordinate);
+
+        return returnVector;
     }
 
     /**
@@ -184,6 +193,15 @@ public class BezierCurve {
      */
     public Point getLastControlPoint() {
         return controlPoints.get(controlPoints.size()-1);
+    }
+
+    /**
+     * Returns the approximate length of this Bezier curve
+     *
+     * @return This returns the length
+     */
+    public double length() {
+        return length;
     }
 
     /**

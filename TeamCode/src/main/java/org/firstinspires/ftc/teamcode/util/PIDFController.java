@@ -16,6 +16,14 @@ public class PIDFController {
         targetPosition = 0;
         accumulatedError = 0;
     }
+    public PIDFController(double[] setCoefficients) {
+        coefficients = setCoefficients;
+        previousError = 0;
+        error = 0;
+        position = 0;
+        targetPosition = 0;
+        accumulatedError = 0;
+    }
 
     public double runPIDF() {
         return error*P() + (error-previousError)*D() + accumulatedError*I() + F();
@@ -26,6 +34,20 @@ public class PIDFController {
         previousError = error;
         error = targetPosition-position;
         accumulatedError += error;
+    }
+
+    public void updateError(double error) {
+        previousError = this.error;
+        this.error = error;
+        accumulatedError += error;
+    }
+
+    public void reset() {
+        previousError = 0;
+        error = 0;
+        position = 0;
+        targetPosition = 0;
+        accumulatedError = 0;
     }
 
     public void setTargetPosition(double set) {

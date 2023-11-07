@@ -158,19 +158,19 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             case "left":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), blueLeftSideLeftSpikeMark.getY()+(ROBOT_FRONT_LENGTH/Math.sqrt(2))-2, Math.toRadians(360-45));
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH, -1.5+1.5+blueLeftBackdrop.getY(), Math.toRadians(180));
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -1.5+1.5+blueLeftBackdrop.getY() +0.25, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, 1.5+2.5+blueMiddleBackdrop.getY(), Math.toRadians(180));
                 firstStackPose = new Pose2d(blueInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-1.75, blueInnerStack.getY()+3);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX(), blueLeftSideMiddleSpikeMark.getY()+ROBOT_FRONT_LENGTH+1.25, Math.toRadians(270));
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH, 1+blueMiddleBackdrop.getY(), Math.toRadians(180));
+                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, 1+blueMiddleBackdrop.getY() +0.5, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, 2+blueLeftBackdrop.getY(), Math.toRadians(180));
                 firstStackPose = new Pose2d(blueInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-1.75, blueInnerStack.getY()+3);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), blueLeftSideRightSpikeMark.getY()+(ROBOT_FRONT_LENGTH/Math.sqrt(2))-2, Math.toRadians(360-135));
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()-ROBOT_BACK_LENGTH, -2.5+1.5+blueRightBackdrop.getY(), Math.toRadians(180));
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -2.5+1.5+blueRightBackdrop.getY() +0.5, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5, 1.5+blueMiddleBackdrop.getY(), Math.toRadians(180));
                 firstStackPose = new Pose2d(blueInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH-1.75, blueInnerStack.getY()+3);
                 break;
@@ -188,7 +188,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 .splineToConstantHeading(new Vector2d(15,48), Math.toRadians(270))
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
                 .splineToSplineHeading(new Pose2d(30, 56, Math.toRadians(180)), Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(40, initialBackdropGoalPose.getY(), Math.toRadians(180.00001)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(35, initialBackdropGoalPose.getY(), Math.toRadians(180.00001)), Math.toRadians(270))
                 .setReversed(false)
                 .lineToLinearHeading(initialBackdropGoalPose)
                 .resetConstraints()

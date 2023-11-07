@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
+import java.math.BigDecimal;
+
 public class Point {
     /**
      * IMPORTANT NOTE: theta is defined in radians
@@ -62,7 +64,7 @@ public class Point {
      * @return returns the distance between the two
      */
     public double distanceFrom(Point otherPoint) {
-        return Math.sqrt((otherPoint.getX()-x)*(otherPoint.getX()-x) + (otherPoint.getY()-y)*(otherPoint.getY()-y));
+        return Math.sqrt(Math.pow(otherPoint.getX()-x, 2) + Math.pow(otherPoint.getY()-y, 2));
     }
 
     /**

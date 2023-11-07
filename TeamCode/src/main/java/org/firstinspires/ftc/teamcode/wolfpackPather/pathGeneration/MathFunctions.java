@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 public class MathFunctions {
     /**
      * There is possibly a more efficient method of doing this, but I'm doing it this way
@@ -24,6 +26,18 @@ public class MathFunctions {
         }
 
         return num/denom;
+    }
+
+    /**
+     * This returns the sign of a number
+     *
+     * @param get the number
+     * @return returns the sign of the number
+     */
+    public static double getSign(double get) {
+        if (get == 0) return 0;
+        if (get > 0) return 1;
+        return -1;
     }
 
     /**
@@ -53,6 +67,39 @@ public class MathFunctions {
         while (angle<0) angle += 2*Math.PI;
         while (angle>2*Math.PI) angle -= 2*Math.PI;
         return angle;
+    }
+
+    /**
+     * This returns the smallest angle between two angles
+     *
+     * @param one one of the angles
+     * @param two the other one
+     * @return returns the smallest angle
+     */
+    public static double getSmallestAngleDifference(double one, double two) {
+        return Math.min(MathFunctions.normalizeAngle(one-two), MathFunctions.normalizeAngle(two-one));
+    }
+
+    /**
+     * This returns the distance between a Pose2d and a point
+     *
+     * @param pose this is the pose
+     * @param point this is the point
+     * @return returns the distance between the two
+     */
+    public static double distance(Pose2d pose, Point point) {
+        return Math.sqrt(Math.pow(pose.getX()-point.getX(), 2) + Math.pow(pose.getY()-point.getY(), 2));
+    }
+
+    /**
+     * This returns the distance between a Pose2d and another Pose2d
+     *
+     * @param one this is the first pose
+     * @param two this is the second pose
+     * @return returns the distance between the two
+     */
+    public static double distance(Pose2d one, Pose2d two) {
+        return Math.sqrt(Math.pow(one.getX()-two.getX(), 2) + Math.pow(one.getY()-two.getY(), 2));
     }
 
     /**
