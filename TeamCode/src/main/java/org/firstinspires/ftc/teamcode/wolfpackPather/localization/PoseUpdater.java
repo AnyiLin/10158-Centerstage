@@ -26,6 +26,11 @@ public class PoseUpdater {
 
     private long previousPoseTime, currentPoseTime;
 
+    /**
+     * Creates a new PoseUpdater from a hardware map
+     *
+     * @param hardwareMap the hardware map
+     */
     public PoseUpdater(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
 
@@ -44,6 +49,9 @@ public class PoseUpdater {
         localizer = new ThreeWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels);
     }
 
+    /**
+     * Updates the robot's pose
+     */
     public void update() {
         previousPose = localizer.getPoseEstimate();
         previousPoseTime = currentPoseTime;
@@ -51,6 +59,11 @@ public class PoseUpdater {
         localizer.update();
     }
 
+    /**
+     * This sets the starting pose. Do not run this after moving at all.
+     *
+     * @param set the pose to set the starting pose to
+     */
     public void setStartingPose(Pose2d set) {
         startingPose = set;
         previousPose = startingPose;
@@ -58,18 +71,38 @@ public class PoseUpdater {
         currentPoseTime = System.nanoTime();
     }
 
+    /**
+     * This returns the current pose
+     *
+     * @return returns the current pose
+     */
     public Pose2d getPose() {
         return localizer.getPoseEstimate();
     }
 
+    /**
+     * This sets the current pose
+     *
+     * @param set the pose to set the current pose to
+     */
     public void setPose(Pose2d set) {
         localizer.setPoseEstimate(set);
     }
 
+    /**
+     * Returns the robot's pose from the previous update
+     *
+     * @return returns the robot's previous pose
+     */
     public Pose2d getPreviousPose() {
         return previousPose;
     }
 
+    /**
+     * This returns the velocity of the robot as a vector
+     *
+     * @return returns the velocity of the robot
+     */
     public Vector getVelocity() {
         Vector velocity = new Vector(0,0);
         velocity.setOrthogonalComponents(getPose().getX() - previousPose.getX(), getPose().getY() - previousPose.getY());
@@ -77,10 +110,18 @@ public class PoseUpdater {
         return velocity;
     }
 
+    /**
+     * This resets the heading of the robot to the IMU's heading
+     */
     public void resetHeadingToIMU() {
         localizer.resetHeading(getNormalizedIMUHeading() + startingPose.getHeading());
     }
 
+    /**
+     * This returns the IMU heading normalized to be between [0, 2 PI] radians
+     *
+     * @return returns the normalized IMU heading
+     */
     public double getNormalizedIMUHeading() {
         return MathFunctions.normalizeAngle(-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
     }

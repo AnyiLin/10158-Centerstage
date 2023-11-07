@@ -13,15 +13,35 @@ public class Path {
 
     private boolean isTangentHeadingInterpolation = true;
 
+    /**
+     * Creates a new Path from a Bezier curve. The default heading interpolation is tangential.
+     *
+     * @param curve the Bezier curve
+     */
     public Path(BezierCurve curve) {
         this.curve = curve;
     }
 
+    /**
+     * This sets the heading interpolation to linear with a specified start heading for the path and
+     * an end heading for the path
+     *
+     * @param startHeading the start heading for the path
+     * @param endHeading the end heading for the path
+     */
     public void setLinearHeadingInterpolation(double startHeading, double endHeading) {
         this.startHeading = startHeading;
         this.endHeading = endHeading;
     }
 
+    /**
+     * This gets the closest point from a specified pose to the curve with a specified binary search
+     * step limit
+     *
+     * @param pose the pose
+     * @param searchStepLimit the binary search step limit
+     * @return returns the closest point
+     */
     public Pose2d getClosestPoint(Pose2d pose, int searchStepLimit) {
         double lower = 0;
         double upper = 1;
@@ -47,30 +67,67 @@ public class Path {
         return new Pose2d(returnPoint.getX(), returnPoint.getY(), getClosestPointHeadingGoal());
     }
 
+    /**
+     * This gets a point on the curve at a specified t-value
+     *
+     * @param t the t-value specified
+     * @return returns the point at the t-value point on the curve
+     */
     public Point getPoint(double t) {
         return curve.getPoint(t);
     }
 
+    /**
+     * This returns the t-value of the closest point on the curve
+     *
+     * @return returns the closest point t-value
+     */
     public double getClosestPointTValue() {
         return closestPointTValue;
     }
 
+    /**
+     * This returns the approximated length of the curve
+     *
+     * @return returns the length of the curve
+     */
     public double length() {
         return curve.length();
     }
 
+    /**
+     * This returns the curvature of the curve at a specified t-value
+     *
+     * @param t the specified t-value
+     * @return returns the curvature of the curve at the specified t-value
+     */
     public double getCurvature(double t) {
         return curve.getCurvature(t);
     }
 
+    /**
+     * This returns the curvature of the curve at the closest point
+     *
+     * @return returns the curvature of the curve at the closest point
+     */
     public double getClosestPointCurvature() {
         return closestPointCurvature;
     }
 
+    /**
+     * This returns the tangent vector at the closest point
+     *
+     * @return returns the tangent vector at the closest point
+     */
     public Vector getClosestPointTangentVector() {
         return MathFunctions.copyVector(closestPointTangentVector);
     }
 
+    /**
+     * This returns the heading goal at the closest point
+     *
+     * @return returns the heading goal at the closest point
+     */
     public double getClosestPointHeadingGoal() {
         if (isTangentHeadingInterpolation) {
             return closestPointTangentVector.getTheta();
@@ -79,6 +136,12 @@ public class Path {
         }
     }
 
+    /**
+     * This gets the heading goal at a specified t-value
+     *
+     * @param t the specified t-value
+     * @return returns the heading goal at the specified t-value
+     */
     public double getHeadingGoal(double t) {
         if (isTangentHeadingInterpolation) {
             return curve.getDerivative(t).getTheta();
@@ -87,6 +150,11 @@ public class Path {
         }
     }
 
+    /**
+     * This gets the direction to turn from the start heading to the end heading for linear interpolation
+     *
+     * @return returns the turn direction
+     */
     public double getTurnDirection() {
         if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI * 2) {
             return 1; // counter clock wise
@@ -94,6 +162,11 @@ public class Path {
         return -1; // clock wise
     }
 
+    /**
+     * This returns if the robot is at the end of the path
+     *
+     * @return returns if at end
+     */
     public boolean isAtEnd() {
         if (closestPointTValue >= FollowerConstants.pathEndTValue) return true;
         return false;

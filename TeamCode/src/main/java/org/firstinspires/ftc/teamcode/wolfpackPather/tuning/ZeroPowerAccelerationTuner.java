@@ -33,7 +33,7 @@ public class ZeroPowerAccelerationTuner extends OpMode {
 
     private long previousTimeNano;
 
-    private Telemetry telemetry;
+    private Telemetry telemetryA;
 
     private boolean stopping, end;
 
@@ -58,14 +58,14 @@ public class ZeroPowerAccelerationTuner extends OpMode {
         }
 
         for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
 
-        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second");
-        telemetry.addLine("Make sure you have enough room");
-        telemetry.addLine("Press cross or A to stop");
-        telemetry.update();
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetryA.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second");
+        telemetryA.addLine("Make sure you have enough room");
+        telemetryA.addLine("Press cross or A to stop");
+        telemetryA.update();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class ZeroPowerAccelerationTuner extends OpMode {
                 }
             } else {
                 double currentVelocity = poseUpdater.getVelocity().getMagnitude();
-                accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) * Math.pow(10.0, 9))));
+                accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
                 if (currentVelocity < FollowerConstants.pathEndVelocity) {
@@ -112,8 +112,8 @@ public class ZeroPowerAccelerationTuner extends OpMode {
             }
             average /= (double)accelerations.size();
 
-            telemetry.addData("average acceleration:", average);
-            telemetry.update();
+            telemetryA.addData("average acceleration:", average);
+            telemetryA.update();
         }
     }
 

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous (name = "Strafe Velocity Tuner", group = "Autonomous Pathing Tuning")
+@Autonomous (name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
 public class ForwardVelocityTuner extends OpMode {
     private ArrayList<Double> velocities = new ArrayList<Double>();
 
@@ -31,7 +31,7 @@ public class ForwardVelocityTuner extends OpMode {
 
     public static double DISTANCE = 40, RECORD_NUMBER = 10;
 
-    private Telemetry telemetry;
+    private Telemetry telemetryA;
 
     private boolean end;
 
@@ -56,18 +56,18 @@ public class ForwardVelocityTuner extends OpMode {
         }
 
         for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
 
         for (int i = 0; i < RECORD_NUMBER; i++) {
             velocities.add(new Double(0));
         }
 
-        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
-        telemetry.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
-        telemetry.addLine("Press cross or A to stop");
-        telemetry.update();
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
+        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
+        telemetryA.addLine("Press cross or A to stop");
+        telemetryA.update();
     }
 
     @Override
@@ -110,8 +110,8 @@ public class ForwardVelocityTuner extends OpMode {
             }
             average /= (double) velocities.size();
 
-            telemetry.addData("forward velocity:", average);
-            telemetry.update();
+            telemetryA.addData("forward velocity:", average);
+            telemetryA.update();
         }
     }
 

@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
 @Config
 @Autonomous (name = "Curved Back And Forth", group = "Autonomous Pathing Tuning")
 public class CurvedBackAndForth extends OpMode {
-    private Telemetry telemetry;
+    private Telemetry telemetryA;
 
     public static double DISTANCE = 40;
 
@@ -34,9 +34,9 @@ public class CurvedBackAndForth extends OpMode {
 
         follower.followPath(forwards);
 
-        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.addLine("stuff");
-        telemetry.update();
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetryA.addLine("stuff");
+        telemetryA.update();
     }
 
     @Override

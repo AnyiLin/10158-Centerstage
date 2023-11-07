@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.firstinspires.ftc.teamcode.util.CustomPIDFCoefficients;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
@@ -10,29 +11,29 @@ import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
 public class FollowerConstants {
 
     // This section is for setting the actual drive vector for the front left wheel
-    private static double xMovement = 1;
-    private static double yMovement = 1;
+    private static double xMovement = 78.54602;
+    private static double yMovement = 55.68387;
     private static double[] convertToPolar = Point.cartesianToPolar(xMovement, yMovement);
     public static Vector frontLeftVector = MathFunctions.normalizeVector(new Vector(convertToPolar[0],convertToPolar[1]));
 
     // Mass of robot in kilograms
-    public static double mass = 0.0;
+    public static double mass = 10.4326;
 
     // Heading PIDF coefficients
-    public static double[] headingPIDFCoefficients = {0,0,0,0};
+    public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(0,0,0,0);
 
     // Translational PIDF coefficients
-    public static double[] translationalPIDFCoefficients = {0,0,0,0};
+    public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(0,0,0,0);
 
     // Drive PIDF coefficients
-    public static double[] drivePIDFCoefficients = {0,0,0,0};
+    public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(0,0,0,0);
 
     // Centrifugal force to power scaling
     public static double centrifugalScaling = 0;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
-    public static double zeroPowerAcceleration = -100;
+    public static double zeroPowerAcceleration = -30;
 
     // When the drivetrain is at the end of its current path or path chain and the velocity goes
     // below this value, then end the path. This is in inches/second

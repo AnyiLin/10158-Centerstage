@@ -5,28 +5,18 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.wolfpackPather.follower.Follower;
-import org.firstinspires.ftc.teamcode.wolfpackPather.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @Config
 @Autonomous (name = "Straight Back And Forth", group = "Autonomous Pathing Tuning")
 public class StraightBackAndForth extends OpMode {
-    private Telemetry telemetry;
+    private Telemetry telemetryA;
 
     public static double DISTANCE = 40;
 
@@ -47,9 +37,9 @@ public class StraightBackAndForth extends OpMode {
 
         follower.followPath(forwards);
 
-        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetry.addLine("stuff");
-        telemetry.update();
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetryA.addLine("stuff");
+        telemetryA.update();
     }
 
     @Override
@@ -72,8 +62,13 @@ public class StraightBackAndForth extends OpMode {
                 follower.followPath(forwards);
             }
         }
-        telemetry.addData("Heading error", MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
-        telemetry.update();
+        telemetryA.addData("Heading error", MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
+        telemetryA.addData("translational error", follower.asdf());
+        telemetryA.addData("isBusy", follower.isBusy());
+        telemetryA.addData("heading", follower.getHeadingVector().getMagnitude());
+        telemetryA.addData("corrective", follower.getCorrectiveVector().getMagnitude());
+        telemetryA.addData("drive", follower.getDriveVector().getMagnitude());
+        telemetryA.update();
     }
 
     @Override

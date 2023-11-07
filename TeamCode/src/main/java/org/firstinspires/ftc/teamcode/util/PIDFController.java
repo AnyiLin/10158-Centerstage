@@ -1,23 +1,12 @@
 package org.firstinspires.ftc.teamcode.util;
 
 public class PIDFController {
-    private double[] coefficients = new double[4];
+    private CustomPIDFCoefficients coefficients;
 
     private double previousError, error, position, targetPosition, accumulatedError;
 
-    public PIDFController(double P, double I, double D, double F) {
-        coefficients[0] = P;
-        coefficients[1] = I;
-        coefficients[2] = D;
-        coefficients[3] = F;
-        previousError = 0;
-        error = 0;
-        position = 0;
-        targetPosition = 0;
-        accumulatedError = 0;
-    }
-    public PIDFController(double[] setCoefficients) {
-        coefficients = setCoefficients;
+    public PIDFController(CustomPIDFCoefficients set) {
+        coefficients = set;
         previousError = 0;
         error = 0;
         position = 0;
@@ -58,43 +47,43 @@ public class PIDFController {
         return targetPosition;
     }
 
-    public void setCoefficients(double[] set) {
+    public void setCoefficients(CustomPIDFCoefficients set) {
         coefficients = set;
     }
 
-    public double[] getCoefficients() {
+    public CustomPIDFCoefficients getCoefficients() {
         return coefficients;
     }
 
     public void setP(double set) {
-        coefficients[0] = set;
+        coefficients.P = set;
     }
 
     public double P() {
-        return coefficients[0];
+        return coefficients.P;
     }
 
     public void setI(double set) {
-        coefficients[1] = set;
+        coefficients.I = set;
     }
 
     public double I() {
-        return coefficients[1];
+        return coefficients.I;
     }
 
     public void setD(double set) {
-        coefficients[2] = set;
+        coefficients.D = set;
     }
 
     public double D() {
-        return coefficients[2];
+        return coefficients.D;
     }
 
     public void setF(double set) {
-        coefficients[3] = set;
+        coefficients.F = set;
     }
 
     public double F() {
-        return coefficients[3];
+        return coefficients.F;
     }
 }

@@ -73,7 +73,7 @@ public class Follower {
         }
 
         for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
     }
 
@@ -163,7 +163,7 @@ public class Follower {
     /**
      * This returns a Vector in the direction the robot must go to move along the path
      *
-     * Note: This vector is clamped to be between [0, 1] in magnitude
+     * Note: This vector is clamped to be at most 1 in magnitude
      *
      * @return returns the drive vector
      */
@@ -172,7 +172,7 @@ public class Follower {
             return new Vector(1, currentPath.getClosestPointHeadingGoal());
         }
         drivePIDF.updateError(currentPath.length() * currentPath.getClosestPointTValue() - getZeroPowerDistance());
-        return new Vector(drivePIDF.runPIDF(), currentPath.getClosestPointHeadingGoal());
+        return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointHeadingGoal());
     }
 
     /**
@@ -188,34 +188,40 @@ public class Follower {
      * This returns a Vector in the direction of the robot that contains the heading correction
      * as its magnitude
      *
-     * Note: This vector is clamped to between [0, 1] in magnitude
+     * Note: This vector is clamped to be at most 1 in magnitude
      *
      * @return returns the heading vector
      */
     public Vector getHeadingVector() {
         headingPIDF.updateError(MathFunctions.getSmallestAngleDifference(currentPath.getClosestPointHeadingGoal(), poseUpdater.getPose().getHeading()));
-        return new Vector(MathFunctions.clamp(headingPIDF.runPIDF(), 0, 1), poseUpdater.getPose().getHeading());
+        return new Vector(MathFunctions.clamp(headingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
     }
 
     /**
      * This returns a Vector in the direction the robot must go to account for both translational
      * error as well as centripetal force.
      *
-     * Note: This vector is clamped to be between [0, 1] in magnitude
+     * Note: This vector is clamped to be at most 1 in magnitude
      *
      * @return returns the corrective vector
      */
     public Vector getCorrectiveVector() {
         Vector centripetal = getCentripetalForceCorrection();
         Vector translational = getTranslationalCorrection();
-        return MathFunctions.addVectors(centripetal, MathFunctions.scalarMultiplyVector(translational, driveVectorScaler.findNormalizingScaling(centripetal, translational)));
+        Vector corrective = MathFunctions.addVectors(centripetal, translational);
+
+        if (corrective.getMagnitude() > 1) {
+            return MathFunctions.addVectors(centripetal, MathFunctions.scalarMultiplyVector(translational, driveVectorScaler.findNormalizingScaling(centripetal, translational)));
+        }
+
+        return corrective;
     }
 
     /**
      * This returns a Vector in the direction the robot must go to account for only translational
      * error
      *
-     * Note: This vector is clamped to be between [0, 1] in magnitude
+     * Note: This vector is clamped to be at most 1 in magnitude
      *
      * @return returns the translational vector
      */
@@ -223,8 +229,13 @@ public class Follower {
         Vector translationalVector = new Vector(0,0);
         translationalPIDF.updateError(MathFunctions.distance(closestPose, poseUpdater.getPose()));
         translationalVector.setOrthogonalComponents(closestPose.getX() - poseUpdater.getPose().getX(), closestPose.getY() - poseUpdater.getPose().getY());
-        translationalVector.setMagnitude(MathFunctions.clamp(translationalPIDF.runPIDF(), 0, 1));
+        translationalVector.setMagnitude(MathFunctions.clamp(translationalPIDF.runPIDF(), -1, 1));
         return translationalVector;
+    }
+
+    // TODO: remove later
+    public double asdf() {
+        return MathFunctions.distance(closestPose, poseUpdater.getPose());
     }
 
     /**
