@@ -171,17 +171,31 @@ public class Follower {
         if (followingPathChain && chainIndex < currentPathChain.size()-1) {
             return new Vector(1, currentPath.getClosestPointHeadingGoal());
         }
-        drivePIDF.updateError(currentPath.length() * currentPath.getClosestPointTValue() - getZeroPowerDistance());
-        return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointHeadingGoal());
+
+        if (!currentPath.isAtEnd()) {
+            drivePIDF.updateError(currentPath.length() * (1 - currentPath.getClosestPointTValue()) - getZeroPowerDistance());
+        } else {
+            Vector offset = new Vector(0,0);
+            offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
+            drivePIDF.updateError(MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - getZeroPowerDistance());
+        }
+
+        return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+    }
+
+    // TODO: remove
+    public double zxcv() {
+        return drivePIDF.getError();
     }
 
     /**
      * This returns the distance the robot is projected to go when all power is cut from the drivetrain
+     * as a vector
      *
-     * @return returns the projected distance
+     * @return returns the projected distance vector
      */
     public double getZeroPowerDistance() {
-        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / 2 * FollowerConstants.zeroPowerAcceleration;
+        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / (2 * FollowerConstants.zeroPowerAcceleration);
     }
 
     /**
@@ -235,7 +249,11 @@ public class Follower {
 
     // TODO: remove later
     public double asdf() {
-        return MathFunctions.distance(closestPose, poseUpdater.getPose());
+        return translationalPIDF.getError();
+    }
+
+    public double qwerty() {
+        return driveVectorScaler.getLeftSidePath().getMagnitude();
     }
 
     /**
@@ -248,6 +266,7 @@ public class Follower {
      */
     public Vector getCentripetalForceCorrection() {
         double curvature = currentPath.getClosestPointCurvature();
-        return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,0,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
+        if (Double.isNaN(curvature)) return new Vector(0,0);
+        return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,-1,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
     }
 }

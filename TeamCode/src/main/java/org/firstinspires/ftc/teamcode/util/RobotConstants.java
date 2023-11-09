@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import kotlin.jvm.JvmField;
+
+@Config
 public class RobotConstants {
     // Put all the constants we need across opmodes here. Don't forget to make them public and static!
 
@@ -9,9 +13,11 @@ public class RobotConstants {
 
     // the slides are on a 4 to 1 gearbox, so their 28 encoder counts at end of motor are actually 28*4
     // absolute max lift extension is 508.
-    public static final int
+    @JvmField public static int
             LIFT_VELOCITY = 1200,
             LIFT_MAX = 520,
+            FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
+            REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
             LIFT_TOLERANCE = 4,
             LIFT_VELOCITY_TOLERANCE = 28*4/6,
             LIFT_GRAB_TOLERANCE = 4,
@@ -23,7 +29,7 @@ public class RobotConstants {
             DRIVETRAIN_CURRENT_LIMIT = 10000*10,
             DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
 
-    public static final double
+    @JvmField public static double
             ROBOT_FRONT_LENGTH = 8,
             ROBOT_BACK_LENGTH = 7.75,
             ROBOT_INTAKE_LENGTH = 14.75,
@@ -73,9 +79,13 @@ public class RobotConstants {
             OUTER_CLAW_OPEN_POSITION = 1,
 
             PLANE_LAUNCHER_LAUNCH = 0,
-            PLANE_LAUNCHER_HOLD = 0.2;
+            PLANE_LAUNCHER_HOLD = 0.2,
 
-    public static final long
+            INTAKE_CHANGE = 40,
+            OUTTAKE_CHANGE = 120,
+            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8;
+
+    @JvmField public static long
             LIFT_GRAB_TIMEOUT = 500,
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,

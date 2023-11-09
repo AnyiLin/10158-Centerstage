@@ -25,10 +25,11 @@ public class Vector {
      * @param theta sets the theta value of this vector
      */
     public void setComponents(double magnitude, double theta) {
+        double pi = Math.PI;
         double[] orthogonalComponents;
         if (magnitude<0) {
             this.magnitude = -magnitude;
-            this.theta = MathFunctions.normalizeAngle(theta+Math.PI);
+            this.theta = MathFunctions.normalizeAngle(theta+pi);
         } else {
             this.magnitude = magnitude;
             this.theta = MathFunctions.normalizeAngle(theta);
@@ -59,10 +60,10 @@ public class Vector {
     /**
      * This rotates the vector by an angle theta
      *
-     * @param theta the angle to be added
+     * @param theta2 the angle to be added
      */
-    public void rotateVector(double theta) {
-        setTheta(this.theta+theta);
+    public void rotateVector(double theta2) {
+        setTheta(theta+theta2);
     }
 
     /**

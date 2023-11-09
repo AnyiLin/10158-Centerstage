@@ -4,6 +4,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
 
+import java.util.ArrayList;
+
 public class Path {
     private BezierCurve curve;
 
@@ -65,6 +67,15 @@ public class Path {
         closestPointCurvature = curve.getCurvature(closestPointTValue);
 
         return new Pose2d(returnPoint.getX(), returnPoint.getY(), getClosestPointHeadingGoal());
+    }
+
+    /**
+     * This returns the unit tangent vector at the end of the curve
+     *
+     * @return returns the tangent vector
+     */
+    public Vector getEndTangent() {
+        return curve.getEndTangent();
     }
 
     /**
@@ -170,5 +181,50 @@ public class Path {
     public boolean isAtEnd() {
         if (closestPointTValue >= FollowerConstants.pathEndTValue) return true;
         return false;
+    }
+
+    /**
+     * Returns the ArrayList of control points for this Bezier curve
+     *
+     * @return This returns the ArrayList
+     */
+    public ArrayList<Point> getControlPoints() {
+        return curve.getControlPoints();
+    }
+
+    /**
+     * Returns the first control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getFirstControlPoint() {
+        return curve.getFirstControlPoint();
+    }
+
+    /**
+     * Returns the second control point, or the one after the start, for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getSecondControlPoint() {
+        return curve.getSecondControlPoint();
+    }
+
+    /**
+     * Returns the second to last control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getSecondToLastControlPoint() {
+        return curve.getSecondToLastControlPoint();
+    }
+
+    /**
+     * Returns the last control point for this Bezier curve
+     *
+     * @return This returns the Point
+     */
+    public Point getLastControlPoint() {
+        return curve.getLastControlPoint();
     }
 }

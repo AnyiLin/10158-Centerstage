@@ -64,10 +64,16 @@ public class StraightBackAndForth extends OpMode {
         }
         telemetryA.addData("Heading error", MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
         telemetryA.addData("translational error", follower.asdf());
+        telemetryA.addData("left side pathing power", follower.qwerty());
         telemetryA.addData("isBusy", follower.isBusy());
         telemetryA.addData("heading", follower.getHeadingVector().getMagnitude());
         telemetryA.addData("corrective", follower.getCorrectiveVector().getMagnitude());
+        telemetryA.addData("translational", follower.getTranslationalCorrection().getMagnitude());
+        telemetryA.addData("centripetal", follower.getCentripetalForceCorrection().getMagnitude());
         telemetryA.addData("drive", follower.getDriveVector().getMagnitude());
+        telemetryA.addData("x", follower.getPose().getX());
+        telemetryA.addData("y", follower.getPose().getY());
+        telemetryA.addData("drive error", follower.zxcv());
         telemetryA.update();
     }
 

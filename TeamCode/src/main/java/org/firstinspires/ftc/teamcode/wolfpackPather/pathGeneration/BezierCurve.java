@@ -10,6 +10,8 @@ public class BezierCurve {
     // This contains the control points for the Bezier curve
     private ArrayList<Point> controlPoints = new ArrayList<Point>();
 
+    private Vector endTangent = new Vector(0,0);
+
     private final int APPROXIMATION_STEPS = 100;
 
     private double UNIT_TO_TIME, length;
@@ -33,6 +35,8 @@ public class BezierCurve {
         generateBezierCurve();
         length = approximateLength();
         UNIT_TO_TIME = 1/length;
+        endTangent.setOrthogonalComponents(controlPoints.get(controlPoints.size()-1).getX()-controlPoints.get(controlPoints.size()-2).getX(), controlPoints.get(controlPoints.size()-1).getY()-controlPoints.get(controlPoints.size()-2).getY());
+        endTangent = MathFunctions.normalizeVector(endTangent);
     }
 
     /**
@@ -56,6 +60,8 @@ public class BezierCurve {
         generateBezierCurve();
         length = approximateLength();
         UNIT_TO_TIME = 1/length;
+        endTangent.setOrthogonalComponents(this.controlPoints.get(this.controlPoints.size()-1).getX()-this.controlPoints.get(this.controlPoints.size()-2).getX(), this.controlPoints.get(this.controlPoints.size()-1).getY()-this.controlPoints.get(this.controlPoints.size()-2).getY());
+        endTangent = MathFunctions.normalizeVector(endTangent);
     }
 
     /**
@@ -68,6 +74,15 @@ public class BezierCurve {
         for (int i = 0; i <= n; i++) {
             pointCoefficients.add(new BezierCurveCoefficients(n, i));
         }
+    }
+
+    /**
+     * This returns the unit tangent vector at the end of the curve
+     *
+     * @return returns the tangent vector
+     */
+    public Vector getEndTangent() {
+        return MathFunctions.copyVector(endTangent);
     }
 
     /**

@@ -87,6 +87,13 @@ public class Point {
      */
     public static double[] cartesianToPolar(double x, double y) {
         if (x < 0) return new double[] {x*x+y*y, Math.PI+Math.atan(y/x)};
+        if (x == 0) {
+            if (y > 0) {
+                return new double[] {y*y, Math.PI/2};
+            } else {
+                return new double[] {y*y, -Math.PI/2};
+            }
+        }
         return new double[] {x*x+y*y, Math.atan(y/x)};
     }
 

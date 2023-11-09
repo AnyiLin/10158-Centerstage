@@ -1,5 +1,16 @@
 package org.firstinspires.ftc.teamcode.competition.autonomous;
 
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_CLAW_OPEN_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_STACK_TOP_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_AVOID_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_CLAW_OPEN_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_AVOID_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_BACK_LENGTH;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_FRONT_LENGTH;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_INTAKE_LENGTH;
+
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -22,75 +33,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class BlueLeftInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive = new TwoPersonDrive(true);
-
-    private final int
-            LIFT_VELOCITY = RobotConstants.LIFT_VELOCITY,
-            LIFT_GRAB_TOLERANCE = RobotConstants.LIFT_GRAB_TOLERANCE,
-            LIFT_VELOCITY_TOLERANCE = RobotConstants.LIFT_VELOCITY_TOLERANCE,
-            FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
-            REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
-            LIFT_MAX = RobotConstants.LIFT_MAX,
-            LIFT_TOLERANCE = RobotConstants.LIFT_TOLERANCE,
-            TOP_LINE_POSITION = RobotConstants.TOP_LINE_POSITION,
-            MIDDLE_LINE_POSITION = RobotConstants.MIDDLE_LINE_POSITION,
-            BOTTOM_LINE_POSITION = RobotConstants.BOTTOM_LINE_POSITION,
-            LIFT_GRAB_POSITION = RobotConstants.LIFT_GRAB_POSITION,
-            INTAKE_VELOCITY = RobotConstants.INTAKE_VELOCITY;
-
-    private final double
-            ROBOT_FRONT_LENGTH = RobotConstants.ROBOT_FRONT_LENGTH,
-            ROBOT_BACK_LENGTH = RobotConstants.ROBOT_BACK_LENGTH,
-            ROBOT_INTAKE_LENGTH = RobotConstants.ROBOT_INTAKE_LENGTH,
-            INTAKE_STACK_TOP_POSITION = RobotConstants.INTAKE_STACK_TOP_POSITION,
-            INTAKE_CHANGE = 40, // this is set to degrees/second
-            OUTTAKE_CHANGE = 40, // this is set to degrees/second
-            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
-            RIGHT_INTAKE_OFFSET = RobotConstants.RIGHT_INTAKE_OFFSET,
-            LEFT_INTAKE_OUT_POSITION = RobotConstants.LEFT_INTAKE_OUT_POSITION,
-            RIGHT_INTAKE_OUT_POSITION = RobotConstants.RIGHT_INTAKE_OUT_POSITION,
-            LEFT_INTAKE_OUT_PAUSE_POSITION = RobotConstants.LEFT_INTAKE_OUT_PAUSE_POSITION,
-            RIGHT_INTAKE_OUT_PAUSE_POSITION = RobotConstants.RIGHT_INTAKE_OUT_PAUSE_POSITION,
-            LEFT_INTAKE_IN_POSITION = RobotConstants.LEFT_INTAKE_IN_POSITION,
-            RIGHT_INTAKE_IN_POSITION = RobotConstants.RIGHT_INTAKE_IN_POSITION,
-            LEFT_INTAKE_MIDDLE_POSITION = RobotConstants.LEFT_INTAKE_MIDDLE_POSITION,
-            RIGHT_INTAKE_MIDDLE_POSITION = RobotConstants.RIGHT_INTAKE_MIDDLE_POSITION,
-            LEFT_INTAKE_DROP_POSITION = RobotConstants.LEFT_INTAKE_DROP_POSITION,
-            RIGHT_INTAKE_DROP_POSITION = RobotConstants.RIGHT_INTAKE_DROP_POSITION,
-            RIGHT_OUTTAKE_OFFSET = RobotConstants.RIGHT_OUTTAKE_OFFSET,
-            LEFT_OUTTAKE_OUT_POSITION = RobotConstants.LEFT_OUTTAKE_OUT_POSITION,
-            RIGHT_OUTTAKE_OUT_POSITION = RobotConstants.RIGHT_OUTTAKE_OUT_POSITION,
-            LEFT_OUTTAKE_IN_POSITION= RobotConstants.LEFT_OUTTAKE_IN_POSITION,
-            RIGHT_OUTTAKE_IN_POSITION = RobotConstants.RIGHT_OUTTAKE_IN_POSITION,
-            LEFT_OUTTAKE_GRAB_POSITION = RobotConstants.LEFT_OUTTAKE_GRAB_POSITION,
-            RIGHT_OUTTAKE_GRAB_POSITION = RobotConstants.RIGHT_OUTTAKE_GRAB_POSITION,
-            LEFT_OUTTAKE_AVOID_POSITION = RobotConstants.LEFT_OUTTAKE_AVOID_POSITION,
-            RIGHT_OUTTAKE_AVOID_POSITION = RobotConstants.RIGHT_OUTTAKE_AVOID_POSITION,
-            OUTER_CLAW_CLOSE_POSITION = RobotConstants.OUTER_CLAW_CLOSE_POSITION,
-            INNER_CLAW_CLOSE_POSITION = RobotConstants.INNER_CLAW_CLOSE_POSITION,
-            OUTER_CLAW_OPEN_POSITION = RobotConstants.OUTER_CLAW_OPEN_POSITION,
-            INNER_CLAW_OPEN_POSITION = RobotConstants.INNER_CLAW_OPEN_POSITION,
-            INTAKE_SERVO_TO_DEGREES = RobotConstants.INTAKE_SERVO_TO_DEGREES,
-            INTAKE_DEGREES_TO_SERVO = RobotConstants.INTAKE_DEGREES_TO_SERVO,
-            OUTTAKE_SERVO_TO_DEGREES = RobotConstants.OUTTAKE_SERVO_TO_DEGREES,
-            OUTTAKE_DEGREES_TO_SERVO = RobotConstants.OUTTAKE_DEGREES_TO_SERVO,
-            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = RobotConstants.OUTTAKE_PICK_UP_DEGREES_PER_SECOND;
-
-    private final long
-            LIFT_GRAB_TIMEOUT = RobotConstants.LIFT_GRAB_TIMEOUT,
-            INTAKE_IN_WAIT = RobotConstants.INTAKE_IN_WAIT,
-            INTAKE_OBSTACLE_OUT_WAIT = RobotConstants.INTAKE_OBSTACLE_OUT_WAIT,
-            INTAKE_OBSTACLE_OUT_RETRACT_WAIT = RobotConstants.INTAKE_OBSTACLE_OUT_RETRACT_WAIT,
-            INTAKE_OBSTACLE_IN_WAIT = RobotConstants.INTAKE_OBSTACLE_IN_WAIT,
-            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = RobotConstants.OUTTAKE_OBSTACLE_FOLD_IN_WAIT,
-            CLAW_GRAB_WAIT = RobotConstants.CLAW_GRAB_WAIT,
-            CLAW_CLOSE_WAIT = RobotConstants.CLAW_CLOSE_WAIT,
-            CLAW_LIFT_WAIT = RobotConstants.CLAW_LIFT_WAIT,
-            PRESET_TIMEOUT = RobotConstants.PRESET_TIMEOUT,
-            RESET_PIXEL_DROP_WAIT = RobotConstants.RESET_PIXEL_DROP_WAIT,
-            RESET_FOLD_IN_WAIT = RobotConstants.RESET_FOLD_IN_WAIT,
-            LIFT_GO_WAIT = RobotConstants.LIFT_GO_WAIT,
-            INTAKE_FULL_OUT_WAIT = RobotConstants.INTAKE_FULL_OUT_WAIT,
-            INTAKE_BURST_TIME = RobotConstants.INTAKE_BURST_TIME;
 
     private final PIDFCoefficients
             LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_UP_VELOCITY_PIDF_COEFFICIENTS,

@@ -16,7 +16,8 @@ public class DriveVectorScaler {
      */
     public DriveVectorScaler(Vector frontLeftVector) {
         Vector copiedFrontLeftVector = MathFunctions.normalizeVector(frontLeftVector);
-        mecanumVectors = new Vector[]{new Vector(copiedFrontLeftVector.getMagnitude(), copiedFrontLeftVector.getTheta()),
+        mecanumVectors = new Vector[]{
+                new Vector(copiedFrontLeftVector.getMagnitude(), copiedFrontLeftVector.getTheta()),
                 new Vector(copiedFrontLeftVector.getMagnitude(), Math.PI-copiedFrontLeftVector.getTheta()),
                 new Vector(copiedFrontLeftVector.getMagnitude(), Math.PI-copiedFrontLeftVector.getTheta()),
                 new Vector(copiedFrontLeftVector.getMagnitude(), copiedFrontLeftVector.getTheta())};
@@ -37,7 +38,6 @@ public class DriveVectorScaler {
      * @return
      */
     public double[] getDrivePowers(Vector correctivePower, Vector headingPower, Vector pathingPower) {
-
         // clamps down the magnitudes of the input vectors
         if (correctivePower.getMagnitude() > 1) correctivePower.setMagnitude(1);
         if (headingPower.getMagnitude() > 1) headingPower.setMagnitude(1);
@@ -45,9 +45,6 @@ public class DriveVectorScaler {
 
         // This contains a copy of the mecanum wheel vectors
         Vector[] mecanumVectorsCopy = new Vector[4];
-
-        double leftSideSmallestVerticalComponent = 1;
-        double rightSideSmallestVerticalComponent = 1;
 
         // this contains the pathing vectors, one for each side (heading control requires 2)
         Vector[] truePathingVectors = new Vector[2];
@@ -66,10 +63,6 @@ public class DriveVectorScaler {
                 double headingScalingFactor = Math.min(findNormalizingScaling(correctivePower, headingPower), findNormalizingScaling(correctivePower, MathFunctions.scalarMultiplyVector(headingPower, -1)));
                 truePathingVectors[0] = MathFunctions.subtractVectors(correctivePower, MathFunctions.scalarMultiplyVector(headingPower, headingScalingFactor));
                 truePathingVectors[1] = MathFunctions.addVectors(correctivePower, MathFunctions.scalarMultiplyVector(headingPower, headingScalingFactor));
-            } else if (leftSideVector.getMagnitude() == 1 || rightSideVector.getMagnitude() == 1) {
-                // if my some miracle the combined powers are equal to one, then skip some math
-                truePathingVectors[0] = MathFunctions.copyVector(leftSideVector);
-                truePathingVectors[1] = MathFunctions.copyVector(rightSideVector);
             } else {
                 // if we're here then we can add on some drive power but scaled down to 1
                 Vector leftSideVectorWithPathing = MathFunctions.addVectors(leftSideVector, pathingPower);
@@ -88,6 +81,9 @@ public class DriveVectorScaler {
             }
         }
 
+        // TODO: remove
+        leftSidePath = MathFunctions.copyVector(truePathingVectors[0]);
+
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
             // this copies the vectors from mecanumVectors but creates new references for them
             mecanumVectorsCopy[i] = MathFunctions.copyVector(mecanumVectors[i]);
@@ -100,30 +96,40 @@ public class DriveVectorScaler {
             }
         }
 
-        // These two lines gets the smallest vertical components from each side so we can cancel them out
-        leftSideSmallestVerticalComponent = Math.min(Math.abs(mecanumVectorsCopy[0].getYComponent()), Math.abs(mecanumVectorsCopy[1].getYComponent()));
-        rightSideSmallestVerticalComponent = Math.min(Math.abs(mecanumVectorsCopy[2].getYComponent()), Math.abs(mecanumVectorsCopy[3].getYComponent()));
-
+        // These two statements scale the wheel vectors so that the vertical components cancel out
+        // it also scales the wheel vectors to the magnitude of the pathing vectors
+        if (Math.abs(mecanumVectorsCopy[0].getYComponent()) < Math.abs(mecanumVectorsCopy[1].getYComponent())) {
+            mecanumVectorsCopy[1].setMagnitude(truePathingVectors[0].getMagnitude() * (-mecanumVectorsCopy[0].getYComponent() / mecanumVectorsCopy[1].getYComponent()));
+            mecanumVectorsCopy[0].setMagnitude(truePathingVectors[0].getMagnitude());
+        } else {
+            mecanumVectorsCopy[0].setMagnitude(truePathingVectors[0].getMagnitude() * (-mecanumVectorsCopy[1].getYComponent() / mecanumVectorsCopy[0].getYComponent()));
+            mecanumVectorsCopy[1].setMagnitude(truePathingVectors[0].getMagnitude());
+        }
+        if (Math.abs(mecanumVectorsCopy[2].getYComponent()) < Math.abs(mecanumVectorsCopy[3].getYComponent())) {
+            mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude() * (-mecanumVectorsCopy[2].getYComponent() / mecanumVectorsCopy[3].getYComponent()));
+            mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude());
+        } else {
+            mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude() * (-mecanumVectorsCopy[3].getYComponent() / mecanumVectorsCopy[2].getYComponent()));
+            mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude());
+        }
 
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
-            // this scales down all the vertical components of the mecanum wheel vectors so that the
-            // robot drives in the direction of the actual pathing vector
+            // this rotates the vectors back to make the math easier
             if (i == 0 || i == 1) {
-                if (leftSideSmallestVerticalComponent == 0) {
-                    mecanumVectorsCopy[i].setMagnitude(0.0);
-                } else {
-                    mecanumVectorsCopy[i].setMagnitude(mecanumVectorsCopy[i].getMagnitude() * (leftSideSmallestVerticalComponent / Math.abs(mecanumVectorsCopy[i].getYComponent())));
-                }
+                mecanumVectorsCopy[i].rotateVector(truePathingVectors[0].getTheta());
             } else {
-                if (rightSideSmallestVerticalComponent == 0) {
-                    mecanumVectorsCopy[i].setMagnitude(0.0);
-                } else {
-                    mecanumVectorsCopy[i].setMagnitude(mecanumVectorsCopy[i].getMagnitude() * (rightSideSmallestVerticalComponent / Math.abs(mecanumVectorsCopy[i].getYComponent())));
-                }
+                mecanumVectorsCopy[i].rotateVector(truePathingVectors[1].getTheta());
             }
         }
 
-        return new double[] {mecanumVectorsCopy[0].getMagnitude(), mecanumVectorsCopy[1].getMagnitude(), mecanumVectorsCopy[2].getMagnitude(), mecanumVectorsCopy[3].getMagnitude()};
+        return new double[] {MathFunctions.dotProduct(mecanumVectorsCopy[0], mecanumVectors[0]), MathFunctions.dotProduct(mecanumVectorsCopy[1], mecanumVectors[1]), MathFunctions.dotProduct(mecanumVectorsCopy[2], mecanumVectors[2]), MathFunctions.dotProduct(mecanumVectorsCopy[3], mecanumVectors[3])};
+    }
+
+    // TODO: remove
+    private Vector leftSidePath;
+
+    public Vector getLeftSidePath() {
+        return leftSidePath;
     }
 
     /**

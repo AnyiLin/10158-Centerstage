@@ -86,4 +86,8 @@ public class PIDFController {
     public double F() {
         return coefficients.F;
     }
+
+    public double getError() {
+        return error;
+    }
 }
