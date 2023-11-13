@@ -64,7 +64,7 @@ public class Follower {
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
 
         for (DcMotorEx motor : motors) {
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
@@ -254,6 +254,10 @@ public class Follower {
 
     public double qwerty() {
         return driveVectorScaler.getLeftSidePath().getMagnitude();
+    }
+
+    public double qwerty2() {
+        return driveVectorScaler.getRightSidePath().getMagnitude();
     }
 
     /**

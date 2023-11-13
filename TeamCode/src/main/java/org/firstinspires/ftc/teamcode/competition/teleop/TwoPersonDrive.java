@@ -213,10 +213,10 @@ public class TwoPersonDrive extends LinearOpMode {
 
             double rx = 0;
             if (Math.abs(gamepad1.left_stick_x)>0.1) rx = gamepad1.left_stick_x;
-            if (rx > 1-gamepad1.right_trigger*0.4) {
-                rx = 1-gamepad1.right_trigger*0.4;
-            } else if (rx < -1+gamepad1.right_trigger*0.4) {
-                rx = -1+gamepad1.right_trigger*0.4;
+            if (rx > 1-gamepad1.right_trigger*0.5) {
+                rx = 1-gamepad1.right_trigger*0.5;
+            } else if (rx < -1+gamepad1.right_trigger*0.5) {
+                rx = -1+gamepad1.right_trigger*0.5;
             }
 
             adjustDriveTrainCurrent();
@@ -235,24 +235,24 @@ public class TwoPersonDrive extends LinearOpMode {
             rightFront.setPower(rightFrontPower);
             rightRear.setPower(rightRearPower);
 
-            if (!presetInMotion && !resetInMotion) {
-                if (gamepad1.x || gamepad1.square) {
-                    updateIntake(gamepad1.left_trigger);
-                    if (!intaking) {
-                        intaking = true;
-                        intakingStartTime = System.currentTimeMillis();
-                    }
-                } else if (gamepad1.b || gamepad1.circle) {
-                    updateIntake(-gamepad1.left_trigger);
-                    if (!intaking) {
-                        intaking = true;
-                        intakingStartTime = System.currentTimeMillis();
-                    }
-                } else {
-                    intake.setVelocity(0);
-                    intaking = false;
+            if (gamepad1.x || gamepad1.square) {
+                updateIntake(gamepad1.left_trigger);
+                if (!intaking) {
+                    intaking = true;
+                    intakingStartTime = System.currentTimeMillis();
                 }
+            } else if (gamepad1.b || gamepad1.circle) {
+                updateIntake(-gamepad1.left_trigger);
+                if (!intaking) {
+                    intaking = true;
+                    intakingStartTime = System.currentTimeMillis();
+                }
+            } else {
+                intake.setVelocity(0);
+                intaking = false;
+            }
 
+            if (!presetInMotion && !resetInMotion) {
                 if (gamepad1.y || gamepad1.triangle) {
                     if (!intakeIn) {
                         intakeIn = true;

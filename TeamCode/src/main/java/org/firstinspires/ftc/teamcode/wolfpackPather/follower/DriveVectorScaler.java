@@ -83,6 +83,7 @@ public class DriveVectorScaler {
 
         // TODO: remove
         leftSidePath = MathFunctions.copyVector(truePathingVectors[0]);
+        rightSidePath = MathFunctions.copyVector(truePathingVectors[1]);
 
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
             // this copies the vectors from mecanumVectors but creates new references for them
@@ -105,12 +106,21 @@ public class DriveVectorScaler {
             mecanumVectorsCopy[0].setMagnitude(truePathingVectors[0].getMagnitude() * (-mecanumVectorsCopy[1].getYComponent() / mecanumVectorsCopy[0].getYComponent()));
             mecanumVectorsCopy[1].setMagnitude(truePathingVectors[0].getMagnitude());
         }
+        if (MathFunctions.dotProduct(new Vector(1,0), MathFunctions.addVectors(mecanumVectorsCopy[0], mecanumVectorsCopy[1])) < 0) {
+            mecanumVectorsCopy[0] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[0], -1);
+            mecanumVectorsCopy[1] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[1], -1);
+        }
+
         if (Math.abs(mecanumVectorsCopy[2].getYComponent()) < Math.abs(mecanumVectorsCopy[3].getYComponent())) {
             mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude() * (-mecanumVectorsCopy[2].getYComponent() / mecanumVectorsCopy[3].getYComponent()));
             mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude());
         } else {
             mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude() * (-mecanumVectorsCopy[3].getYComponent() / mecanumVectorsCopy[2].getYComponent()));
             mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude());
+        }
+        if (MathFunctions.dotProduct(new Vector(1,0), MathFunctions.addVectors(mecanumVectorsCopy[2], mecanumVectorsCopy[3])) < 0) {
+            mecanumVectorsCopy[2] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[2], -1);
+            mecanumVectorsCopy[3] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[3], -1);
         }
 
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
@@ -127,9 +137,13 @@ public class DriveVectorScaler {
 
     // TODO: remove
     private Vector leftSidePath;
+    private Vector rightSidePath;
 
     public Vector getLeftSidePath() {
         return leftSidePath;
+    }
+    public Vector getRightSidePath() {
+        return rightSidePath;
     }
 
     /**
@@ -151,6 +165,6 @@ public class DriveVectorScaler {
             double a = Math.pow(variableVector.getXComponent(), 2) + Math.pow(variableVector.getYComponent(), 2);
             double b = staticVector.getXComponent() * variableVector.getXComponent() + staticVector.getYComponent() * variableVector.getYComponent();
             double c = Math.pow(staticVector.getXComponent(), 2) + Math.pow(staticVector.getYComponent(), 2) - 1.0;
-            return (-b +  Math.sqrt(Math.pow(b, 2) - a*c))/(a);
+            return (-b + Math.sqrt(Math.pow(b, 2) - a*c))/(a);
     }
 }
