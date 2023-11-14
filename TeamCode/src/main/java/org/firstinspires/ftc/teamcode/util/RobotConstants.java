@@ -13,7 +13,7 @@ public class RobotConstants {
 
     // the slides are on a 4 to 1 gearbox, so their 28 encoder counts at end of motor are actually 28*4
     // absolute max lift extension is 508.
-    @JvmField public static int
+    public static int
             LIFT_VELOCITY = 1200,
             LIFT_MAX = 520,
             FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
@@ -24,12 +24,12 @@ public class RobotConstants {
             TOP_LINE_POSITION = 190,
             MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 50,
+            LIFT_GRAB_POSITION = 57,
             INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
             DRIVETRAIN_CURRENT_LIMIT = 10000*10,
             DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
 
-    @JvmField public static double
+    public static double
             ROBOT_FRONT_LENGTH = 8,
             ROBOT_BACK_LENGTH = 7.75,
             ROBOT_INTAKE_LENGTH = 14.75,
@@ -59,8 +59,10 @@ public class RobotConstants {
             RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_GRAB_POSITION= 0.95,
             RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
-            LEFT_OUTTAKE_AVOID_POSITION = 0.6,
-            RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
+                    LEFT_OUTTAKE_AVOID_POSITION = 0.6,
+                    RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
+                    LEFT_OUTTAKE_PRESET_POSITION = 0.86,
+                    RIGHT_OUTTAKE_PRESET_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
             OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 110,
 
 
@@ -85,7 +87,7 @@ public class RobotConstants {
             OUTTAKE_CHANGE = 120,
             OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8;
 
-    @JvmField public static long
+    public static long
             LIFT_GRAB_TIMEOUT = 500,
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,

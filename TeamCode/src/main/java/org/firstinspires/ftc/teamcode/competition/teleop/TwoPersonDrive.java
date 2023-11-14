@@ -28,6 +28,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_AV
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_GRAB_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_PRESET_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GO_WAIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_TIMEOUT;
@@ -59,6 +60,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_G
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_PRESET_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TOP_LINE_POSITION;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -88,7 +90,7 @@ public class TwoPersonDrive extends LinearOpMode {
             LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS,
             LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = RobotConstants.LIFT_DOWN_POSITION_PIDF_COEFFICIENTS;
 
-    public boolean intakeEdgeCaseCollide, burstToggleButtonPressed, intaking, burstIntake = true, setCustomIntakeOutPosition, useInnerClaw = true, autonomous, adjustingLiftZero, outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, presetLifting, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
+    public boolean outtakeHovering, presetButtonPressed, presetOverride, intakeEdgeCaseCollide, burstToggleButtonPressed, intaking, burstIntake = true, setCustomIntakeOutPosition, useInnerClaw = true, autonomous, adjustingLiftZero, outtakeSlowPickup, outerClawButtonPressed, innerClawButtonPressed, liftGoing, resetFoldIn, resetPixelDrop, liftInGrabbingPosition = true, resetInMotion, clawLifting, clawClosing, outtakeIn, intakeIn, intakeGoingOut, intakeGoingInObstacle, intakeGoingInObstacleFoldUp, intakeGoingIn, intakeGoingOutObstacle, intakeGoingOutObstacleRetract, clawGrabbing, presetInMotion, presetQueue;
 
     public double customIntakeOutPosition;
 
@@ -100,6 +102,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public TwoPersonDrive() {
     }
+
     public TwoPersonDrive(boolean setAuto) {
         autonomous = setAuto;
     }
@@ -206,9 +209,9 @@ public class TwoPersonDrive extends LinearOpMode {
             if (Math.abs(gamepad2.right_stick_x)>1) {
                 x = gamepad2.right_stick_x*0.5/throttle;
             } else if (gamepad1.left_bumper) {
-                x = 1;
-            } else if (gamepad1.right_bumper) {
                 x = -1;
+            } else if (gamepad1.right_bumper) {
+                x = 1;
             }
 
             double rx = 0;
@@ -252,7 +255,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 intaking = false;
             }
 
-            if (!presetInMotion && !resetInMotion) {
+            if (!presetInMotion && !resetInMotion && !outtakeHovering) {
                 if (gamepad1.y || gamepad1.triangle) {
                     if (!intakeIn) {
                         intakeIn = true;
@@ -385,13 +388,28 @@ public class TwoPersonDrive extends LinearOpMode {
 
             if (!resetInMotion) {
                 if (gamepad2.dpad_up) {
+                    if (!presetButtonPressed && presetInMotion) {
+                        presetOverride = true;
+                    }
+                    presetButtonPressed = true;
                     startPreset(TOP_LINE_POSITION);
                 }
                 if (gamepad2.dpad_left) {
+                    if (!presetButtonPressed && presetInMotion) {
+                        presetOverride = true;
+                    }
+                    presetButtonPressed = true;
                     startPreset(MIDDLE_LINE_POSITION);
                 }
                 if (gamepad2.dpad_down) {
+                    if (!presetButtonPressed && presetInMotion) {
+                        presetOverride = true;
+                    }
+                    presetButtonPressed = true;
                     startPreset(BOTTOM_LINE_POSITION);
+                }
+                if (!(gamepad2.dpad_up || gamepad2.dpad_left || gamepad2.dpad_down)) {
+                    presetButtonPressed = false;
                 }
                 if (gamepad2.dpad_right) {
                     resetPreset();
@@ -465,8 +483,13 @@ public class TwoPersonDrive extends LinearOpMode {
             }
         } else { // if the outtake isnt in, then just go to the position specified
             if (liftInGrabbingPosition && !clawGrabbing && !clawClosing && !clawLifting && !liftGoing) {
-                presetLifting = true;
+                presetInMotion = false;
                 leftLiftTargetPosition = presetTargetPosition;
+                if (!autonomous) {
+                    leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
+                    rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+                    outtakeHovering = false;
+                }
             }
         }
     }
@@ -480,8 +503,9 @@ public class TwoPersonDrive extends LinearOpMode {
         adjustingLiftZero = false;
 
         outtakeSlowPickup = false;
+        presetOverride = false;
+        outtakeHovering = false;
         presetQueue = false;
-        presetLifting = false;
         presetInMotion = false;
         resetFoldIn = false;
         liftInGrabbingPosition = true;
@@ -504,7 +528,6 @@ public class TwoPersonDrive extends LinearOpMode {
     public void detectPresetEnd() {
         if (System.currentTimeMillis()-presetStartTime > PRESET_TIMEOUT) {
             presetInMotion = false;
-            presetLifting = false;
         }
     }
 
@@ -670,7 +693,7 @@ public class TwoPersonDrive extends LinearOpMode {
         }
         if (outtakeSlowPickup && ((System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT) && (System.currentTimeMillis()-clawGrabbingStartTime < LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT))) {
             if (autonomous) {
-                if (leftOuttake.getPosition() >= LEFT_OUTTAKE_OUT_POSITION) {
+                if (leftOuttake.getPosition() > LEFT_OUTTAKE_OUT_POSITION) {
                     leftOuttake.setPosition(leftOuttake.getPosition() - (deltaTimeNano / 1000000000.0) * OUTTAKE_PICK_UP_DEGREES_PER_SECOND * OUTTAKE_DEGREES_TO_SERVO);
                     rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
                 } else {
@@ -678,26 +701,29 @@ public class TwoPersonDrive extends LinearOpMode {
                     rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
                 }
             } else {
-                if (leftOuttake.getPosition() >= LEFT_OUTTAKE_AVOID_POSITION) {
+                if (leftOuttake.getPosition() > LEFT_OUTTAKE_PRESET_POSITION) {
                     leftOuttake.setPosition(leftOuttake.getPosition() - (deltaTimeNano / 1000000000.0) * OUTTAKE_PICK_UP_DEGREES_PER_SECOND * OUTTAKE_DEGREES_TO_SERVO);
                     rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
                 } else {
-                    leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
-                    rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+                    leftOuttake.setPosition(LEFT_OUTTAKE_PRESET_POSITION);
+                    rightOuttake.setPosition(RIGHT_OUTTAKE_PRESET_POSITION);
+                    clawGrabbingStartTime = System.currentTimeMillis() - (LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT);
                 }
             }
         }
-        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
+        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT)) {
             liftGoing = false;
             outtakeSlowPickup = false;
             if (autonomous) {
                 leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);
                 rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
             } else {
-                leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
-                rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+                leftOuttake.setPosition(LEFT_OUTTAKE_PRESET_POSITION);
+                rightOuttake.setPosition(RIGHT_OUTTAKE_PRESET_POSITION);
             }
-            startPreset(presetTargetPosition);
+            if (autonomous || presetOverride) startPreset(presetTargetPosition);
+            if (!presetOverride && !autonomous) outtakeHovering = true;
+            presetOverride = false;
             presetInMotion = false;
         }
 
@@ -830,7 +856,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public void fineAdjustOuttakeV4B() {
         if (Math.abs(gamepad2.right_stick_y) >= OUTTAKE_FINE_ADJUST_DEAD_ZONE) {
-            if (leftOuttake.getPosition() < LEFT_OUTTAKE_AVOID_POSITION && leftOuttake.getPosition() > LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
+            if (leftOuttake.getPosition() < LEFT_OUTTAKE_PRESET_POSITION && leftOuttake.getPosition() > LEFT_OUTTAKE_OUT_POSITION - 90 * OUTTAKE_DEGREES_TO_SERVO) {
                 leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
                 rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
             } else {
@@ -838,7 +864,7 @@ public class TwoPersonDrive extends LinearOpMode {
                     leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
                     rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
                 } else {
-                    if ((leftOuttake.getPosition() >= LEFT_OUTTAKE_AVOID_POSITION && leftOuttake.getPosition() < LEFT_OUTTAKE_AVOID_POSITION + 20 * OUTTAKE_DEGREES_TO_SERVO) && -gamepad2.right_stick_y > 0) {
+                    if ((leftOuttake.getPosition() >= LEFT_OUTTAKE_PRESET_POSITION && leftOuttake.getPosition() < LEFT_OUTTAKE_PRESET_POSITION + 20 * OUTTAKE_DEGREES_TO_SERVO) && -gamepad2.right_stick_y > 0) {
                         leftOuttake.setPosition(leftOuttake.getPosition() + gamepad2.right_stick_y * (deltaTimeNano / 1000000000.0) * OUTTAKE_CHANGE * OUTTAKE_DEGREES_TO_SERVO);
                         rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
                     }

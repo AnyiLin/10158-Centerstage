@@ -76,6 +76,7 @@ public class StraightBackAndForth extends OpMode {
         telemetryA.addData("x", follower.getPose().getX());
         telemetryA.addData("y", follower.getPose().getY());
         telemetryA.addData("drive error", follower.zxcv());
+        telemetryA.addData("pose", follower.getClosestPose().getX() + ", " + follower.getClosestPose().getY());
         telemetryA.update();
     }
 

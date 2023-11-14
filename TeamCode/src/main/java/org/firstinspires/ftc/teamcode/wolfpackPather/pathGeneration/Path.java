@@ -157,20 +157,8 @@ public class Path {
         if (isTangentHeadingInterpolation) {
             return curve.getDerivative(t).getTheta();
         } else {
-            return MathFunctions.normalizeAngle(startHeading + getTurnDirection() * Math.abs(endHeading-startHeading) * t);
+            return MathFunctions.normalizeAngle(startHeading + MathFunctions.getTurnDirection(startHeading, endHeading) * Math.abs(endHeading-startHeading) * t);
         }
-    }
-
-    /**
-     * This gets the direction to turn from the start heading to the end heading for linear interpolation
-     *
-     * @return returns the turn direction
-     */
-    public double getTurnDirection() {
-        if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI * 2) {
-            return 1; // counter clock wise
-        }
-        return -1; // clock wise
     }
 
     /**
