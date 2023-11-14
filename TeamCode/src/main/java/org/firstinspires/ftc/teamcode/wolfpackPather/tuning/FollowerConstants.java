@@ -21,21 +21,21 @@ public class FollowerConstants {
 
     // Heading PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            0.00055,
+            0.001,
             0,
             0.00275,
             0);
 
     // Translational PIDF coefficients
     public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.0075,
+            0.05,
             0,
             0.00275,
             0);
 
     // Drive PIDF coefficients
     public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.00075,
+            0.001,
             0,
             0.0025,
             0);

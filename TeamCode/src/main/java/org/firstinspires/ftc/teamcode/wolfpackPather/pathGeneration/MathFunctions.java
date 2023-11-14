@@ -81,6 +81,18 @@ public class MathFunctions {
     }
 
     /**
+     * This gets the direction to turn between a start heading and an end heading
+     *
+     * @return returns the turn direction
+     */
+    public static double getTurnDirection(double startHeading, double endHeading) {
+        if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI * 2) {
+            return 1; // counter clock wise
+        }
+        return -1; // clock wise
+    }
+
+    /**
      * This returns the distance between a Pose2d and a point
      *
      * @param pose this is the pose

@@ -42,7 +42,8 @@ public class Follower {
 
     private double[] drivePowers;
 
-    private PIDFController translationalPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
+    private PIDFController translationalXPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
+            translationalYPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
             headingPIDF = new PIDFController(FollowerConstants.headingPIDFCoefficients),
             drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
 
@@ -207,7 +208,7 @@ public class Follower {
      * @return returns the heading vector
      */
     public Vector getHeadingVector() {
-        headingPIDF.updateError(MathFunctions.getSmallestAngleDifference(currentPath.getClosestPointHeadingGoal(), poseUpdater.getPose().getHeading()));
+        headingPIDF.updateError(MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()));
         return new Vector(MathFunctions.clamp(headingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
     }
 
@@ -241,15 +242,16 @@ public class Follower {
      */
     public Vector getTranslationalCorrection() {
         Vector translationalVector = new Vector(0,0);
-        translationalPIDF.updateError(MathFunctions.distance(closestPose, poseUpdater.getPose()));
-        translationalVector.setOrthogonalComponents(closestPose.getX() - poseUpdater.getPose().getX(), closestPose.getY() - poseUpdater.getPose().getY());
-        translationalVector.setMagnitude(MathFunctions.clamp(translationalPIDF.runPIDF(), -1, 1));
+        translationalXPIDF.updateError(closestPose.getX() - poseUpdater.getPose().getX());
+        translationalYPIDF.updateError(closestPose.getY() - poseUpdater.getPose().getY());
+        translationalVector.setOrthogonalComponents(translationalXPIDF.runPIDF(), translationalYPIDF.runPIDF());
+        translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
         return translationalVector;
     }
 
     // TODO: remove later
     public double asdf() {
-        return translationalPIDF.getError();
+        return translationalYPIDF.getError();
     }
 
     public double qwerty() {
@@ -272,5 +274,9 @@ public class Follower {
         double curvature = currentPath.getClosestPointCurvature();
         if (Double.isNaN(curvature)) return new Vector(0,0);
         return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,-1,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
+    }
+
+    public Pose2d getClosestPose() {
+        return closestPose;
     }
 }
