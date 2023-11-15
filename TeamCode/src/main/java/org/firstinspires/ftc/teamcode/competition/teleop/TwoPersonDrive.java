@@ -19,6 +19,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OBSTACLE
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OBSTACLE_OUT_RETRACT_WAIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OBSTACLE_OUT_WAIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_VELOCITY;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_INTAKE_DROP_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_INTAKE_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_INTAKE_MIDDLE_POSITION;
@@ -33,12 +34,14 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GO_WAIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_TIMEOUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_TOLERANCE;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_GRAB_VELOCITY_LIMIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MAX;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_TOLERANCE;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_VELOCITY;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.MIDDLE_LINE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_CLAW_CLOSE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_CLAW_OPEN_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_AUTONOMOUS_PICK_UP_DEGREES_PER_SECOND;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CHANGE;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_DEGREES_TO_SERVO;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_FINE_ADJUST_DEAD_ZONE;
@@ -49,6 +52,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.PLANE_LAUNCHER_
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.PRESET_TIMEOUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.REGULAR_LIFT_CHANGE;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RESET_PIXEL_DROP_WAIT;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_AUTONOMOUS_OUTTAKE_GRAB_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_INTAKE_DROP_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_INTAKE_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_INTAKE_MIDDLE_POSITION;
@@ -667,11 +671,17 @@ public class TwoPersonDrive extends LinearOpMode {
             intakeEdgeCaseCollide = false;
             startPreset(presetTargetPosition, useInnerClaw);
         }
-        if (!liftInGrabbingPosition && ((System.currentTimeMillis()-liftGrabStartTime > LIFT_GRAB_TIMEOUT) || (leftLift.getCurrentPosition()<=LIFT_GRAB_POSITION+LIFT_GRAB_TOLERANCE&&leftLift.getCurrentPosition()>=LIFT_GRAB_POSITION-LIFT_GRAB_TOLERANCE))) {
+        if (!liftInGrabbingPosition && ((System.currentTimeMillis()-liftGrabStartTime > LIFT_GRAB_TIMEOUT) || (leftLift.getCurrentPosition()<=LIFT_GRAB_POSITION+LIFT_GRAB_TOLERANCE&&leftLift.getCurrentPosition()>=LIFT_GRAB_POSITION-LIFT_GRAB_TOLERANCE && leftLift.getVelocity() < LIFT_GRAB_VELOCITY_LIMIT))) {
             liftInGrabbingPosition = true;
             clawGrabbingStartTime = System.currentTimeMillis();
-            leftOuttake.setPosition(LEFT_OUTTAKE_GRAB_POSITION);
-            rightOuttake.setPosition(RIGHT_OUTTAKE_GRAB_POSITION);
+            if (autonomous) {
+                leftOuttake.setPosition(LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION);
+                rightOuttake.setPosition(RIGHT_AUTONOMOUS_OUTTAKE_GRAB_POSITION);
+            } else {
+                leftOuttake.setPosition(LEFT_OUTTAKE_GRAB_POSITION);
+                rightOuttake.setPosition(RIGHT_OUTTAKE_GRAB_POSITION);
+
+            }
             clawGrabbing = true;
         }
         if (clawGrabbing && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_GRAB_WAIT)) {
@@ -685,7 +695,7 @@ public class TwoPersonDrive extends LinearOpMode {
             clawLifting = true;
         }
         if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = -100;
+            leftLiftTargetPosition = -0;
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;
@@ -694,7 +704,7 @@ public class TwoPersonDrive extends LinearOpMode {
         if (outtakeSlowPickup && ((System.currentTimeMillis()-clawGrabbingStartTime > CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT) && (System.currentTimeMillis()-clawGrabbingStartTime < LIFT_GO_WAIT + CLAW_LIFT_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT))) {
             if (autonomous) {
                 if (leftOuttake.getPosition() > LEFT_OUTTAKE_OUT_POSITION) {
-                    leftOuttake.setPosition(leftOuttake.getPosition() - (deltaTimeNano / 1000000000.0) * OUTTAKE_PICK_UP_DEGREES_PER_SECOND * OUTTAKE_DEGREES_TO_SERVO);
+                    leftOuttake.setPosition(leftOuttake.getPosition() - (deltaTimeNano / 1000000000.0) * OUTTAKE_AUTONOMOUS_PICK_UP_DEGREES_PER_SECOND  * OUTTAKE_DEGREES_TO_SERVO);
                     rightOuttake.setPosition(1 - leftOuttake.getPosition() + RIGHT_OUTTAKE_OFFSET);
                 } else {
                     leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);

@@ -13,18 +13,17 @@ public class RobotConstants {
 
     // the slides are on a 4 to 1 gearbox, so their 28 encoder counts at end of motor are actually 28*4
     // absolute max lift extension is 508.
-    public static int
-            LIFT_VELOCITY = 1200,
+    public static int LIFT_VELOCITY = 1200,
             LIFT_MAX = 520,
             FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
             REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
             LIFT_TOLERANCE = 4,
             LIFT_VELOCITY_TOLERANCE = 28*4/6,
-            LIFT_GRAB_TOLERANCE = 4,
+            LIFT_GRAB_TOLERANCE = 3,
             TOP_LINE_POSITION = 190,
             MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 57,
+            LIFT_GRAB_POSITION = 45,
             INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
             DRIVETRAIN_CURRENT_LIMIT = 10000*10,
             DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
@@ -57,13 +56,16 @@ public class RobotConstants {
             RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
             LEFT_OUTTAKE_IN_POSITION= 0.83,
             RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
-            LEFT_OUTTAKE_GRAB_POSITION= 0.95,
-            RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
+                    LEFT_OUTTAKE_GRAB_POSITION= 0.966,
+                    LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION= 0.96,
+                    RIGHT_OUTTAKE_GRAB_POSITION = 1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
+                    RIGHT_AUTONOMOUS_OUTTAKE_GRAB_POSITION = 1-LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
                     LEFT_OUTTAKE_AVOID_POSITION = 0.6,
                     RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
                     LEFT_OUTTAKE_PRESET_POSITION = 0.86,
                     RIGHT_OUTTAKE_PRESET_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-            OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 110,
+                    OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 140,
+                    OUTTAKE_AUTONOMOUS_PICK_UP_DEGREES_PER_SECOND = 140,
 
 
             // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
@@ -77,7 +79,7 @@ public class RobotConstants {
             OUTER_CLAW_CLOSE_POSITION = 0.85,
 
             //Claw Open Positions
-            INNER_CLAW_OPEN_POSITION = 0.3,
+            INNER_CLAW_OPEN_POSITION = 0.33,
             OUTER_CLAW_OPEN_POSITION = 1,
 
             PLANE_LAUNCHER_LAUNCH = 0,
@@ -85,10 +87,12 @@ public class RobotConstants {
 
             INTAKE_CHANGE = 40,
             OUTTAKE_CHANGE = 120,
-            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8;
+            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
+
+            LIFT_GRAB_VELOCITY_LIMIT = 20;
 
     public static long
-            LIFT_GRAB_TIMEOUT = 500,
+            LIFT_GRAB_TIMEOUT = 750,
             INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
             INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,
             INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
