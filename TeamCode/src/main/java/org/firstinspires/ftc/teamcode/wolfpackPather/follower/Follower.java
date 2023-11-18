@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
 
+import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.headingPIDFSwitch;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -44,7 +46,8 @@ public class Follower {
 
     private PIDFController translationalXPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
             translationalYPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
-            headingPIDF = new PIDFController(FollowerConstants.headingPIDFCoefficients),
+            largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
+            smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
             drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
 
     /**
@@ -139,17 +142,27 @@ public class Follower {
                 // set isBusy to false if at end
                 if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity) {
                     isBusy = false;
+                    drivePIDF.reset();
+                    smallHeadingPIDF.reset();
+                    largeHeadingPIDF.reset();
+                    translationalXPIDF.reset();
+                    translationalYPIDF.reset();
                 }
             }
         }
 
         if (isBusy) {
-            drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector());
+            drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0,0)/*getHeadingVector()*/, new Vector(0,0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
 
             for (int i = 0; i < motors.size(); i++) {
                 motors.get(i).setPower(drivePowers[i]);
             }
         }
+    }
+
+    // TODO: REMOVE
+    public double[] motorPowers() {
+        return driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0,0)/*getHeadingVector()*/, new Vector(0,0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
     }
 
     /**
@@ -170,7 +183,7 @@ public class Follower {
      */
     public Vector getDriveVector() {
         if (followingPathChain && chainIndex < currentPathChain.size()-1) {
-            return new Vector(1, currentPath.getClosestPointHeadingGoal());
+            return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
 
         if (!currentPath.isAtEnd()) {
@@ -208,8 +221,13 @@ public class Follower {
      * @return returns the heading vector
      */
     public Vector getHeadingVector() {
-        headingPIDF.updateError(MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()));
-        return new Vector(MathFunctions.clamp(headingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
+        double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
+        if (Math.abs(headingError) < headingPIDFSwitch) {
+            smallHeadingPIDF.updateError(headingError);
+            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
+        }
+        largeHeadingPIDF.updateError(headingError);
+        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
     }
 
     /**
@@ -242,8 +260,12 @@ public class Follower {
      */
     public Vector getTranslationalCorrection() {
         Vector translationalVector = new Vector(0,0);
-        translationalXPIDF.updateError(closestPose.getX() - poseUpdater.getPose().getX());
-        translationalYPIDF.updateError(closestPose.getY() - poseUpdater.getPose().getY());
+        double x = Math.abs(closestPose.getX() - poseUpdater.getPose().getX());
+        if (closestPose.getX() < poseUpdater.getPose().getX()) x *= -1;
+        double y = Math.abs(closestPose.getY() - poseUpdater.getPose().getY());
+        if (closestPose.getY() < poseUpdater.getPose().getY()) y *= -1;
+        translationalXPIDF.updateError(x);
+        translationalYPIDF.updateError(y);
         translationalVector.setOrthogonalComponents(translationalXPIDF.runPIDF(), translationalYPIDF.runPIDF());
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
         return translationalVector;
@@ -251,15 +273,15 @@ public class Follower {
 
     // TODO: remove later
     public double asdf() {
-        return translationalYPIDF.getError();
+        return getTranslationalCorrection().getTheta();
     }
 
     public double qwerty() {
-        return driveVectorScaler.getLeftSidePath().getMagnitude();
+        return driveVectorScaler.getLeftSidePath().getTheta();
     }
 
     public double qwerty2() {
-        return driveVectorScaler.getRightSidePath().getMagnitude();
+        return driveVectorScaler.getRightSidePath().getTheta();
     }
 
     /**

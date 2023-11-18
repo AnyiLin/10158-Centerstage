@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -63,8 +64,13 @@ public class StraightBackAndForth extends OpMode {
             }
         }
 
-        telemetryA.addData("Heading error", MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
-        telemetryA.addData("translational error", follower.asdf());
+        telemetryA.addData("forward", forward);
+        telemetryA.addData("leftFront", follower.motorPowers()[0]);
+        telemetryA.addData("leftRear", follower.motorPowers()[1]);
+        telemetryA.addData("rightFront", follower.motorPowers()[2]);
+        telemetryA.addData("rightRear", follower.motorPowers()[3]);
+        telemetryA.addData("Heading error", MathFunctions.getTurnDirection(follower.getPose().getHeading(), 0) * MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
+        telemetryA.addData("translational error heading", follower.asdf());
         telemetryA.addData("left side pathing power", follower.qwerty());
         telemetryA.addData("right side pathing power", follower.qwerty2());
         telemetryA.addData("isBusy", follower.isBusy());
@@ -72,7 +78,7 @@ public class StraightBackAndForth extends OpMode {
         telemetryA.addData("corrective", follower.getCorrectiveVector().getMagnitude());
         telemetryA.addData("translational", follower.getTranslationalCorrection().getMagnitude());
         telemetryA.addData("centripetal", follower.getCentripetalForceCorrection().getMagnitude());
-        telemetryA.addData("drive", follower.getDriveVector().getMagnitude());
+        telemetryA.addData("drive", follower.getDriveVector().getTheta());
         telemetryA.addData("x", follower.getPose().getX());
         telemetryA.addData("y", follower.getPose().getY());
         telemetryA.addData("drive error", follower.zxcv());

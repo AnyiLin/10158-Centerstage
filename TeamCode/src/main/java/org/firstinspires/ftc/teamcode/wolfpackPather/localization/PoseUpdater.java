@@ -69,6 +69,7 @@ public class PoseUpdater {
         previousPose = startingPose;
         previousPoseTime = System.nanoTime();
         currentPoseTime = System.nanoTime();
+        localizer.setPoseEstimate(set);
     }
 
     /**

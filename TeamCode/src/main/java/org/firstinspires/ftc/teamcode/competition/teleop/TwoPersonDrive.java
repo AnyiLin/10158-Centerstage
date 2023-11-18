@@ -695,7 +695,7 @@ public class TwoPersonDrive extends LinearOpMode {
             clawLifting = true;
         }
         if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = -0;
+            leftLiftTargetPosition = -100;
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;

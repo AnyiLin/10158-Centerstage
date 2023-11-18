@@ -12,18 +12,27 @@ public class FollowerConstants {
 
     // This section is for setting the actual drive vector for the front left wheel
     private static double xMovement = 78.54602;
-    private static double yMovement = 55.68387;
+    private static double yMovement = -55.68387;
     private static double[] convertToPolar = Point.cartesianToPolar(xMovement, yMovement);
     public static Vector frontLeftVector = MathFunctions.normalizeVector(new Vector(convertToPolar[0],convertToPolar[1]));
 
     // Mass of robot in kilograms
     public static double mass = 10.4326;
 
-    // Heading PIDF coefficients
-    public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            0.001,
-            0,
-            0.00275,
+    // Large heading error PIDF coefficients
+    public static CustomPIDFCoefficients largeHeadingPIDFCoefficients = new CustomPIDFCoefficients(
+            2,
+            0.065,
+            0.0000,
+            0);
+
+    public static double headingPIDFSwitch = Math.PI/6;
+
+    // Small heading error PIDF coefficients
+    public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
+            2,
+            0.045,
+            0.075,
             0);
 
     // Translational PIDF coefficients

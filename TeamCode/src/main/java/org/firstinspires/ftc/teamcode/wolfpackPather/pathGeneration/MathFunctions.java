@@ -86,7 +86,7 @@ public class MathFunctions {
      * @return returns the turn direction
      */
     public static double getTurnDirection(double startHeading, double endHeading) {
-        if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI * 2) {
+        if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI) {
             return 1; // counter clock wise
         }
         return -1; // clock wise
