@@ -93,65 +93,7 @@ public class DriveVectorScaler {
             mecanumVectorsCopy[i] = MathFunctions.copyVector(mecanumVectors[i]);
 
             mecanumVectorsCopy[i].rotateVector(robotHeading);
-/*
-            // this rotates the vectors by the angle of the actual pathing vector so we can get their vertical components
-            if (i == 0 || i == 1) {
-                mecanumVectorsCopy[i].rotateVector(-truePathingVectors[0].getTheta());
-            } else {
-                mecanumVectorsCopy[i].rotateVector(-truePathingVectors[1].getTheta());
-            }
- */
         }
-/*
-        // These two statements scale the wheel vectors so that the vertical components cancel out
-        // it also scales the wheel vectors to the magnitude of the pathing vectors
-        if (Math.abs(mecanumVectorsCopy[0].getYComponent()) < Math.abs(mecanumVectorsCopy[1].getYComponent())) {
-            mecanumVectorsCopy[1].setMagnitude(truePathingVectors[0].getMagnitude() * (mecanumVectorsCopy[0].getYComponent() / mecanumVectorsCopy[1].getYComponent()));
-            mecanumVectorsCopy[0].setMagnitude(truePathingVectors[0].getMagnitude());
-        } else {
-            mecanumVectorsCopy[0].setMagnitude(truePathingVectors[0].getMagnitude() * (mecanumVectorsCopy[1].getYComponent() / mecanumVectorsCopy[0].getYComponent()));
-            mecanumVectorsCopy[1].setMagnitude(truePathingVectors[0].getMagnitude());
-        }
-        if (Math.abs(mecanumVectorsCopy[2].getYComponent()) < Math.abs(mecanumVectorsCopy[3].getYComponent())) {
-            mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude() * (mecanumVectorsCopy[2].getYComponent() / mecanumVectorsCopy[3].getYComponent()));
-            mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude());
-        } else {
-            mecanumVectorsCopy[2].setMagnitude(truePathingVectors[1].getMagnitude() * (mecanumVectorsCopy[3].getYComponent() / mecanumVectorsCopy[2].getYComponent()));
-            mecanumVectorsCopy[3].setMagnitude(truePathingVectors[1].getMagnitude());
-        }
-
-        if (MathFunctions.dotProduct(new Vector(1, 0), MathFunctions.addVectors(mecanumVectorsCopy[0], mecanumVectorsCopy[1])) < 0) {
-            mecanumVectorsCopy[0] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[0], -1);
-            mecanumVectorsCopy[1] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[1], -1);
-        }
-        if (MathFunctions.dotProduct(new Vector(1,0), MathFunctions.addVectors(mecanumVectorsCopy[2], mecanumVectorsCopy[3])) < 0) {
-            mecanumVectorsCopy[2] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[2], -1);
-            mecanumVectorsCopy[3] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[3], -1);
-        }
-        if (MathFunctions.dotProduct(truePathingVectors[0], new Vector(1, robotHeading)) < 0) {
-            mecanumVectorsCopy[0] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[0], -1);
-            mecanumVectorsCopy[1] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[1], -1);
-        }
-        if (MathFunctions.dotProduct(truePathingVectors[1], new Vector(1, robotHeading)) < 0) {
-            mecanumVectorsCopy[2] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[2], -1);
-            mecanumVectorsCopy[3] = MathFunctions.scalarMultiplyVector(mecanumVectorsCopy[3], -1);
-        }
-
-
-
-        for (int i = 0; i < mecanumVectorsCopy.length; i++) {
-            // this rotates the vectors back to make the math easier
-            mecanumVectorsCopy[i].rotateVector(-robotHeading);
-
-            if (i == 0 || i == 1) {
-                mecanumVectorsCopy[i].rotateVector(truePathingVectors[0].getTheta());
-            } else {
-                mecanumVectorsCopy[i].rotateVector(truePathingVectors[1].getTheta());
-            }
-        }
-
-        return new double[] {MathFunctions.dotProduct(mecanumVectorsCopy[0], mecanumVectors[0]), MathFunctions.dotProduct(mecanumVectorsCopy[1], mecanumVectors[1]), MathFunctions.dotProduct(mecanumVectorsCopy[2], mecanumVectors[2]), MathFunctions.dotProduct(mecanumVectorsCopy[3], mecanumVectors[3])};
-        */
 
         wheelPowers[0] = (truePathingVectors[0].getXComponent()*mecanumVectorsCopy[1].getYComponent() - truePathingVectors[0].getYComponent()*mecanumVectorsCopy[1].getXComponent()) / (mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent() - mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent());
         wheelPowers[1] = (truePathingVectors[0].getXComponent()*mecanumVectorsCopy[0].getYComponent() - truePathingVectors[0].getYComponent()*mecanumVectorsCopy[0].getXComponent()) / (mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent() - mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent());
