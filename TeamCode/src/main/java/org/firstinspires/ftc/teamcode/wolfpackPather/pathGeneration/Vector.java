@@ -7,9 +7,15 @@ public class Vector {
     // these are the values of the coordinate defined by this Point, in both polar and Cartesian systems
     private double magnitude, theta, xComponent, yComponent;
 
+    /**
+     * This creates a new Vector with zero magnitude and direction
+     */
+    public Vector() {
+        setComponents(0, 0);
+    }
 
     /**
-     * This creates a new Point with a set coordinate system
+     * This creates a new Vector with a specified magnitude and direction
      *
      * @param magnitude magnitude of the vector
      * @param theta the direction of the vector in radians

@@ -114,7 +114,7 @@ public class PoseUpdater {
      * @return returns the velocity of the robot
      */
     public Vector getVelocity() {
-        Vector velocity = new Vector(0,0);
+        Vector velocity = new Vector();
         velocity.setOrthogonalComponents(getPose().getX() - previousPose.getX(), getPose().getY() - previousPose.getY());
         velocity.setMagnitude(MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime-previousPoseTime)/Math.pow(10.0, 9)));
         return velocity;

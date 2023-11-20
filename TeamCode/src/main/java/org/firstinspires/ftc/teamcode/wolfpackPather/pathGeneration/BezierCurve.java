@@ -10,7 +10,7 @@ public class BezierCurve {
     // This contains the control points for the Bezier curve
     private ArrayList<Point> controlPoints = new ArrayList<Point>();
 
-    private Vector endTangent = new Vector(0,0);
+    private Vector endTangent = new Vector();
 
     private final int APPROXIMATION_STEPS = 100;
 
@@ -149,7 +149,7 @@ public class BezierCurve {
         t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
-        Vector returnVector = new Vector(0,0);
+        Vector returnVector = new Vector();
 
         // calculates the x coordinate of the point requested
         for (int i = 0; i < controlPoints.size()-1; i++) {
@@ -176,7 +176,7 @@ public class BezierCurve {
         t = MathFunctions.clamp(t, 0, 1);
         double xCoordinate = 0;
         double yCoordinate = 0;
-        Vector returnVector = new Vector(0,0);
+        Vector returnVector = new Vector();
 
         // calculates the x coordinate of the point requested
         for (int i = 0; i < controlPoints.size()-2; i++) {

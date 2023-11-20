@@ -202,7 +202,7 @@ public class MathFunctions {
      * @return returns the sum of the vectors
      */
     public static Vector addVectors(Vector one, Vector two) {
-        Vector returnVector = new Vector(0,0);
+        Vector returnVector = new Vector();
         returnVector.setOrthogonalComponents(one.getXComponent()+two.getXComponent(), one.getYComponent()+two.getYComponent());
         return returnVector;
     }
@@ -216,7 +216,7 @@ public class MathFunctions {
      * @return returns the second vector subtracted from the first vector
      */
     public static Vector subtractVectors(Vector one, Vector two) {
-        Vector returnVector = new Vector(0,0);
+        Vector returnVector = new Vector();
         returnVector.setOrthogonalComponents(one.getXComponent()-two.getXComponent(), one.getYComponent()-two.getYComponent());
         return returnVector;
     }

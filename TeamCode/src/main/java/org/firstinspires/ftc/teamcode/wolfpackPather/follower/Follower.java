@@ -65,6 +65,26 @@ public class Follower {
      */
     public Follower(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
+        initialize();
+    }
+
+    /**
+     * This creates a new follower given a hardware map and sets whether the follower is being used
+     * in autonomous or teleop
+     *
+     * @param hardwareMap hardware map required
+     * @param setAuto sets whether or not the follower is being used in autonomous or teleop
+     */
+    public Follower(HardwareMap hardwareMap, boolean setAuto) {
+        this.hardwareMap = hardwareMap;
+        setAuto(setAuto);
+        initialize();
+    }
+
+    /**
+     * This initializes the follower
+     */
+    public void initialize() {
         driveVectorScaler = new DriveVectorScaler(FollowerConstants.frontLeftVector);
         poseUpdater = new PoseUpdater(hardwareMap);
 
@@ -241,7 +261,7 @@ public class Follower {
         if (!currentPath.isAtEnd()) {
             drivePIDF.updateError(currentPath.length() * (1 - currentPath.getClosestPointTValue()) - getZeroPowerDistance());
         } else {
-            Vector offset = new Vector(0,0);
+            Vector offset = new Vector();
             offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
             drivePIDF.updateError(MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - getZeroPowerDistance());
         }
@@ -311,7 +331,7 @@ public class Follower {
      * @return returns the translational vector
      */
     public Vector getTranslationalCorrection() {
-        Vector translationalVector = new Vector(0,0);
+        Vector translationalVector = new Vector();
         double x = Math.abs(closestPose.getX() - poseUpdater.getPose().getX());
         if (closestPose.getX() < poseUpdater.getPose().getX()) x *= -1;
         double y = Math.abs(closestPose.getY() - poseUpdater.getPose().getY());
@@ -353,11 +373,25 @@ public class Follower {
             double yDoublePrime = averageDeltaDeltaPose.getY() / averageDeltaPose.getX();
             curvature = (Math.pow(Math.sqrt(1 + Math.pow(yPrime, 2)), 3)) / (yDoublePrime);
         }
-        if (Double.isNaN(curvature)) return new Vector(0,0);
+        if (Double.isNaN(curvature)) return new Vector();
         return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,-1,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
     }
 
+    /**
+     * This returns the closest pose to the robot on the path the follower is currently following
+     *
+     * @return returns the closest pose
+     */
     public Pose2d getClosestPose() {
         return closestPose;
+    }
+
+    /**
+     * This sets whether or not the follower is being used in auto or teleop
+     *
+     * @param set sets auto or not
+     */
+    public void setAuto(boolean set) {
+        auto = set;
     }
 }
