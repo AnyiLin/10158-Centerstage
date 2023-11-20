@@ -65,6 +65,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_I
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_PRESET_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.SLIDE_DELAY;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TOP_LINE_POSITION;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -633,7 +634,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             }
-            if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>1100 && leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
+            if (leftLift.getCurrent(CurrentUnit.MILLIAMPS)>1000 && leftLift.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
                 leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 leftLift.setPower(0.1);
@@ -695,7 +696,7 @@ public class TwoPersonDrive extends LinearOpMode {
             clawLifting = true;
         }
         if (clawLifting && (System.currentTimeMillis()-clawGrabbingStartTime > CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT)) {
-            leftLiftTargetPosition = -100;
+            leftLiftTargetPosition = 10;
             clawLifting = false;
             outtakeSlowPickup = true;
             liftGoing = true;
@@ -717,11 +718,11 @@ public class TwoPersonDrive extends LinearOpMode {
                 } else {
                     leftOuttake.setPosition(LEFT_OUTTAKE_PRESET_POSITION);
                     rightOuttake.setPosition(RIGHT_OUTTAKE_PRESET_POSITION);
-                    clawGrabbingStartTime = System.currentTimeMillis() - (LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT);
+                    clawGrabbingStartTime = System.currentTimeMillis() - (LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT + SLIDE_DELAY);
                 }
             }
         }
-        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT)) {
+        if (liftGoing && (System.currentTimeMillis()-clawGrabbingStartTime > LIFT_GO_WAIT + CLAW_CLOSE_WAIT + CLAW_GRAB_WAIT + CLAW_GRAB_WAIT + SLIDE_DELAY)) {
             liftGoing = false;
             outtakeSlowPickup = false;
             if (autonomous) {

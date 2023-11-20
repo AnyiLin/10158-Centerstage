@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,13 +37,20 @@ public class Follower {
 
     private PathChain currentPathChain;
 
-    private final int BEZIER_CURVE_BINARY_STEP_LIMIT = 9;
+    private final int BEZIER_CURVE_BINARY_STEP_LIMIT = 9, DELTA_POSE_RECORD_LIMIT = 8;
 
     private int chainIndex;
 
-    private boolean followingPathChain, isBusy;
+    private boolean followingPathChain, isBusy, auto = true;
 
     private double[] drivePowers;
+
+    private Vector[] teleOpMovementVectors = new Vector[] {new Vector(0,0), new Vector(0,0), new Vector(0,0)};
+
+    private ArrayList<Pose2d> deltaPoses = new ArrayList<Pose2d>();
+    private ArrayList<Pose2d> deltaDeltaPoses = new ArrayList<Pose2d>();
+
+    private Pose2d averageDeltaPose, averagePreviousDeltaPose, averageDeltaDeltaPose;
 
     private PIDFController translationalXPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
             translationalYPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
@@ -78,6 +86,13 @@ public class Follower {
 
         for (DcMotorEx motor : motors) {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+
+        for (int i = 0; i < DELTA_POSE_RECORD_LIMIT; i++) {
+            deltaPoses.add(new Pose2d(0,0,0));
+        }
+        for (int i = 0; i < DELTA_POSE_RECORD_LIMIT/2; i++) {
+            deltaDeltaPoses.add(new Pose2d(0,0,0));
         }
     }
 
@@ -131,32 +146,62 @@ public class Follower {
      */
     public void update() {
         poseUpdater.update();
-        closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-        if (currentPath.isAtEnd()) {
-            if (followingPathChain && chainIndex < currentPathChain.size()-1) {
-                // Not at last path, keep going
-                chainIndex++;
-                currentPath = currentPathChain.getPath(chainIndex);
-            } else {
-                // At last path, run some end detection stuff
-                // set isBusy to false if at end
-                if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity) {
-                    isBusy = false;
-                    drivePIDF.reset();
-                    smallHeadingPIDF.reset();
-                    largeHeadingPIDF.reset();
-                    translationalXPIDF.reset();
-                    translationalYPIDF.reset();
+        if (auto) {
+            closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
+            if (currentPath.isAtEnd()) {
+                if (followingPathChain && chainIndex < currentPathChain.size() - 1) {
+                    // Not at last path, keep going
+                    chainIndex++;
+                    currentPath = currentPathChain.getPath(chainIndex);
+                } else {
+                    // At last path, run some end detection stuff
+                    // set isBusy to false if at end
+                    if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity) {
+                        isBusy = false;
+                        drivePIDF.reset();
+                        smallHeadingPIDF.reset();
+                        largeHeadingPIDF.reset();
+                        translationalXPIDF.reset();
+                        translationalYPIDF.reset();
+                    }
                 }
             }
-        }
 
-        if (isBusy) {
-            drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0,0)/*getHeadingVector()*/, new Vector(0,0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
+            if (isBusy) {
+                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0, 0)/*getHeadingVector()*/, new Vector(0, 0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
 
-            for (int i = 0; i < motors.size(); i++) {
-                motors.get(i).setPower(drivePowers[i]);
+                for (int i = 0; i < motors.size(); i++) {
+                    motors.get(i).setPower(drivePowers[i]);
+                }
             }
+        } else {
+            deltaPoses.add(poseUpdater.getDeltaPose());
+            deltaPoses.remove(deltaPoses.get(deltaPoses.size() - 1));
+
+            averageDeltaPose = new Pose2d(0,0,0);
+            averagePreviousDeltaPose = new Pose2d(0,0,0);
+
+            for (int i = 0; i < deltaPoses.size()/2; i++) {
+                averageDeltaPose.plus(deltaPoses.get(i));
+            }
+            averageDeltaPose.div(deltaPoses.size()/2);
+
+            for (int i = deltaPoses.size()/2; i < deltaPoses.size(); i++) {
+                averagePreviousDeltaPose.plus(deltaPoses.get(i));
+            }
+            averagePreviousDeltaPose.div(deltaPoses.size()/2);
+
+            deltaDeltaPoses.add(averageDeltaPose.minus(averagePreviousDeltaPose));
+            deltaDeltaPoses.remove(deltaDeltaPoses.size() - 1);
+
+            averageDeltaDeltaPose = new Pose2d(0,0,0);
+
+            for (int i = 0; i < deltaDeltaPoses.size(); i++) {
+                averageDeltaDeltaPose.plus(deltaDeltaPoses.get(i));
+            }
+            averageDeltaDeltaPose.div(deltaDeltaPoses.size());
+
+            drivePowers = driveVectorScaler.getDrivePowers(teleOpMovementVectors[0], teleOpMovementVectors[1], teleOpMovementVectors[2], poseUpdater.getPose().getHeading());
         }
     }
 
@@ -172,6 +217,13 @@ public class Follower {
      */
     public boolean isBusy() {
         return isBusy;
+    }
+
+    /**
+     * Sets the correctional, heading, and drive movement vectors for teleop enhancements
+     */
+    public void setMovementVectors(Vector correctional, Vector heading, Vector drive) {
+        teleOpMovementVectors = new Vector[] {correctional, heading, drive};
     }
 
     /**
@@ -293,7 +345,14 @@ public class Follower {
      * @return returns the centripetal vector
      */
     public Vector getCentripetalForceCorrection() {
-        double curvature = currentPath.getClosestPointCurvature();
+        double curvature;
+        if (auto) {
+            curvature = currentPath.getClosestPointCurvature();
+        } else {
+            double yPrime = averageDeltaPose.getY() / averageDeltaPose.getX();
+            double yDoublePrime = averageDeltaDeltaPose.getY() / averageDeltaPose.getX();
+            curvature = (Math.pow(Math.sqrt(1 + Math.pow(yPrime, 2)), 3)) / (yDoublePrime);
+        }
         if (Double.isNaN(curvature)) return new Vector(0,0);
         return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature,-1,1), currentPath.getClosestPointHeadingGoal() + MathFunctions.getSign(curvature) * (Math.PI/2));
     }

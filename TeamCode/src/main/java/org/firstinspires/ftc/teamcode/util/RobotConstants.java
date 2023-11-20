@@ -23,7 +23,7 @@ public class RobotConstants {
             TOP_LINE_POSITION = 190,
             MIDDLE_LINE_POSITION = 100,
             BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 55,
+            LIFT_GRAB_POSITION = 50,
             INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
             DRIVETRAIN_CURRENT_LIMIT = 10000*10,
             DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
@@ -107,7 +107,8 @@ public class RobotConstants {
             RESET_FOLD_IN_WAIT = 1000,
             OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500,
             INTAKE_BURST_TIME = 250,
-            INTAKE_EDGE_CASE_COLLIDE_WAIT = 1000;
+            INTAKE_EDGE_CASE_COLLIDE_WAIT = 1000,
+    SLIDE_DELAY = 0;
 
     public static final PIDFCoefficients
             LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(9,6,0,4),

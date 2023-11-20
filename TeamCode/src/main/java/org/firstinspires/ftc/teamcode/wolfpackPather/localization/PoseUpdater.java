@@ -100,6 +100,15 @@ public class PoseUpdater {
     }
 
     /**
+     * Returns the robot's change in pose from the previous update
+     *
+     * @return returns the robot's delta pose
+     */
+    public Pose2d getDeltaPose() {
+        return getPose().minus(previousPose);
+    }
+
+    /**
      * This returns the velocity of the robot as a vector
      *
      * @return returns the velocity of the robot

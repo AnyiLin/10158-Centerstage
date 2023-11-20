@@ -35,7 +35,7 @@ public class StackRelocalization extends OpenCvPipeline {
 
     private Rect biggestBox = new Rect();
 
-    public int CENTER = 220, SEARCH_AREA_X = 440, SEARCH_AREA_UPPER_Y = -5*2, SEARCH_AREA_LOWER_Y = 80*2, H_LOWER = 0, L_LOWER = 215, S_LOWER = 0, H_UPPER = 255, L_UPPER = 255, S_UPPER = 255;
+    public int CENTER = 220, SEARCH_AREA_X = 440, SEARCH_AREA_UPPER_Y = -80, SEARCH_AREA_LOWER_Y = 80*2, H_LOWER = 0, L_LOWER = 180, S_LOWER = 0, H_UPPER = 255, L_UPPER = 255, S_UPPER = 255;
 
     private final double PIXEL_OBJECT_WIDTH_INCHES = 3.34646;
 
