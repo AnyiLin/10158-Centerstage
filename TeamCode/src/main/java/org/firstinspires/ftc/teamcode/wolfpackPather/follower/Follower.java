@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
 
 import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.headingPIDFSwitch;
+import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.translationalPIDFSwitch;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -52,8 +53,10 @@ public class Follower {
 
     private Pose2d averageDeltaPose, averagePreviousDeltaPose, averageDeltaDeltaPose;
 
-    private PIDFController translationalXPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
-            translationalYPIDF = new PIDFController(FollowerConstants.translationalPIDFCoefficients),
+    private PIDFController smallTranslationalXPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
+            smallTranslationalYPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
+            largeTranslationalXPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
+            largeTranslationalYPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
             largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
             smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
             drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
@@ -181,8 +184,10 @@ public class Follower {
                         drivePIDF.reset();
                         smallHeadingPIDF.reset();
                         largeHeadingPIDF.reset();
-                        translationalXPIDF.reset();
-                        translationalYPIDF.reset();
+                        smallTranslationalXPIDF.reset();
+                        smallTranslationalYPIDF.reset();
+                        largeTranslationalXPIDF.reset();
+                        largeTranslationalYPIDF.reset();
                     }
                 }
             }
@@ -336,9 +341,15 @@ public class Follower {
         if (closestPose.getX() < poseUpdater.getPose().getX()) x *= -1;
         double y = Math.abs(closestPose.getY() - poseUpdater.getPose().getY());
         if (closestPose.getY() < poseUpdater.getPose().getY()) y *= -1;
-        translationalXPIDF.updateError(x);
-        translationalYPIDF.updateError(y);
-        translationalVector.setOrthogonalComponents(translationalXPIDF.runPIDF(), translationalYPIDF.runPIDF());
+        if (MathFunctions.distance(poseUpdater.getPose(), closestPose) < translationalPIDFSwitch) {
+            smallTranslationalXPIDF.updateError(x);
+            smallTranslationalYPIDF.updateError(y);
+            translationalVector.setOrthogonalComponents(smallTranslationalXPIDF.runPIDF(), smallTranslationalYPIDF.runPIDF());
+        } else {
+            largeTranslationalXPIDF.updateError(x);
+            largeTranslationalYPIDF.updateError(y);
+            translationalVector.setOrthogonalComponents(largeTranslationalXPIDF.runPIDF(), largeTranslationalYPIDF.runPIDF());
+        }
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
         return translationalVector;
     }

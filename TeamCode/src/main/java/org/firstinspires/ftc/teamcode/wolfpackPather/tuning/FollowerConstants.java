@@ -35,12 +35,21 @@ public class FollowerConstants {
             0.075,
             0);
 
-    // Translational PIDF coefficients
-    public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.05,
+    // Small translational PIDF coefficients
+    public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
+            1,
             0,
-            0.00275,
+            0.1,
             0);
+
+    // Small translational PIDF coefficients
+    public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
+            0.6,
+            0,
+            0,
+            0);
+
+    public static double translationalPIDFSwitch = 1;
 
     // Drive PIDF coefficients
     public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(
