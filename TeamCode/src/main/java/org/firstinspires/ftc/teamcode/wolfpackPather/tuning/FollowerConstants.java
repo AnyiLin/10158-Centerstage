@@ -21,26 +21,28 @@ public class FollowerConstants {
 
     // Large heading error PIDF coefficients
     public static CustomPIDFCoefficients largeHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            2,
-            0.065,
-            0.0000,
+            5,
+            0,
+            0,
             0);
 
     public static double headingPIDFSwitch = Math.PI/6;
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            2,
-            0.045,
-            0.075,
+            6,
+            4,
+            0,
             0);
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            1,
-            0,
+            0.9,
+            0.5,
             0.1,
             0);
+
+    public static double translationalPIDFSwitch = 1;
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
@@ -49,13 +51,11 @@ public class FollowerConstants {
             0,
             0);
 
-    public static double translationalPIDFSwitch = 1;
-
     // Drive PIDF coefficients
     public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.001,
+            0.05,
             0,
-            0.0025,
+            0,
             0);
 
     // Centrifugal force to power scaling

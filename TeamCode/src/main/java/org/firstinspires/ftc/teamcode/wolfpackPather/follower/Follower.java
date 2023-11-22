@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
 import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.headingPIDFSwitch;
 import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.translationalPIDFSwitch;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Config
 public class Follower {
     private HardwareMap hardwareMap;
 
@@ -60,6 +62,8 @@ public class Follower {
             largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
             smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
             drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
+
+    public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
     /**
      * This creates a new follower given a hardware map
@@ -193,7 +197,7 @@ public class Follower {
             }
 
             if (isBusy) {
-                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0, 0)/*getHeadingVector()*/, new Vector(0, 0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
+                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
 
                 for (int i = 0; i < motors.size(); i++) {
                     motors.get(i).setPower(drivePowers[i]);
@@ -232,7 +236,7 @@ public class Follower {
 
     // TODO: REMOVE
     public double[] motorPowers() {
-        return driveVectorScaler.getDrivePowers(getCorrectiveVector(), new Vector(0,0)/*getHeadingVector()*/, new Vector(0,0)/*getDriveVector()*/, poseUpdater.getPose().getHeading());
+        return driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
     }
 
     /**
@@ -259,6 +263,7 @@ public class Follower {
      * @return returns the drive vector
      */
     public Vector getDriveVector() {
+        if (!useDrive) return new Vector();
         if (followingPathChain && chainIndex < currentPathChain.size()-1) {
             return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
@@ -268,7 +273,7 @@ public class Follower {
         } else {
             Vector offset = new Vector();
             offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
-            drivePIDF.updateError(MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - getZeroPowerDistance());
+            drivePIDF.updateError(-MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - getZeroPowerDistance());
         }
 
         return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
@@ -298,6 +303,7 @@ public class Follower {
      * @return returns the heading vector
      */
     public Vector getHeadingVector() {
+        if (!useHeading) return new Vector();
         double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
         if (Math.abs(headingError) < headingPIDFSwitch) {
             smallHeadingPIDF.updateError(headingError);
@@ -336,6 +342,7 @@ public class Follower {
      * @return returns the translational vector
      */
     public Vector getTranslationalCorrection() {
+        if (!useTranslational) return new Vector();
         Vector translationalVector = new Vector();
         double x = Math.abs(closestPose.getX() - poseUpdater.getPose().getX());
         if (closestPose.getX() < poseUpdater.getPose().getX()) x *= -1;
@@ -352,6 +359,8 @@ public class Follower {
         }
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
         return translationalVector;
+        // TODO: fix
+        //return MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, currentPath.getClosestPointTangentVector()), currentPath.getClosestPointTangentVector().getTheta()));
     }
 
     // TODO: remove later
@@ -376,6 +385,7 @@ public class Follower {
      * @return returns the centripetal vector
      */
     public Vector getCentripetalForceCorrection() {
+        if (!useCentripetal) return new Vector();
         double curvature;
         if (auto) {
             curvature = currentPath.getClosestPointCurvature();

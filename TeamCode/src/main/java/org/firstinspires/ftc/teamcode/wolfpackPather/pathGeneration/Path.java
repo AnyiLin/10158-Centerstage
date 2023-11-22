@@ -32,6 +32,7 @@ public class Path {
      * @param endHeading the end heading for the path
      */
     public void setLinearHeadingInterpolation(double startHeading, double endHeading) {
+        isTangentHeadingInterpolation = false;
         this.startHeading = startHeading;
         this.endHeading = endHeading;
     }
