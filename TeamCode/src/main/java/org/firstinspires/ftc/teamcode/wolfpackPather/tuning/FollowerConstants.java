@@ -30,9 +30,9 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            6,
-            4,
-            0,
+            8,
+            20,
+            0.3,
             0);
 
     // Small translational PIDF coefficients

@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
 public class CurvedBackAndForth extends OpMode {
     private Telemetry telemetryA;
 
-    public static double DISTANCE = 40;
+    public static double DISTANCE = 20;
 
     private boolean forward = true;
 
@@ -31,6 +31,8 @@ public class CurvedBackAndForth extends OpMode {
 
         forwards = new Path(new BezierCurve(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN), new Point(DISTANCE,DISTANCE, Point.CARTESIAN)));
         backwards = new Path(new BezierCurve(new Point(DISTANCE,DISTANCE, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
+
+        backwards.setReversed(true);
 
         follower.followPath(forwards);
 

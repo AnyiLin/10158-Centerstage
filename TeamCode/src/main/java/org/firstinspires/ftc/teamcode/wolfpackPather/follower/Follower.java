@@ -273,7 +273,7 @@ public class Follower {
         } else {
             Vector offset = new Vector();
             offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
-            drivePIDF.updateError(-MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - getZeroPowerDistance());
+            drivePIDF.updateError(-MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - MathFunctions.dotProduct(currentPath.getEndTangent(),getZeroPowerDistanceVector()));
         }
 
         return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
@@ -289,6 +289,15 @@ public class Follower {
      * as a vector
      *
      * @return returns the projected distance vector
+     */
+    public Vector getZeroPowerDistanceVector() {
+        return new Vector(getZeroPowerDistance(), poseUpdater.getVelocity().getTheta());
+    }
+
+    /**
+     * This returns the distance the robot is projected to go when all power is cut from the drivetrain
+     *
+     * @return returns the projected distance
      */
     public double getZeroPowerDistance() {
         return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / (2 * FollowerConstants.zeroPowerAcceleration);
@@ -358,9 +367,8 @@ public class Follower {
             translationalVector.setOrthogonalComponents(largeTranslationalXPIDF.runPIDF(), largeTranslationalYPIDF.runPIDF());
         }
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
-        return translationalVector;
         // TODO: fix
-        //return MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, currentPath.getClosestPointTangentVector()), currentPath.getClosestPointTangentVector().getTheta()));
+        return MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
     }
 
     // TODO: remove later

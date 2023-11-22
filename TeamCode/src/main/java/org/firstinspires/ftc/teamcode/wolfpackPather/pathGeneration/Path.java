@@ -13,7 +13,7 @@ public class Path {
 
     private Vector closestPointTangentVector;
 
-    private boolean isTangentHeadingInterpolation = true;
+    private boolean isTangentHeadingInterpolation = true, followTangentReversed;
 
     /**
      * Creates a new Path from a Bezier curve. The default heading interpolation is tangential.
@@ -68,6 +68,16 @@ public class Path {
         closestPointCurvature = curve.getCurvature(closestPointTValue);
 
         return new Pose2d(returnPoint.getX(), returnPoint.getY(), getClosestPointHeadingGoal());
+    }
+
+    /**
+     * This sets whether to follow the tangent heading reversed or not
+     *
+     * @param set sets reversed or not
+     */
+    public void setReversed(boolean set) {
+        isTangentHeadingInterpolation = true;
+        followTangentReversed = set;
     }
 
     /**
@@ -142,6 +152,7 @@ public class Path {
      */
     public double getClosestPointHeadingGoal() {
         if (isTangentHeadingInterpolation) {
+            if (followTangentReversed) return MathFunctions.normalizeAngle(closestPointTangentVector.getTheta() + Math.PI);
             return closestPointTangentVector.getTheta();
         } else {
             return getHeadingGoal(closestPointTValue);
@@ -156,6 +167,7 @@ public class Path {
      */
     public double getHeadingGoal(double t) {
         if (isTangentHeadingInterpolation) {
+            if (followTangentReversed) return MathFunctions.normalizeAngle(curve.getDerivative(t).getTheta() + Math.PI);
             return curve.getDerivative(t).getTheta();
         } else {
             return MathFunctions.normalizeAngle(startHeading + MathFunctions.getTurnDirection(startHeading, endHeading) * Math.abs(endHeading-startHeading) * t);

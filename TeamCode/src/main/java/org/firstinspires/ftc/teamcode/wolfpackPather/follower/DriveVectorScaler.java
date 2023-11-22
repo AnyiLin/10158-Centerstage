@@ -100,16 +100,12 @@ public class DriveVectorScaler {
         wheelPowers[2] = (truePathingVectors[1].getXComponent()*mecanumVectorsCopy[3].getYComponent() - truePathingVectors[1].getYComponent()*mecanumVectorsCopy[3].getXComponent()) / (mecanumVectorsCopy[2].getXComponent()*mecanumVectorsCopy[3].getYComponent() - mecanumVectorsCopy[3].getXComponent()*mecanumVectorsCopy[2].getYComponent());
         wheelPowers[3] = (truePathingVectors[1].getXComponent()*mecanumVectorsCopy[2].getYComponent() - truePathingVectors[1].getYComponent()*mecanumVectorsCopy[2].getXComponent()) / (mecanumVectorsCopy[3].getXComponent()*mecanumVectorsCopy[2].getYComponent() - mecanumVectorsCopy[2].getXComponent()*mecanumVectorsCopy[3].getYComponent());
 
-        double leftSideMax = Math.abs(Math.max(wheelPowers[0], wheelPowers[1]));
-        if (leftSideMax > 1) {
-            wheelPowers[0] /= leftSideMax;
-            wheelPowers[1] /= leftSideMax;
-        }
-
-        double rightSideMax = Math.abs(Math.max(wheelPowers[2], wheelPowers[3]));
-        if (rightSideMax > 1) {
-            wheelPowers[2] /= rightSideMax;
-            wheelPowers[3] /= rightSideMax;
+        double wheelPowerMax = Math.abs(Math.max(Math.max(Math.abs(wheelPowers[0]), Math.abs(wheelPowers[1])), Math.max(Math.abs(wheelPowers[2]), Math.abs(wheelPowers[3]))));
+        if (wheelPowerMax > 1) {
+            wheelPowers[0] /= wheelPowerMax;
+            wheelPowers[1] /= wheelPowerMax;
+            wheelPowers[2] /= wheelPowerMax;
+            wheelPowers[3] /= wheelPowerMax;
         }
 
         return wheelPowers;
