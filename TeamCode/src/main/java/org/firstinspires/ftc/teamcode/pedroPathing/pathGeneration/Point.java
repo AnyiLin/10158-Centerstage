@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
-
-import java.math.BigDecimal;
+package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 public class Point {
     /**

@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
+package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
-import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 
 import java.util.ArrayList;
 
@@ -14,6 +15,25 @@ public class Path {
     private Vector closestPointTangentVector;
 
     private boolean isTangentHeadingInterpolation = true, followTangentReversed;
+
+    // When the drivetrain is at the end of its current path or path chain and the velocity goes
+    // below this value, then end the path. This is in inches/second
+    // This can be custom set for each path
+    public static double pathEndVelocity = FollowerConstants.pathEndVelocity;
+
+    // When the drivetrain is at the end of its current path or path chain and the translational error goes
+    // below this value, then end the path. This is in inches
+    // This can be custom set for each path
+    public static double pathEndTranslational = FollowerConstants.pathEndTranslational;
+
+    // When the drivetrain is at the end of its current path or path chain and the heading error goes
+    // below this value, then end the path. This is in radians
+    // This can be custom set for each path
+    public static double pathEndHeading = FollowerConstants.pathEndHeading;
+
+    // When the t-value of the closest point to the robot on the path is greater than this value,
+    // then the path is considered at its end.
+    public static double pathEndTValue = FollowerConstants.pathEndTValue;
 
     /**
      * Creates a new Path from a Bezier curve. The default heading interpolation is tangential.
@@ -175,11 +195,11 @@ public class Path {
     }
 
     /**
-     * This returns if the robot is at the end of the path
+     * This returns if the robot is at the end of the path, according to the parametric t value
      *
      * @return returns if at end
      */
-    public boolean isAtEnd() {
+    public boolean isAtParametricEnd() {
         if (closestPointTValue >= FollowerConstants.pathEndTValue) return true;
         return false;
     }
@@ -227,5 +247,41 @@ public class Path {
      */
     public Point getLastControlPoint() {
         return curve.getLastControlPoint();
+    }
+
+    /**
+     * This sets the velocity stop criteria
+     *
+     * @param set
+     */
+    public void setPathEndVelocity(double set) {
+        pathEndVelocity = set;
+    }
+
+    /**
+     * This sets the translational stop criteria
+     *
+     * @param set
+     */
+    public void setPathEndTranslational(double set) {
+        pathEndTranslational = set;
+    }
+
+    /**
+     * This sets the heading stop criteria
+     *
+     * @param set
+     */
+    public void setPathEndHeading(double set) {
+        pathEndHeading = set;
+    }
+
+    /**
+     * This sets the parametric end criteria
+     *
+     * @param set
+     */
+    public void setPathEndTValue(double set) {
+        pathEndTValue = set;
     }
 }

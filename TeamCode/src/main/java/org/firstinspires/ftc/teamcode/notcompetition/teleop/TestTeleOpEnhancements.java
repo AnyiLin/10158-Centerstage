@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.notcompetition.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.wolfpackPather.follower.Follower;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 public class TestTeleOpEnhancements extends OpMode {
     private Follower follower;

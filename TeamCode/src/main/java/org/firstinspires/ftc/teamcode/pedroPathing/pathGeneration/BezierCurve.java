@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration;
+package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 
 import java.util.ArrayList;
@@ -14,7 +14,14 @@ public class BezierCurve {
 
     private final int APPROXIMATION_STEPS = 100;
 
-    private double UNIT_TO_TIME, length;
+        private double UNIT_TO_TIME, length;
+
+    /**
+     * This creates an empty Bezier curve.
+     * NOTE: only use this for the constructors of classes extending this.
+     */
+    public BezierCurve() {
+    }
 
     /**
      * This creates a new Bezier curve with an ArrayList of control points and generates the curve

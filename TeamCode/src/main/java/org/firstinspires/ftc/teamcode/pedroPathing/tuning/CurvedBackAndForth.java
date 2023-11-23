@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
+package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.wolfpackPather.follower.Follower;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.BezierCurve;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 
 @Config
 @Autonomous (name = "Curved Back And Forth", group = "Autonomous Pathing Tuning")

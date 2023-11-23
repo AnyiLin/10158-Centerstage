@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.localization;
+package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import androidx.annotation.NonNull;
 
@@ -7,7 +7,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 

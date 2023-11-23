@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
+package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.util.CustomPIDFCoefficients;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 @Config
 public class FollowerConstants {
@@ -26,7 +26,7 @@ public class FollowerConstants {
             0,
             0);
 
-    public static double headingPIDFSwitch = Math.PI/6;
+    public static double headingPIDFSwitch = Math.PI/60;
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
@@ -67,7 +67,18 @@ public class FollowerConstants {
 
     // When the drivetrain is at the end of its current path or path chain and the velocity goes
     // below this value, then end the path. This is in inches/second
-    public static double pathEndVelocity = 0.01;
+    // This can be custom set for each path
+    public static double pathEndVelocity = 0.1;
+
+    // When the drivetrain is at the end of its current path or path chain and the translational error goes
+    // below this value, then end the path. This is in inches
+    // This can be custom set for each path
+    public static double pathEndTranslational = 0.5;
+
+    // When the drivetrain is at the end of its current path or path chain and the heading error goes
+    // below this value, then end the path. This is in radians
+    // This can be custom set for each path
+    public static double pathEndHeading = 0.01;
 
     // When the t-value of the closest point to the robot on the path is greater than this value,
     // then the path is considered at its end.

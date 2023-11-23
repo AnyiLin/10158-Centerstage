@@ -1,7 +1,9 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
+package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 
-import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.headingPIDFSwitch;
-import static org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants.translationalPIDFSwitch;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFSwitch;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.pathEndHeading;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.pathEndTranslational;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.translationalPIDFSwitch;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -12,12 +14,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.teamcode.util.PIDFController;
-import org.firstinspires.ftc.teamcode.wolfpackPather.localization.PoseUpdater;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
-import org.firstinspires.ftc.teamcode.wolfpackPather.tuning.FollowerConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -175,7 +177,7 @@ public class Follower {
         poseUpdater.update();
         if (auto) {
             closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-            if (currentPath.isAtEnd()) {
+            if (currentPath.isAtParametricEnd()) {
                 if (followingPathChain && chainIndex < currentPathChain.size() - 1) {
                     // Not at last path, keep going
                     chainIndex++;
@@ -183,7 +185,7 @@ public class Follower {
                 } else {
                     // At last path, run some end detection stuff
                     // set isBusy to false if at end
-                    if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity) {
+                    if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity && MathFunctions.distance(poseUpdater.getPose(), closestPose) < pathEndTranslational && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < pathEndHeading) {
                         isBusy = false;
                         drivePIDF.reset();
                         smallHeadingPIDF.reset();
@@ -268,7 +270,7 @@ public class Follower {
             return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
 
-        if (!currentPath.isAtEnd()) {
+        if (!currentPath.isAtParametricEnd()) {
             drivePIDF.updateError(currentPath.length() * (1 - currentPath.getClosestPointTValue()) - getZeroPowerDistance());
         } else {
             Vector offset = new Vector();

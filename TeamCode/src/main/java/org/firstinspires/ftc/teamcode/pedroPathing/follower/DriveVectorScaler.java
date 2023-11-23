@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.follower;
+package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 public class DriveVectorScaler {
     // This is in the order left front, left back, right front, right back. These are also normalized

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.localization;
+package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.wolfpackPather.tuning;
+package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -11,17 +11,17 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.wolfpackPather.localization.PoseUpdater;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.wolfpackPather.pathGeneration.Vector;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous (name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
-public class ForwardVelocityTuner extends OpMode {
+@Autonomous (name = "Strafe Velocity Tuner", group = "Autonomous Pathing Tuning")
+public class StrafeVelocityTuner extends OpMode {
     private ArrayList<Double> velocities = new ArrayList<Double>();
 
     private DcMotorEx leftFront, leftRear, rightFront, rightRear;
@@ -64,7 +64,7 @@ public class ForwardVelocityTuner extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
+        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
         telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
         telemetryA.addLine("Press cross or A to stop");
         telemetryA.update();
@@ -77,8 +77,8 @@ public class ForwardVelocityTuner extends OpMode {
     @Override
     public void start() {
         leftFront.setPower(1);
-        leftRear.setPower(1);
-        rightFront.setPower(1);
+        leftRear.setPower(-1);
+        rightFront.setPower(-1);
         rightRear.setPower(1);
     }
 
@@ -90,13 +90,13 @@ public class ForwardVelocityTuner extends OpMode {
 
         poseUpdater.update();
         if (!end) {
-            if (Math.abs(poseUpdater.getPose().getX()) > DISTANCE) {
+            if (Math.abs(poseUpdater.getPose().getY()) > DISTANCE) {
                 end = true;
                 for (DcMotorEx motor : motors) {
                         motor.setPower(0);
                 }
             } else {
-                double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));
+                double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, Math.PI/2)));
                 velocities.add(new Double(currentVelocity));
                 velocities.remove(0);
                 if (currentVelocity < FollowerConstants.pathEndVelocity) {
@@ -110,7 +110,7 @@ public class ForwardVelocityTuner extends OpMode {
             }
             average /= (double) velocities.size();
 
-            telemetryA.addData("forward velocity:", average);
+            telemetryA.addData("strafe velocity:", average);
             telemetryA.update();
         }
     }
