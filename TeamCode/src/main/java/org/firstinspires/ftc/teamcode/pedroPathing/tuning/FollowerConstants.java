@@ -30,8 +30,8 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            8,
-            20,
+            15,
+            3,
             0.3,
             0);
 
@@ -53,17 +53,17 @@ public class FollowerConstants {
 
     // Drive PIDF coefficients
     public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.05,
+            0.75,
             0,
             0,
             0);
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 0;
+    public static double centrifugalScaling = 2.5;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
-    public static double zeroPowerAcceleration = -30; // used to be -17.5
+    public static double zeroPowerAcceleration = -29.5; // used to be -17.5
 
     // When the drivetrain is at the end of its current path or path chain and the velocity goes
     // below this value, then end the path. This is in inches/second

@@ -185,7 +185,7 @@ public class Follower {
                 } else {
                     // At last path, run some end detection stuff
                     // set isBusy to false if at end
-                    if (poseUpdater.getVelocity().getMagnitude() < FollowerConstants.pathEndVelocity && MathFunctions.distance(poseUpdater.getPose(), closestPose) < pathEndTranslational && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < pathEndHeading) {
+                    if (poseUpdater.getVelocity().getMagnitude() < currentPath.getPathEndVelocity() && MathFunctions.distance(poseUpdater.getPose(), closestPose) < currentPath.getPathEndTranslational() && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < currentPath.getPathEndHeading()) {
                         isBusy = false;
                         drivePIDF.reset();
                         smallHeadingPIDF.reset();

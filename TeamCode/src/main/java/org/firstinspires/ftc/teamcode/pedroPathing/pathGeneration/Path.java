@@ -200,7 +200,7 @@ public class Path {
      * @return returns if at end
      */
     public boolean isAtParametricEnd() {
-        if (closestPointTValue >= FollowerConstants.pathEndTValue) return true;
+        if (closestPointTValue >= pathEndTValue) return true;
         return false;
     }
 
@@ -283,5 +283,33 @@ public class Path {
      */
     public void setPathEndTValue(double set) {
         pathEndTValue = set;
+    }
+
+    /**
+     * This gets the velocity stop criteria
+     */
+    public double getPathEndVelocity() {
+        return pathEndVelocity;
+    }
+
+    /**
+     * This gets the translational stop criteria
+     */
+    public double getPathEndTranslational() {
+        return pathEndTranslational;
+    }
+
+    /**
+     * This gets the heading stop criteria
+     */
+    public double getPathEndHeading() {
+        return pathEndHeading;
+    }
+
+    /**
+     * This gets the parametric end criteria
+     */
+    public double getPathEndTValue() {
+        return pathEndTValue;
     }
 }

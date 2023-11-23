@@ -55,7 +55,7 @@ public class BezierLine extends BezierCurve {
     @Override
     public Point getPoint(double t) {
         t = MathFunctions.clamp(t, 0, 1);
-        return new Point((endPoint.getX()-startPoint.getX())*t, (endPoint.getY()-startPoint.getY())*t, Point.CARTESIAN);
+        return new Point((endPoint.getX()-startPoint.getX())*t+startPoint.getX(), (endPoint.getY()-startPoint.getY())*t+startPoint.getY(), Point.CARTESIAN);
     }
 
     /**
