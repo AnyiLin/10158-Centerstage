@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.drivePIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.pathEndHeading;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.pathEndTranslational;
@@ -61,9 +62,10 @@ public class Follower {
             smallTranslationalYPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
             largeTranslationalXPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
             largeTranslationalYPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
-            largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
             smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
-            drivePIDF = new PIDFController(FollowerConstants.drivePIDFCoefficients);
+            largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
+            smallDrivePIDF = new PIDFController(FollowerConstants.smallDrivePIDFCoefficients),
+            largeDrivePIDF = new PIDFController(FollowerConstants.largeDrivePIDFCoefficients);
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
@@ -187,7 +189,8 @@ public class Follower {
                     // set isBusy to false if at end
                     if (poseUpdater.getVelocity().getMagnitude() < currentPath.getPathEndVelocity() && MathFunctions.distance(poseUpdater.getPose(), closestPose) < currentPath.getPathEndTranslational() && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < currentPath.getPathEndHeading()) {
                         isBusy = false;
-                        drivePIDF.reset();
+                        smallDrivePIDF.reset();
+                        largeDrivePIDF.reset();
                         smallHeadingPIDF.reset();
                         largeHeadingPIDF.reset();
                         smallTranslationalXPIDF.reset();
@@ -270,20 +273,37 @@ public class Follower {
             return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
 
-        if (!currentPath.isAtParametricEnd()) {
-            drivePIDF.updateError(currentPath.length() * (1 - currentPath.getClosestPointTValue()) - getZeroPowerDistance());
-        } else {
-            Vector offset = new Vector();
-            offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
-            drivePIDF.updateError(-MathFunctions.dotProduct(currentPath.getEndTangent(), offset) - MathFunctions.dotProduct(currentPath.getEndTangent(),getZeroPowerDistanceVector()));
+        double driveError = getDriveVelocityGoal() - MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector()));
+
+        if (Math.abs(driveError) < drivePIDFSwitch) {
+            smallDrivePIDF.updateError(driveError);
+            return new Vector(smallDrivePIDF.runPIDF(), currentPath.getClosestPointTangentVector().getTheta());
         }
 
-        return new Vector(MathFunctions.clamp(drivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+        largeDrivePIDF.updateError(driveError);
+        return new Vector(largeDrivePIDF.runPIDF(), currentPath.getClosestPointTangentVector().getTheta());
     }
 
     // TODO: remove
     public double zxcv() {
-        return drivePIDF.getError();
+        return poseUpdater.getVelocity().getMagnitude();//getDriveVelocityGoal() - poseUpdater.getVelocity().getMagnitude();
+    }
+
+    /**
+     * This returns the velocity the robot needs to be at to make it to the end of the trajectory
+     *
+     * @return returns the projected distance
+     */
+    public double getDriveVelocityGoal() {
+        double distanceToGoal;
+        if (!currentPath.isAtParametricEnd()) {
+            distanceToGoal = currentPath.length() * (1 - currentPath.getClosestPointTValue());
+        } else {
+            Vector offset = new Vector();
+            offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
+            distanceToGoal = -MathFunctions.dotProduct(currentPath.getEndTangent(), offset);
+        }
+        return MathFunctions.getSign(distanceToGoal) * Math.sqrt(Math.abs(-2 * currentPath.getZeroPowerAcceleration() * distanceToGoal));
     }
 
     /**
@@ -302,7 +322,7 @@ public class Follower {
      * @return returns the projected distance
      */
     public double getZeroPowerDistance() {
-        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / (2 * FollowerConstants.zeroPowerAcceleration);
+        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / (2 * currentPath.getZeroPowerAcceleration());
     }
 
     /**

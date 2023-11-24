@@ -30,16 +30,16 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            15,
-            3,
+            12,
+            6,
             0.3,
             0);
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.9,
-            0.5,
-            0.1,
+            0.8,
+            0.8,
+            0,
             0);
 
     public static double translationalPIDFSwitch = 1;
@@ -51,19 +51,34 @@ public class FollowerConstants {
             0,
             0);
 
-    // Drive PIDF coefficients
-    public static CustomPIDFCoefficients drivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.75,
+    // Small drive PIDF coefficients
+    public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
+            0.1,
+            0,
+            0,
+            0);
+
+    public static double drivePIDFSwitch = 10;
+
+    // Large drive PIDF coefficients
+    public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
+            0.1,
             0,
             0,
             0);
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 2.5;
+    public static double centrifugalScaling = 0.5;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
-    public static double zeroPowerAcceleration = -29.5; // used to be -17.5
+    // this is for straight lines
+    public static double lineZeroPowerAcceleration = -50;
+
+    // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
+    // if not negative, then the robot thinks that its going to go faster under 0 power
+    // this is for curves
+    public static double curvedZeroPowerAcceleration = -1;
 
     // When the drivetrain is at the end of its current path or path chain and the velocity goes
     // below this value, then end the path. This is in inches/second

@@ -312,4 +312,13 @@ public class Path {
     public double getPathEndTValue() {
         return pathEndTValue;
     }
+
+    /**
+     * Returns the zero power acceleration for this path
+     *
+     * @return returns the zero power acceleration for this path
+     */
+    public double getZeroPowerAcceleration() {
+        return curve.getZeroPowerAcceleration();
+    }
 }
