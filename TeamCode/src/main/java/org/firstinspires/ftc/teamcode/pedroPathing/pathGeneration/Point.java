@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 public class Point {
     /**
      * IMPORTANT NOTE: theta is defined in radians
@@ -20,6 +22,15 @@ public class Point {
      */
     public Point(double rOrX, double thetaOrY, int identifier) {
         setCoordinates(rOrX, thetaOrY, identifier);
+    }
+
+    /**
+     * This creates a new Point from a Pose2d
+     *
+     * @param pose the pose
+     */
+    public Point(Pose2d pose) {
+        setCoordinates(pose.getX(), pose.getY(), CARTESIAN);
     }
 
     /**

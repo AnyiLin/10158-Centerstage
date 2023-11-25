@@ -33,7 +33,13 @@ public class Path {
 
     // When the t-value of the closest point to the robot on the path is greater than this value,
     // then the path is considered at its end.
+    // This can be custom set for each path
     public static double pathEndTValue = FollowerConstants.pathEndTValue;
+
+    // When the path is considered at its end parametrically, then the follower has this many
+    // seconds to further correct by default.
+    // This can be custom set for each path
+    public static double pathEndTimeout = FollowerConstants.pathEndTimeout;
 
     /**
      * Creates a new Path from a Bezier curve. The default heading interpolation is tangential.
@@ -55,6 +61,17 @@ public class Path {
         isTangentHeadingInterpolation = false;
         this.startHeading = startHeading;
         this.endHeading = endHeading;
+    }
+
+    /**
+     * This sets the heading interpolation to maintain a constant heading
+     *
+     * @param setHeading the constant heading for the path
+     */
+    public void setConstantHeadingInterpolation(double setHeading) {
+        isTangentHeadingInterpolation = false;
+        startHeading = setHeading;
+        endHeading = setHeading;
     }
 
     /**
@@ -286,6 +303,15 @@ public class Path {
     }
 
     /**
+     * This sets the path end timeout
+     *
+     * @param set
+     */
+    public void setPathEndTimeout(double set) {
+        pathEndTimeout = set;
+    }
+
+    /**
      * This gets the velocity stop criteria
      */
     public double getPathEndVelocity() {
@@ -311,6 +337,13 @@ public class Path {
      */
     public double getPathEndTValue() {
         return pathEndTValue;
+    }
+
+    /**
+     * This gets the end correction time
+     */
+    public double getPathEndTimeout() {
+        return pathEndTimeout;
     }
 
     /**

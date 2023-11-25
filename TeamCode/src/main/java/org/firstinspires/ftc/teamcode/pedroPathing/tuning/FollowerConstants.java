@@ -30,9 +30,9 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            12,
+            10,
             6,
-            0.3,
+            0.1,
             0);
 
     // Small translational PIDF coefficients
@@ -53,16 +53,16 @@ public class FollowerConstants {
 
     // Small drive PIDF coefficients
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.15,
             0,
             0,
             0);
 
-    public static double drivePIDFSwitch = 10;
+    public static double drivePIDFSwitch = 0.5;
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.07,
             0,
             0,
             0);
@@ -93,9 +93,18 @@ public class FollowerConstants {
     // When the drivetrain is at the end of its current path or path chain and the heading error goes
     // below this value, then end the path. This is in radians
     // This can be custom set for each path
-    public static double pathEndHeading = 0.01;
+    public static double pathEndHeading = 0.02;
 
     // When the t-value of the closest point to the robot on the path is greater than this value,
     // then the path is considered at its end.
+    // This can be custom set for each path
     public static double pathEndTValue = 0.99;
+
+    // When the path is considered at its end parametrically, then the follower has this many
+    // seconds to further correct by default.
+    // This can be custom set for each path
+    public static double pathEndTimeout = 1;
+
+    // When the drive power vector is less than this in magnitude, then
+    public static double recalculateZeroPowerAccelerationLimit = 0.001;
 }
