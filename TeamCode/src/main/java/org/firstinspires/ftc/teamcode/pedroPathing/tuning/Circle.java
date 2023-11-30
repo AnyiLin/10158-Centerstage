@@ -37,7 +37,7 @@ public class Circle extends OpMode {
 
         circle = new PathChain(firstQuarter, secondQuarter, thirdQuarter, fourthQuarter);
 
-        follower.followPathChain(circle);
+        follower.followPath(circle);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetryA.addLine("stuff");
@@ -56,7 +56,7 @@ public class Circle extends OpMode {
     public void loop() {
         follower.update();
         if (follower.atParametricEnd()) {
-            follower.followPathChain(circle);
+            follower.followPath(circle);
         }
     }
 

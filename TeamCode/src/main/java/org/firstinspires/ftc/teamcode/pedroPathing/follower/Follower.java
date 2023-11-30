@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.angularMomentumScaling;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.drivePIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.recalculateZeroPowerAccelerationLimit;
@@ -7,12 +8,15 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathBuilder;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathCallback;
 import org.firstinspires.ftc.teamcode.util.PIDFController;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
@@ -42,9 +46,11 @@ public class Follower {
 
     private PathChain currentPathChain;
 
-    private final int BEZIER_CURVE_BINARY_STEP_LIMIT = 9, DELTA_POSE_RECORD_LIMIT = 8;
+    private final int BEZIER_CURVE_BINARY_STEP_LIMIT = 10, DELTA_POSE_RECORD_LIMIT = 8;
 
     private int chainIndex;
+
+    private long[] pathStartTimes;
 
     private boolean followingPathChain, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
 
@@ -142,6 +148,24 @@ public class Follower {
     }
 
     /**
+     * This returns the current velocity
+     *
+     * @return returns the current velocity
+     */
+    public Vector getVelocity() {
+        return poseUpdater.getVelocity();
+    }
+
+    /**
+     * This returns the magnitude of the current velocity
+     *
+     * @return returns the magnitude of the current velocity
+     */
+    public double getVelocityMagnitude() {
+        return poseUpdater.getVelocity().getMagnitude();
+    }
+
+    /**
      * This sets the starting pose. Do not run this after moving at all.
      *
      * @param pose the pose to set the starting pose to
@@ -171,8 +195,10 @@ public class Follower {
      *
      * @param pathChain the path chain to follow
      */
-    public void followPathChain(PathChain pathChain) {
+    public void followPath(PathChain pathChain) {
         breakFollowing();
+        pathStartTimes = new long[pathChain.size()];
+        pathStartTimes[0] = System.currentTimeMillis();
         isBusy = true;
         followingPathChain = true;
         chainIndex = 0;
@@ -189,11 +215,22 @@ public class Follower {
     public void update() {
         poseUpdater.update();
         if (auto) {
-            closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
+            if (isBusy) {
+                closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
+
+                if (followingPathChain) updateCallbacks();
+
+                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
+
+                for (int i = 0; i < motors.size(); i++) {
+                    motors.get(i).setPower(drivePowers[i]);
+                }
+            }
             if (currentPath.isAtParametricEnd()) {
                 if (followingPathChain && chainIndex < currentPathChain.size() - 1) {
                     // Not at last path, keep going
                     breakFollowing();
+                    pathStartTimes[chainIndex] = System.currentTimeMillis();
                     isBusy = true;
                     followingPathChain = true;
                     chainIndex++;
@@ -212,14 +249,6 @@ public class Follower {
                     if ((System.currentTimeMillis() - reachedParametricPathEndTime > currentPath.getPathEndTimeout()) || (poseUpdater.getVelocity().getMagnitude() < currentPath.getPathEndVelocity() && MathFunctions.distance(poseUpdater.getPose(), closestPose) < currentPath.getPathEndTranslational() && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < currentPath.getPathEndHeading())) {
                         breakFollowing();
                     }
-                }
-            }
-
-            if (isBusy) {
-                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
-
-                for (int i = 0; i < motors.size(); i++) {
-                    motors.get(i).setPower(drivePowers[i]);
                 }
             }
         } else {
@@ -254,6 +283,28 @@ public class Follower {
     }
 
     /**
+     * This checks if any callbacks should be run right now, and runs them if applicable.
+     */
+    public void updateCallbacks() {
+        for (PathCallback callback : currentPathChain.getCallbacks()) {
+            if (!callback.hasBeenRun()) {
+                if (callback.getType() == PathCallback.PARAMETRIC) {
+                    // parametric call back
+                    if (chainIndex == callback.getIndex() && getCurrentTValue() >= callback.getStartCondition()) {
+                        callback.run();
+                    }
+                } else {
+                    // time based call back
+                    if (chainIndex >= callback.getIndex() && System.currentTimeMillis() - pathStartTimes[callback.getIndex()] > callback.getStartCondition()) {
+                        callback.run();
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
      * This resets the PIDFs and stops following
      */
     public void breakFollowing() {
@@ -268,6 +319,10 @@ public class Follower {
         smallTranslationalYPIDF.reset();
         largeTranslationalXPIDF.reset();
         largeTranslationalYPIDF.reset();
+
+        for (int i = 0; i < motors.size(); i++) {
+            motors.get(i).setPower(0);
+        }
     }
 
     // TODO: REMOVE
@@ -390,13 +445,14 @@ public class Follower {
      */
     public Vector getHeadingVector() {
         if (!useHeading) return new Vector();
+        double angularMomentum = poseUpdater.getAngularVelocity() * FollowerConstants.mass;
         double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
         if (Math.abs(headingError) < headingPIDFSwitch) {
             smallHeadingPIDF.updateError(headingError);
             return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
         }
         largeHeadingPIDF.updateError(headingError);
-        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
+        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() - angularMomentum * angularMomentumScaling, -1, 1), poseUpdater.getPose().getHeading());
     }
 
     /**
@@ -524,5 +580,20 @@ public class Follower {
     public double getCurrentTValue() {
         if (isBusy) return currentPath.getClosestPointTValue();
         return 1.0;
+    }
+
+    /**
+     * This returns the current path number. For just paths, this will return 0. For path chains,
+     * this will return the current path number.
+     *
+     * @return returns the current path number
+     */
+    public double getCurrentPathNumber() {
+        if (!followingPathChain) return 0;
+        return chainIndex;
+    }
+
+    public PathBuilder pathBuilder() {
+        return new PathBuilder();
     }
 }

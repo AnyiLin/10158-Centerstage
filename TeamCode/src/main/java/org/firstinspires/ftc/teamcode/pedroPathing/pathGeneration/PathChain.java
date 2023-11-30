@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 import java.util.ArrayList;
 
 public class PathChain {
-    ArrayList<Path> pathChain = new ArrayList<Path>();
+    private ArrayList<Path> pathChain = new ArrayList<>();
+
+    private ArrayList<PathCallback> callbacks = new ArrayList<>();
 
     /**
      * This creates a new path chain from some specified paths
@@ -48,5 +50,19 @@ public class PathChain {
      */
     public int size() {
         return pathChain.size();
+    }
+
+    public void setCallbacks(PathCallback... callbacks) {
+        for (PathCallback callback : callbacks) {
+            this.callbacks.add(callback);
+        }
+    }
+
+    public void setCallbacks(ArrayList<PathCallback> callbacks) {
+        this.callbacks = callbacks;
+    }
+
+    public ArrayList<PathCallback> getCallbacks() {
+        return callbacks;
     }
 }

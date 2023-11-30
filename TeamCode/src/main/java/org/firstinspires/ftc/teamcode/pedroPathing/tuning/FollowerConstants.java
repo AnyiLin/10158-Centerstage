@@ -21,24 +21,24 @@ public class FollowerConstants {
 
     // Large heading error PIDF coefficients
     public static CustomPIDFCoefficients largeHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            5,
+            3,
             0,
             0,
             0);
 
-    public static double headingPIDFSwitch = Math.PI/60;
+    public static double headingPIDFSwitch = Math.PI/30;
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            10,
-            6,
-            0.1,
+            3,//4
+            8.5,
+            0.15,
             0);
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.8,
-            0.8,
+            0.4,
+            0.6,
             0,
             0);
 
@@ -46,7 +46,7 @@ public class FollowerConstants {
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.6,
+            0.25,
             0,
             0,
             0);
@@ -68,7 +68,10 @@ public class FollowerConstants {
             0);
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 0.5;
+    public static double centrifugalScaling = 1.5;
+
+    // Centrifugal force to power scaling
+    public static double angularMomentumScaling = 0.0075;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power

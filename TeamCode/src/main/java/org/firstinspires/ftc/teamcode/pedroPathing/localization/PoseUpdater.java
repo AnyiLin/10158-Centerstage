@@ -121,6 +121,15 @@ public class PoseUpdater {
     }
 
     /**
+     * This returns the velocity of the robot as a vector
+     *
+     * @return returns the velocity of the robot
+     */
+    public double getAngularVelocity() {
+        return MathFunctions.getTurnDirection(previousPose.getHeading(), getPose().getHeading()) * MathFunctions.getSmallestAngleDifference(getPose().getHeading(), previousPose.getHeading()) / ((currentPoseTime-previousPoseTime)/Math.pow(10.0, 9));
+    }
+
+    /**
      * This resets the heading of the robot to the IMU's heading
      */
     public void resetHeadingToIMU() {

@@ -14,7 +14,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_INTAKE_LE
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -26,9 +25,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.util.VisionPortalStackRelocalization;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -76,23 +72,19 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
     private Pose2d blueMiddleStack = new Pose2d(-72, 72-48);
     private Pose2d blueOuterStack = new Pose2d(-72, 72-36);
 
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstStackPose, firstCycleBackdropGoalPose;
+    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, stackPose, firstCycleBackdropGoalPose;
 
     // TODO: adjust this for each auto
     private Pose2d startPose = new Pose2d(12,-72+9, Math.toRadians(90));
 
-    private SampleMecanumDrive drive;
-
-    private TrajectorySequence scoreSpikeMark, getStackPixels, adjustStack, getStackPixels2, scoreFirstStackPixels, park;
-
     private Follower follower;
 
-    private Path scoreOnSpikeMark;
+    private Path scoreOnSpikeMark, goBackFromSpikeMark, scoreOnBackdrop, adjustStack, actuallyGetStackPixels;
 
-    private PathChain scoreOnBackdrop;
+    private PathChain getStackPixels, scoreStackPixels;
 
     // these are auto specific timings and booleans
-    private boolean scanningStack, scanningStack2, atBackdrop, runningTrajectory, atStack;
+    private boolean scanningStack, actuallyGoingToStack, atBackdrop, atStack, hasActivatedStackRelocalization, goToStackTimeout;
 
     private long scanningStackStartTime, scanningTime, initializationSlideResetStartTime, atBackdropStartTime, atStackStartTime;
 
@@ -103,77 +95,68 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
     public void setBackdropGoalPose() {
         switch (navigation) {
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideLeftSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(135));
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2))-1.5, redRightSideLeftSpikeMark.getY());
                 initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, 2.5-2.5+redLeftBackdrop.getY() -0.5, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5-2.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-3);
+                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+1.5, redInnerStack.getY()-3);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.25, Math.toRadians(90));
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -2+redMiddleBackdrop.getY() -0.5, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -2+redLeftBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
+                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), redRightSideRightSpikeMark.getY()-(ROBOT_FRONT_LENGTH/Math.sqrt(2)), Math.toRadians(45));
+                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2))+1.5, redRightSideRightSpikeMark.getY());
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -1.5+redRightBackdrop.getY() -0.25, Math.toRadians(180));
                 firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                firstStackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
+                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
                 break;
         }
     }
 
-    public void buildTrajectories() {
+    public void buildPaths() {
+        scoreOnSpikeMark = new Path(new BezierCurve(new Point(startPose), new Point(startPose.getX(), spikeMarkGoalPose.getY()-6, Point.CARTESIAN), new Point(spikeMarkGoalPose)));
 
-        scoreOnSpikeMark = new Path(new BezierCurve(new Point(startPose), new Point(startPose.getX(), spikeMarkGoalPose.getY(), Point.CARTESIAN), new Point(spikeMarkGoalPose)));
 
-
-        Path goBackFromSpikeMark = new Path(new BezierCurve(new Point(spikeMarkGoalPose), new Point(startPose.getX(), spikeMarkGoalPose.getY(), Point.CARTESIAN), new Point(startPose.getX(), -48, Point.CARTESIAN)));
+        goBackFromSpikeMark = new Path(new BezierLine(new Point(spikeMarkGoalPose), new Point(startPose.getX()+5, spikeMarkGoalPose.getY()-6-5, Point.CARTESIAN)));
         goBackFromSpikeMark.setReversed(true);
 
-        Path goToBackdropInitial = new Path(new BezierCurve(goBackFromSpikeMark.getLastControlPoint(), new Point(30, -56, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
-        goToBackdropInitial.setConstantHeadingInterpolation(180);
+        scoreOnBackdrop = new Path(new BezierCurve(new Point(startPose.getX()+3, -48, Point.CARTESIAN), new Point(33, -58, Point.CARTESIAN), new Point(31, initialBackdropGoalPose.getY(), Point.CARTESIAN), new Point(initialBackdropGoalPose)));
+        scoreOnBackdrop.setConstantHeadingInterpolation(Math.PI);
+        scoreOnBackdrop.setPathEndTimeout(2);
 
-        scoreOnBackdrop = new PathChain(goBackFromSpikeMark, goToBackdropInitial);
-/*
-        // this does the scoring on the spike mark at the start of auto
-        scoreSpikeMark = drive.trajectorySequenceBuilder(startPose)
-                .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
-                .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .splineTo(new Vector2d(12,-48), Math.toRadians(90))
-                .splineToSplineHeading(spikeMarkGoalPose, spikeMarkGoalPose.getHeading())
-                .setReversed(true)
-                .splineToConstantHeading(new Vector2d(15,-48), Math.toRadians(90))
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> twoPersonDrive.startPreset(0, false))
-                .splineToSplineHeading(new Pose2d(30, -56, Math.toRadians(180)), Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(35, initialBackdropGoalPose.getY(), Math.toRadians(180.00001)), Math.toRadians(90))
-                .setReversed(false)
-                .lineToLinearHeading(initialBackdropGoalPose)
-                .resetConstraints()
+        getStackPixels = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(34, initialBackdropGoalPose.getY(), Point.CARTESIAN), new Point(42, -12, Point.CARTESIAN), new Point(12, -12, Point.CARTESIAN)))
+                .addParametricCallback(0, ()-> visionPortal.resumeStreaming())
+                .addParametricCallback(0, ()-> visionPortal.setProcessorEnabled(teamPropPipeline, false))
+                .addParametricCallback(0, ()-> visionPortal.setProcessorEnabled(stackRelocalization, true))
+                .addPath(new BezierLine(new Point(12, -12, Point.CARTESIAN), new Point(stackPose.getX()+6, stackPose.getY(), Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI)
                 .build();
-
-        getStackPixels = drive.trajectorySequenceBuilder(scoreSpikeMark.end())
-                .splineToLinearHeading(new Pose2d(24, -12, Math.toRadians(180)), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+8, firstStackPose.getY()+0.0001, Math.toRadians(180)))
-                .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.resumeStreaming())
-                .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.setProcessorEnabled(teamPropPipeline, false))
-                .UNSTABLE_addTemporalMarkerOffset(-1.5,()-> visionPortal.setProcessorEnabled(stackRelocalization, true))
-                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+6, firstStackPose.getY(), Math.toRadians(180)))
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> scanningTime = System.currentTimeMillis()-1000)
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> scanningStackStartTime = System.currentTimeMillis())
-                .UNSTABLE_addTemporalMarkerOffset(0,()-> scanningStack = true)
-                .resetConstraints()
-                .build();
- */
     }
 
     public void adjustStack() {
-        adjustStack = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(firstStackPose.getX()+6, firstStackPose.getY(), Math.toRadians(180)))
-                .build();
+        adjustStack = new Path(new BezierLine(new Point(12, -12, Point.CARTESIAN), new Point(stackPose.getX()+6, stackPose.getY(), Point.CARTESIAN)));
+        adjustStack.setConstantHeadingInterpolation(Math.PI);
     }
 
-    public void stackAdjustTrajectories() {
+    public void stackAdjustPaths() {
+        actuallyGetStackPixels = new Path(new BezierLine(new Point(-48, -12, Point.CARTESIAN), new Point(stackPose)));
+        actuallyGetStackPixels.setConstantHeadingInterpolation(Math.PI);
+        actuallyGetStackPixels.setPathEndHeading(0.01);
+
+        scoreStackPixels = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(stackPose), new Point(-36, -12, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI)
+                .addPath(new BezierLine(new Point(-36, -12, Point.CARTESIAN), new Point(12, -12, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI)
+                .addParametricCallback(0.75, ()-> twoPersonDrive.startPreset(50))
+                .addPath(new BezierCurve(new Point(12, -12, Point.CARTESIAN), new Point(42, -12, Point.CARTESIAN), new Point(34, firstCycleBackdropGoalPose.getY(), Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
+                .setConstantHeadingInterpolation(Math.PI)
+                .build();
+
+        /*
         getStackPixels2 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
@@ -197,6 +180,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         park = drive.trajectorySequenceBuilder(scoreFirstStackPixels.end())
                 .lineToConstantHeading(new Vector2d(46, redMiddleBackdrop.getY()))
                 .build();
+         */
     }
 
     public void initialize() {
@@ -221,16 +205,124 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
 
     @Override
     public void loop() {
-        drive.update();
+        follower.update();
         twoPersonDrive.updateFrameTime();
         twoPersonDrive.asyncTimers();
         if (!twoPersonDrive.adjustingLiftZero) twoPersonDrive.updateLiftMotors();
         if (twoPersonDrive.presetInMotion) twoPersonDrive.detectPresetEnd();
 
-        if (!drive.isBusy() && runningTrajectory) {
-            runningTrajectory = false;
-            pathNumber++;
+        // After push pixel
+        if (pathNumber == 0 && follower.atParametricEnd()) {
+            follower.followPath(goBackFromSpikeMark);
+            pathNumber = 1;
         }
+
+        // go to backdrop
+        if (pathNumber == 1 && follower.getCurrentTValue() > 0.7) {
+            follower.followPath(scoreOnBackdrop);
+            pathNumber = 2;
+        }
+
+        // score at backdrop
+        if (pathNumber == 2 && (!follower.isBusy() || (follower.getCurrentTValue() > 0.9 && follower.getVelocityMagnitude() < 3)) && !atBackdrop) {
+            atBackdrop = true;
+            atBackdropStartTime = System.currentTimeMillis();
+        }
+        if (pathNumber == 2 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME) {
+            if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
+        }
+        if (pathNumber == 2 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
+            // after scoring on the backdrop, do something else
+            pathNumber = 3;
+            follower.followPath(getStackPixels);
+            atBackdrop = false;
+            if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
+        }
+
+        // start readjustments
+        if (pathNumber == 3 && !follower.isBusy() && !(scanningStack || actuallyGoingToStack || goToStackTimeout)) {
+            scanningTime = System.currentTimeMillis()-1000;
+            scanningStackStartTime = System.currentTimeMillis();
+            scanningStack = true;
+        }
+
+        // readjustments
+        if (scanningStack) {
+            if (System.currentTimeMillis()-scanningTime>700) {
+                stackPose = new Pose2d(stackPose.getX(), follower.getPose().getY()+stackRelocalization.getXErrorInches());
+                adjustStack();
+                follower.followPath(adjustStack);
+                scanningTime = System.currentTimeMillis();
+            }
+            if (System.currentTimeMillis()-scanningStackStartTime>SCANNING_TIME) {
+                scanningStack = false;
+                actuallyGoingToStack = true;
+                stackAdjustPaths();
+                twoPersonDrive.setCustomIntakeOutPosition(INTAKE_STACK_TOP_POSITION);
+                visionPortal.stopStreaming();
+            }
+        }
+
+        if (actuallyGoingToStack && System.currentTimeMillis()-scanningStackStartTime>SCANNING_TIME + 1500) {
+            actuallyGoingToStack = false;
+            goToStackTimeout = true;
+            pathNumber = 4;
+            follower.followPath(actuallyGetStackPixels);
+        }
+        if (goToStackTimeout && System.currentTimeMillis()-scanningStackStartTime>SCANNING_TIME + 3500) {
+            goToStackTimeout = false;
+            follower.breakFollowing();
+        }
+
+        if (pathNumber == 4 && !(goToStackTimeout || atStack)) {
+            atStack = true;
+            atStackStartTime = System.currentTimeMillis();
+        }
+        if (atStack && System.currentTimeMillis()-atStackStartTime<INTAKE_INTAKING_TIME) {
+            if (!twoPersonDrive.intaking) {
+                twoPersonDrive.intakingStartTime = System.currentTimeMillis();
+            }
+            twoPersonDrive.intaking = true;
+            twoPersonDrive.updateIntake(1);
+        }
+        if (atStack && System.currentTimeMillis()-atStackStartTime>INTAKE_INTAKING_TIME) {
+            twoPersonDrive.intaking = false;
+            twoPersonDrive.updateIntake(0);
+            twoPersonDrive.startPreset(0);
+        }
+        if (atStack && System.currentTimeMillis()-atStackStartTime>INTAKE_INTAKING_TIME+1000) {
+            atStack = false;
+            pathNumber = 5;
+            follower.followPath(scoreStackPixels);
+        }
+
+        if ((!follower.isBusy() || (follower.getCurrentTValue() > 0.9 && follower.getVelocityMagnitude() < 3)) && pathNumber == 5 && !atBackdrop) {
+            atBackdrop = true;
+            atBackdropStartTime = System.currentTimeMillis();
+        }
+        if (pathNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME+200) {
+            twoPersonDrive.outerClaw.setPosition(OUTER_CLAW_OPEN_POSITION);
+        }
+        if (pathNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*2+200) {
+            twoPersonDrive.leftOuttake.setPosition(LEFT_OUTTAKE_AVOID_POSITION);
+            twoPersonDrive.rightOuttake.setPosition(RIGHT_OUTTAKE_AVOID_POSITION);
+        }
+        if (pathNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*3) {
+            twoPersonDrive.leftOuttake.setPosition(LEFT_OUTTAKE_OUT_POSITION);
+            twoPersonDrive.rightOuttake.setPosition(RIGHT_OUTTAKE_OUT_POSITION);
+        }
+        if (pathNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*4) {
+            twoPersonDrive.innerClaw.setPosition(INNER_CLAW_OPEN_POSITION);
+            twoPersonDrive.resetPreset();
+            atBackdrop = false;
+            pathNumber = 6;
+        }
+
+        if (!follower.isBusy() && pathNumber == 6) {
+            requestOpModeStop();
+        }
+
+        /*
 
         if (!drive.isBusy() && pathNumber == 1 && !atBackdrop) {
             atBackdrop = true;
@@ -241,7 +333,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         }
         if (pathNumber == 1 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > BACKDROP_WAIT_TIME+SCORE_WAIT_TIME) {
             // after scoring on the backdrop, do something else
-            runningTrajectory = true;
+            runningPath = true;
             drive.followTrajectorySequenceAsync(getStackPixels);
             atBackdrop = false;
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
@@ -266,7 +358,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
 
         if (scanningStack2 && System.currentTimeMillis()-scanningStackStartTime>SCANNING_TIME + 1500) {
                 scanningStack2 = false;
-                runningTrajectory = true;
+                runningPath = true;
             pathNumber = 2;
                 drive.followTrajectorySequenceAsync(getStackPixels2);
         }
@@ -287,7 +379,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
             twoPersonDrive.updateIntake(0);
             atStack = false;
             if (pathNumber == 3) {
-                runningTrajectory = true;
+                runningPath = true;
                 drive.followTrajectorySequenceAsync(scoreFirstStackPixels);
             }
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
@@ -306,7 +398,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         }
         if (pathNumber == 4 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*3) {
             atBackdrop = false;
-            runningTrajectory = true;
+            runningPath = true;
         }
 
         if (!drive.isBusy() && pathNumber == 5 && !atBackdrop) {
@@ -322,7 +414,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         }
         if (pathNumber == 5 && atBackdrop && System.currentTimeMillis()-atBackdropStartTime > SCORE_WAIT_TIME*2) {
             atBackdrop = false;
-            runningTrajectory = true;
+            runningPath = true;
             drive.followTrajectorySequenceAsync(park);
             if (!twoPersonDrive.resetInMotion) twoPersonDrive.resetPreset();
         }
@@ -330,9 +422,12 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         if (!drive.isBusy() && pathNumber == 6 && !atBackdrop) {
             requestOpModeStop();
         }
+         */
 
         telemetry.addData("x error", stackRelocalization.getXErrorInches());
         telemetry.addData("path #", pathNumber);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
         telemetry.update();
     }
 
@@ -351,7 +446,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
         telemetry.addData("Navigation:", navigation);
         telemetry.update();
         setBackdropGoalPose();
-        buildTrajectories();
+        buildPaths();
 
     }
 
@@ -359,8 +454,8 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
     public void start() {
         super.start();
         visionPortal.stopStreaming();
-        drive.followTrajectorySequenceAsync(scoreSpikeMark);
-        runningTrajectory = true;
+        follower.followPath(scoreOnSpikeMark);
+        twoPersonDrive.startPreset(0, false);
         twoPersonDrive.lastFrameTimeNano = System.nanoTime();
     }
 
