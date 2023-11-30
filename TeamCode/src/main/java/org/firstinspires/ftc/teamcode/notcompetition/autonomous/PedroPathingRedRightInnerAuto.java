@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
@@ -137,7 +138,7 @@ public class PedroPathingRedRightInnerAuto extends OpMode {
     }
 
     public void adjustStack() {
-        adjustStack = new Path(new BezierLine(new Point(12, -12, Point.CARTESIAN), new Point(stackPose.getX()+6, stackPose.getY(), Point.CARTESIAN)));
+        adjustStack = new Path(new BezierPoint(new Point(stackPose.getX()+6, stackPose.getY(), Point.CARTESIAN)));
         adjustStack.setConstantHeadingInterpolation(Math.PI);
     }
 

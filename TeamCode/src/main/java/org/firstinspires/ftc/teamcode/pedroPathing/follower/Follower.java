@@ -449,7 +449,7 @@ public class Follower {
         double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
         if (Math.abs(headingError) < headingPIDFSwitch) {
             smallHeadingPIDF.updateError(headingError);
-            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF(), -1, 1), poseUpdater.getPose().getHeading());
+            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF() - angularMomentum * angularMomentumScaling, -1, 1), poseUpdater.getPose().getHeading());
         }
         largeHeadingPIDF.updateError(headingError);
         return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() - angularMomentum * angularMomentumScaling, -1, 1), poseUpdater.getPose().getHeading());
@@ -486,10 +486,14 @@ public class Follower {
     public Vector getTranslationalCorrection() {
         if (!useTranslational) return new Vector();
         Vector translationalVector = new Vector();
+        Vector momentumVector = MathFunctions.scalarMultiplyVector(poseUpdater.getVelocity(), FollowerConstants.linearMomentumScaling * FollowerConstants.mass);
         double x = closestPose.getX() - poseUpdater.getPose().getX();
         double y = closestPose.getY() - poseUpdater.getPose().getY();
         translationalVector.setOrthogonalComponents(x, y);
-        if (!currentPath.isAtParametricEnd())  translationalVector = MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
+        if (!(currentPath.isAtParametricEnd() || currentPath.isAtParametricStart())) {
+            translationalVector = MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
+            momentumVector = MathFunctions.subtractVectors(momentumVector , new Vector(MathFunctions.dotProduct(momentumVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
+        }
         if (MathFunctions.distance(poseUpdater.getPose(), closestPose) < translationalPIDFSwitch) {
             smallTranslationalXPIDF.updateError(translationalVector.getXComponent());
             smallTranslationalYPIDF.updateError(translationalVector.getYComponent());
@@ -499,6 +503,9 @@ public class Follower {
             largeTranslationalYPIDF.updateError(translationalVector.getYComponent());
             translationalVector.setOrthogonalComponents(largeTranslationalXPIDF.runPIDF(), largeTranslationalYPIDF.runPIDF());
         }
+
+        translationalVector = MathFunctions.subtractVectors(translationalVector, momentumVector);
+
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
 
         return translationalVector;

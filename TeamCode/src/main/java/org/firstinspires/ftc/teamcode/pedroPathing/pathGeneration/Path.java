@@ -222,6 +222,16 @@ public class Path {
     }
 
     /**
+     * This returns if the robot is at the beginning of the path, according to the parametric t value
+     *
+     * @return returns if at start
+     */
+    public boolean isAtParametricStart() {
+        if (closestPointTValue <= 1-pathEndTValue) return true;
+        return false;
+    }
+
+    /**
      * Returns the ArrayList of control points for this Bezier curve
      *
      * @return This returns the ArrayList
