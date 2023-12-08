@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 public class PIDFController {
     private CustomPIDFCoefficients coefficients;
 
-    private double previousError, error, position, targetPosition, errorIntegral, errorDerivative;
+    private double previousError, error, position, targetPosition, errorIntegral, errorDerivative, feedForwardInput;
 
     private long previousUpdateTimeNano, deltaTimeNano;
 
@@ -43,6 +43,10 @@ public class PIDFController {
 
         errorIntegral += error * (deltaTimeNano / Math.pow(10.0, 9));
         errorDerivative = (error - previousError) / (deltaTimeNano / Math.pow(10.0, 9));
+    }
+
+    public void updateFeedForwardInput(double input) {
+        feedForwardInput = input;
     }
 
     public void reset() {
@@ -100,7 +104,7 @@ public class PIDFController {
     }
 
     public double F() {
-        return coefficients.F;
+        return coefficients.getCoefficient(feedForwardInput);
     }
 
     public double getError() {

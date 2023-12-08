@@ -1,118 +1,126 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
-import kotlin.jvm.JvmField;
-
-@Config
 public class RobotConstants {
-    // Put all the constants we need across opmodes here. Don't forget to make them public and static!
+    public static FeedForwardConstant
+            liftGravityConstant = (double i) -> {return i;};
 
-    // gobilda 312 rpms apparently have 537.7 ppr at the output shaft and 28 counts on the actual motor shaft like most other motors
+    public static CustomPIDFCoefficients
 
-    // the slides are on a 4 to 1 gearbox, so their 28 encoder counts at end of motor are actually 28*4
-    // absolute max lift extension is 508.
-    public static int LIFT_VELOCITY = 1200,
-            LIFT_MAX = 520,
-            FINE_ADJUST_LIFT_CHANGE = 300, // this is set to encoder ticks/second
-            REGULAR_LIFT_CHANGE = 2*620, // this is set to encoder ticks/second
-            LIFT_TOLERANCE = 4,
-            LIFT_VELOCITY_TOLERANCE = 28*4/6,
-            LIFT_GRAB_TOLERANCE = 3,
-            TOP_LINE_POSITION = 190,
-            MIDDLE_LINE_POSITION = 100,
-            BOTTOM_LINE_POSITION = 0,
-            LIFT_GRAB_POSITION = 50,
-            INTAKE_VELOCITY = 2790, // this is 850 rpm for the gobilda 312 rpm motor. 850/60/2.73 * 537.7
-            DRIVETRAIN_CURRENT_LIMIT = 10000*10,
-            DRIVETRAIN_CURRENT_ADJUST_FACTOR = 1;
+    // lift PIDF coefficients
+    liftPIDFCoefficients = new CustomPIDFCoefficients(
+            0,
+            0,
+            0,
+            liftGravityConstant),
 
+    // extension PIDF coefficients
+    extensionPIDFCoefficients = new CustomPIDFCoefficients(
+        0,
+        0,
+        0,
+        0);
+
+    public static int
+
+    // max extension of the scoring slides
+    LIFT_MAX_POSITION = 2000, // TODO: check this later
+
+    // max extension of the extension slides
+    EXTENSION_MAX_POSITION = 0, // TODO: check this later
+
+    // position the extension slides extend to to avoid the outtake coming back in
+    EXTENSION_AVOID_POSITION = 100; // TODO: check this later
+
+    public static final int
+    // states for mechanisms
+    INTAKE_IN = 0,
+    INTAKE_GOING_OUT = 1,
+    INTAKE_OUT = 2,
+    INTAKE_GOING_IN = 3,
+    OUTTAKE_IN = 4,
+    OUTTAKE_GOING_OUT = 5,
+    OUTTAKE_OUT = 6,
+    OUTTAKE_GOING_IN = 7,
+    INTAKE_AVOID = 8;
+
+    /**
+     * IMPORTANT: all arm servo positions are from the left side
+     */
     public static double
-            ROBOT_FRONT_LENGTH = 8,
-            ROBOT_BACK_LENGTH = 9,
-            ROBOT_INTAKE_LENGTH = 14.75,
-            RIGHT_INTAKE_OFFSET = 0.03,
-            LEFT_INTAKE_OUT_POSITION = 0.858,
-            RIGHT_INTAKE_OUT_POSITION = 1-LEFT_INTAKE_OUT_POSITION+RIGHT_INTAKE_OFFSET,
-            LEFT_INTAKE_OUT_PAUSE_POSITION = 0.83,
-            RIGHT_INTAKE_OUT_PAUSE_POSITION = 1-LEFT_INTAKE_OUT_PAUSE_POSITION+RIGHT_INTAKE_OFFSET,
-            LEFT_INTAKE_IN_POSITION = 0.3,
-            RIGHT_INTAKE_IN_POSITION = 1-LEFT_INTAKE_IN_POSITION+RIGHT_INTAKE_OFFSET,
-            LEFT_INTAKE_MIDDLE_POSITION = 0.5,
-            RIGHT_INTAKE_MIDDLE_POSITION = 1-LEFT_INTAKE_MIDDLE_POSITION+RIGHT_INTAKE_OFFSET,
-            LEFT_INTAKE_DROP_POSITION = 0.1,
-            RIGHT_INTAKE_DROP_POSITION = 1-LEFT_INTAKE_DROP_POSITION+RIGHT_INTAKE_OFFSET,
 
-            // for the intake, 0.31 servo position change means 90 degrees forward change
-            // so, 0.00344444444 servo position change is a 1 degree change
-            INTAKE_SERVO_TO_DEGREES = 1/0.003444444444444444444444444444444444444444,
-            INTAKE_DEGREES_TO_SERVO = 0.003444444444444444444444444444444444444444,
+    // how offset the right intake arm is from the left
+    RIGHT_INTAKE_ARM_OFFSET = 0,
 
-            INTAKE_STACK_TOP_POSITION = 0.815,
+    // position for the intake arm being in the robot
+    INTAKE_ARM_IN_POSITION = 0, // TODO: SET LATER
 
-            RIGHT_OUTTAKE_OFFSET = -0.04,
-            LEFT_OUTTAKE_OUT_POSITION = 0.235,
-            RIGHT_OUTTAKE_OUT_POSITION = 1-LEFT_OUTTAKE_OUT_POSITION+RIGHT_OUTTAKE_OFFSET,
-            LEFT_OUTTAKE_IN_POSITION= 0.685,
-            RIGHT_OUTTAKE_IN_POSITION = 1-LEFT_OUTTAKE_IN_POSITION+RIGHT_OUTTAKE_OFFSET,
-                    LEFT_OUTTAKE_GRAB_POSITION= 0.81,
-                    LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION= 0.81,
-                    RIGHT_OUTTAKE_GRAB_POSITION = 0.17,//1-LEFT_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
-                    RIGHT_AUTONOMOUS_OUTTAKE_GRAB_POSITION = 0.17,//1-LEFT_AUTONOMOUS_OUTTAKE_GRAB_POSITION+RIGHT_OUTTAKE_OFFSET,
-                    LEFT_OUTTAKE_AVOID_POSITION = 0.455,
-                    RIGHT_OUTTAKE_AVOID_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-                    LEFT_OUTTAKE_PRESET_POSITION = 0.715,
-                    RIGHT_OUTTAKE_PRESET_POSITION = 1-LEFT_OUTTAKE_AVOID_POSITION+RIGHT_OUTTAKE_OFFSET,
-                    OUTTAKE_PICK_UP_DEGREES_PER_SECOND = 30,
-                    OUTTAKE_AUTONOMOUS_PICK_UP_DEGREES_PER_SECOND = 30,
+    // position for the intake arm being out of the robot at ground level
+    INTAKE_ARM_OUT_POSITION = 0, // TODO: SET LATER
+
+    // position for the intake arm being at the top of a pixel stack
+    INTAKE_ARM_STACK_TOP_POSITION = 0, // TODO: SET LATER
+
+    // position for the intake arm being at the middle of a pixel stack
+    INTAKE_ARM_STACK_MIDDLE_POSITION = 0, // TODO: SET LATER
 
 
-            // the rev smart servo has a 270 degree range of motion and servo positions rang from [0,1]
-            // so, 0.003703703704 servo units is equal to one degree
-            OUTTAKE_SERVO_TO_DEGREES = 1/0.003703703704,
-            OUTTAKE_DEGREES_TO_SERVO = 0.003703703704,
+    // how offset the right outtake arm is from the left
+    RIGHT_OUTTAKE_ARM_OFFSET = 0,
+
+    // position for the outtake arm being in the robot
+    OUTTAKE_ARM_IN_POSITION = 0, // TODO: SET LATER
+
+    // position for the outtake arm being out of the robot
+    OUTTAKE_ARM_OUT_POSITION = 0, // TODO: SET LATER
+
+    // position for the outtake arm on the first tap of a preset
+    OUTTAKE_ARM_PRESET_HOLD_POSITION = 0, // TODO: SET LATER
 
 
-            //Claw Close positions
-            INNER_CLAW_CLOSE_POSITION = 0.45,
-            OUTER_CLAW_CLOSE_POSITION = 0.85,
+    // the position the wrist has to be at to be vertical when the outtake arm is in the robot
+    OUTTAKE_WRIST_VERTICAL_OFFSET = 0,
 
-            //Claw Open Positions
-            INNER_CLAW_OPEN_POSITION = 0.31,
-            OUTER_CLAW_OPEN_POSITION = 1,
 
-            PLANE_LAUNCHER_LAUNCH = 0,
-            PLANE_LAUNCHER_HOLD = 0.2,
+    // conversion factor of servo position units to degrees for the intake arm
+    INTAKE_SERVO_TO_DEGREES = 0, // TODO: SET LATER
 
-            INTAKE_CHANGE = 40,
-            OUTTAKE_CHANGE = 120,
-            OUTTAKE_FINE_ADJUST_DEAD_ZONE = 0.8,
+    // conversion factor of servo position units to degrees for the outtake arm
+    OUTTAKE_ARM_SERVO_TO_DEGREES = 0, // TODO: SET LATER
 
-            LIFT_GRAB_VELOCITY_LIMIT = 20;
+    // conversion factor of servo position units to degrees for the outtake wrist
+    OUTTAKE_WRIST_SERVO_TO_DEGREES = 0, // TODO: SET LATER
 
-    public static long
-            LIFT_GRAB_TIMEOUT = 750,
-            INTAKE_OBSTACLE_OUT_WAIT = 200, // this is in milliseconds
-            INTAKE_OBSTACLE_OUT_RETRACT_WAIT = 1000,
-            INTAKE_FULL_OUT_WAIT = 1000, // this is in milliseconds
-            INTAKE_IN_WAIT = 1000,
-            INTAKE_OBSTACLE_IN_WAIT = 500,
-            CLAW_GRAB_WAIT = 250, //
-            CLAW_CLOSE_WAIT = 200,
-            CLAW_LIFT_WAIT = 0,
-            LIFT_GO_WAIT = 1000,
-            PRESET_TIMEOUT = 3000,
-            RESET_PIXEL_DROP_WAIT = 300,
-            RESET_FOLD_IN_WAIT = 1000,
-            OUTTAKE_OBSTACLE_FOLD_IN_WAIT = 500,
-            INTAKE_BURST_TIME = 250,
-            INTAKE_EDGE_CASE_COLLIDE_WAIT = 1000,
-    SLIDE_DELAY = 0;
+    // conversion factor of degrees to servo position units for the intake arm
+    INTAKE_DEGREES_TO_SERVO = 0, // TODO: SET LATER
 
-    public static final PIDFCoefficients
-            LIFT_UP_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(9,6,0,4),
-            LIFT_UP_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(10,0,0,0),
-            LIFT_DOWN_VELOCITY_PIDF_COEFFICIENTS = new PIDFCoefficients(10,2,0,-4.5),
-            LIFT_DOWN_POSITION_PIDF_COEFFICIENTS = new PIDFCoefficients(5,0,0,0);
+    // conversion factor of degrees to servo position units for the outtake arm
+    OUTTAKE_ARM_DEGREES_TO_SERVO = 0, // TODO: SET LATER
+
+    // conversion factor of degrees to servo position units for the outtake wrist
+    OUTTAKE_WRIST_DEGREES_TO_SERVO = 0, // TODO: SET LATER
+
+
+    // open position of the outer scoring claw
+    OUTER_OUTTAKE_CLAW_OPEN = 0, // TODO: SET LATER
+
+    // closed position of the outer scoring claw
+    OUTER_OUTTAKE_CLAW_CLOSED = 0, // TODO: SET LATER
+
+    // open position of the inner scoring claw
+    INNER_OUTTAKE_CLAW_OPEN = 0, // TODO: SET LATER
+
+    // closed position of the inner scoring claw
+    INNER_OUTTAKE_CLAW_CLOSED = 0, // TODO: SET LATER
+
+    // open position of the intake claw
+    INTAKE_CLAW_OPEN = 0, // TODO: SET LATER
+
+    // closed position of the intake claw
+    INTAKE_CLAW_CLOSED = 0, // TODO: SET LATER
+
+    // plane launcher launch position
+    PLANE_LAUNCHER_LAUNCH = 0,
+
+    // plane launcher hold position
+    PLANE_LAUNCHER_HOLD = 0.2;
 }

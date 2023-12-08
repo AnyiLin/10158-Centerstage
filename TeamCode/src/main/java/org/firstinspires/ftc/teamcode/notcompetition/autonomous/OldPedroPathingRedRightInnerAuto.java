@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.notcompetition.autonomous;
 
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_CLAW_OPEN_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_STACK_TOP_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_AVOID_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.LEFT_OUTTAKE_OUT_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_CLAW_OPEN_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_AVOID_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_OUT_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_BACK_LENGTH;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_FRONT_LENGTH;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_INTAKE_LENGTH;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.INNER_CLAW_OPEN_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.INTAKE_STACK_TOP_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.LEFT_OUTTAKE_AVOID_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.LEFT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.OUTER_CLAW_OPEN_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.RIGHT_OUTTAKE_AVOID_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.RIGHT_OUTTAKE_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.ROBOT_BACK_LENGTH;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.ROBOT_FRONT_LENGTH;
+import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.ROBOT_INTAKE_LENGTH;
 
 import android.util.Size;
 
@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
+import org.firstinspires.ftc.teamcode.notcompetition.teleop.OldTwoPersonDrive;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
@@ -30,10 +30,10 @@ import org.firstinspires.ftc.teamcode.util.VisionPortalStackRelocalization;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Pedro Pathing Red Right Inner Auto", group = "Not Comp Autonomous")
-public class PedroPathingRedRightInnerAuto extends OpMode {
+@Autonomous(name = "Old Pedro Pathing Red Right Inner Auto", group = "Not Comp Autonomous")
+public class OldPedroPathingRedRightInnerAuto extends OpMode {
 
-    private TwoPersonDrive twoPersonDrive = new TwoPersonDrive(true);
+    private OldTwoPersonDrive twoPersonDrive = new OldTwoPersonDrive(true);
 
     private VisionPortalTeamPropPipeline teamPropPipeline = new VisionPortalTeamPropPipeline(0);
 

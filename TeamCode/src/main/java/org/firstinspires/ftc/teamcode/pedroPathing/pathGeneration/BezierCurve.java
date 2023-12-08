@@ -14,7 +14,7 @@ public class BezierCurve {
 
     private Vector endTangent = new Vector();
 
-    private final int APPROXIMATION_STEPS = 100;
+    private final int APPROXIMATION_STEPS = 5000;
 
     private double UNIT_TO_TIME, length, zeroPowerAcceleration = FollowerConstants.curvedZeroPowerAcceleration;
 
