@@ -25,11 +25,20 @@ public class RobotConstants {
     // max extension of the scoring slides
     LIFT_MAX_POSITION = 2000, // TODO: check this later
 
+    // max extension of the scoring slides
+    LIFT_LOW_PRESET_POSITION = 0, // TODO: set this later
+
+    // max extension of the scoring slides
+    LIFT_MIDDLE_PRESET_POSITION = 0, // TODO: set this later
+
+    // max extension of the scoring slides
+    LIFT_HIGH_PRESET_POSITION = 0, // TODO: set this later
+
     // max extension of the extension slides
     EXTENSION_MAX_POSITION = 0, // TODO: check this later
 
     // position the extension slides extend to to avoid the outtake coming back in
-    EXTENSION_AVOID_POSITION = 100; // TODO: check this later
+    EXTENSION_AVOID_POSITION = 100; // TODO: set this later
 
     public static final int
     // states for mechanisms
@@ -41,7 +50,12 @@ public class RobotConstants {
     OUTTAKE_GOING_OUT = 5,
     OUTTAKE_OUT = 6,
     OUTTAKE_GOING_IN = 7,
-    INTAKE_AVOID = 8;
+    INTAKE_AVOID = 8,
+    OUTTAKE_PRESET = 9,
+    OUTTAKE_WAIT = 10,
+    EXTENSION_NOMINAL = 11,
+    EXTENSION_AVOID = 12,
+    EXTENSION_AVOID_RESET = 13;
 
     /**
      * IMPORTANT: all arm servo positions are from the left side
@@ -62,6 +76,12 @@ public class RobotConstants {
 
     // position for the intake arm being at the middle of a pixel stack
     INTAKE_ARM_STACK_MIDDLE_POSITION = 0, // TODO: SET LATER
+
+    // angle at which the intake arm, when folded back, can pass back under the trusses and stage door
+    INTAKE_ENCODER_SAFE_ANGLE = 0,// TODO: GET LATER
+
+    // angle at which the intake arm is "out", which can be set to just above the highest pixel stack
+    INTAKE_ENCODER_OUT_ANGLE = 0,// TODO: GET LATER
 
 
     // how offset the right outtake arm is from the left

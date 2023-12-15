@@ -39,18 +39,15 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double X_MULTIPLIER = 0.50590219241;
     public static double Y_MULTIPLIER = 0.5088913607;//0.51569836281*0.9868004193644;
 
-    public static double LATERAL_DISTANCE = 2*((150.173)/(25.4)) - 0.065; // in; distance between the left and right wheels
-    public static double FORWARD_OFFSET = (-98.584)/(25.4); // in; offset of the lateral wheel
-
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
     private List<Integer> lastEncPositions, lastEncVels;
 
     public ThreeWheelLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
-                new Pose2d((-7.358)/(25.4), LATERAL_DISTANCE / 2 + (13.57/25.4), 0), // left
-                new Pose2d((-7.358)/(25.4), -LATERAL_DISTANCE / 2 - (3.855/25.4), 0), // right
-                new Pose2d(FORWARD_OFFSET, (1.407-24)/(25.4),  Math.toRadians(90)) // front
+                new Pose2d(-18.5/25.4, 164.4/25.4, 0), // left
+                new Pose2d(-18.4/25.4, -159.6/25.4, 0), // right
+                new Pose2d(-107.9/25.4, -1.1/25.4,  Math.toRadians(90)) // strafe
         ));
 
         lastEncPositions = lastTrackingEncPositions;
