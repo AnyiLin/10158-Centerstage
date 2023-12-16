@@ -38,12 +38,6 @@ public class PoseUpdater {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        // TODO: change this when new robot is built
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
-        imu.initialize(parameters);
-
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();
         localizer = new ThreeWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels);

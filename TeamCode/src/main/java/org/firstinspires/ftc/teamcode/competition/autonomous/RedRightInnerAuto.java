@@ -145,7 +145,7 @@ public class RedRightInnerAuto extends OpMode {
     public void start() {
         super.start();
         visionPortal.stopStreaming();
-        twoPersonDrive.lastFrameTimeNano = System.nanoTime();
+        twoPersonDrive.frameTimer.resetTimer();
     }
 
     @Override

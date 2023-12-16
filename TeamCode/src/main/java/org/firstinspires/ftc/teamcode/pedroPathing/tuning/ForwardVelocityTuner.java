@@ -24,7 +24,7 @@ import java.util.List;
 public class ForwardVelocityTuner extends OpMode {
     private ArrayList<Double> velocities = new ArrayList<Double>();
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftExtension, rightExtension;
     private List<DcMotorEx> motors;
 
     private PoseUpdater poseUpdater;
@@ -68,6 +68,15 @@ public class ForwardVelocityTuner extends OpMode {
         telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
         telemetryA.addLine("Press cross or A to stop");
         telemetryA.update();
+
+
+        leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
+        rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+        leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftExtension.setPower(-0.2);
+        rightExtension.setPower(-0.2);
+
     }
 
     @Override
@@ -80,6 +89,7 @@ public class ForwardVelocityTuner extends OpMode {
         leftRear.setPower(1);
         rightFront.setPower(1);
         rightRear.setPower(1);
+        end = false;
     }
 
     @Override
@@ -99,9 +109,10 @@ public class ForwardVelocityTuner extends OpMode {
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));
                 velocities.add(new Double(currentVelocity));
                 velocities.remove(0);
+                /*
                 if (currentVelocity < FollowerConstants.pathEndVelocity) {
                     end = true;
-                }
+                }*/
             }
         } else {
             double average = 0;

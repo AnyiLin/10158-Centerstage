@@ -505,7 +505,6 @@ public class Follower {
         }
 
         translationalVector = MathFunctions.subtractVectors(translationalVector, momentumVector);
-
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
 
         return translationalVector;

@@ -21,11 +21,15 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MIDDLE_PRE
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_IN_TIME;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_PRESET_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_PRESET_HOLD_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_PRESET_IN_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_SERVO_TO_DEGREES;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_GOING_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_GOING_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IN;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_MOVING_OUTSIDE;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_PRESET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WAIT;
@@ -80,7 +84,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public boolean autonomous;
 
-    public long deltaTimeSeconds;
+    public long deltaTimeSeconds, outtakeMovementTime;
 
     public double outtakeWristDirection, intakeArmTargetPosition, outtakeArmTargetPosition, intakeArmOutPosition, outtakePreviousStaticPosition;
 
@@ -105,6 +109,9 @@ public class TwoPersonDrive extends LinearOpMode {
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -320,7 +327,6 @@ public class TwoPersonDrive extends LinearOpMode {
                             // set the outtake to move back to its previous static state
                             // and push the intake to avoiding
                             // when the intake is out of the way, put the outtake in and then fold up
-                            outtakeArmWait.run();
                             setOuttakeState(OUTTAKE_WAIT);
                             setIntakeState(INTAKE_AVOID);
                             updateIntake();
@@ -343,7 +349,7 @@ public class TwoPersonDrive extends LinearOpMode {
                         }
                         break;
                     case INTAKE_AVOID:
-                        if (outtakeArmWait.hasBeenRun()) outtakeArmWait.reset();
+                        outtakeArmWait.run();
                         if (extensionTargetPosition < EXTENSION_AVOID_POSITION) setExtensionState(EXTENSION_AVOID);
                         if (extensionEncoder.getCurrentPosition() > EXTENSION_AVOID_POSITION) {
                             setIntakeState(INTAKE_GOING_OUT);
@@ -381,6 +387,7 @@ public class TwoPersonDrive extends LinearOpMode {
             case OUTTAKE_GOING_IN:
             case OUTTAKE_GOING_OUT:
             case OUTTAKE_WAIT:
+            case OUTTAKE_MOVING_OUTSIDE:
                 outtakeTimer.resetTimer();
                 outtakeState = state;
                 resetOuttakeActions();
@@ -388,9 +395,10 @@ public class TwoPersonDrive extends LinearOpMode {
         }
     }
 
-    // TODO: whenever the outtake reaches a static state, check if extension is avoiding, and if it is, then return the extension
+    // this second todo is actually only really a problem for the preset position
+    // and also dont allow for fine adjust movement control in teleop until the arm is out
+    // as well as slide control
     public void updateOuttake() {
-        //if (extensionState == EXTENSION_AVOID) setExtensionState(EXTENSION_AVOID_RESET);
         if (!(outtakeState == OUTTAKE_WAIT)) {
             switch (outtakeArmTargetState) {
                 case OUTTAKE_IN:
@@ -400,61 +408,117 @@ public class TwoPersonDrive extends LinearOpMode {
                             if (extensionState == EXTENSION_AVOID) setExtensionState(EXTENSION_AVOID_RESET);
                             break;
                         case OUTTAKE_PRESET:
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
+                                setIntakeState(INTAKE_AVOID);
+                                updateIntake();
+                            } else {
+                                setOuttakeState(OUTTAKE_GOING_IN);
+                                outtakeMovementTime = OUTTAKE_ARM_PRESET_IN_TIME;
+                                updateOuttake();
+                            }
                             break;
                         case OUTTAKE_OUT:
-                            if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionEncoder.getCurrentPosition() < EXTENSION_AVOID_POSITION)) {
-                            } else {
-                                intakeState = INTAKE_GOING_IN;
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
+                                setIntakeState(INTAKE_AVOID);
                                 updateIntake();
+                            } else {
+                                setOuttakeState(OUTTAKE_GOING_IN);
+                                outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
+                                updateOuttake();
                             }
                             break;
                         case OUTTAKE_GOING_IN:
-                            if (extensionAvoid.hasBeenRun()) extensionAvoid.reset();
-                            if (intakeArmTargetPosition != leftIntakeArm.getPosition()) {
-                                setIntakeArmPosition(INTAKE_ARM_IN_POSITION);
-                                intakeArmTargetPosition = leftIntakeArm.getPosition();
+                            outtakeArmIn.run();
+                            if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
+                                setOuttakeState(OUTTAKE_IN);
+                                updateOuttake();
                             }
                             break;
                         case OUTTAKE_GOING_OUT:
-                            intakeState = INTAKE_GOING_IN;
-                            updateIntake();
+                        case OUTTAKE_MOVING_OUTSIDE:
+                            setOuttakeState(OUTTAKE_GOING_IN);
+                            outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
+                            updateOuttake();
                             break;
                     }
                     break;
                 case OUTTAKE_OUT:
                     switch (outtakeState) {
                         case OUTTAKE_IN:
-                            if (!(outtakeState == OUTTAKE_GOING_IN || outtakeState == OUTTAKE_OUT)) {
-                                // TODO: this means that the outtake is moving while the intake is in the way
-                                // set the outtake to move back to its previous static state
-                                // and push the intake to avoiding
-                                // when the intake is out of the way, put the outtake in and then fold up
-                                setOuttakeArmPosition(outtakePreviousStaticPosition);
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
+                            if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
+                                setIntakeState(INTAKE_AVOID);
+                                updateIntake();
                             } else {
-                                // TODO: coast is clear, move on
+                                setOuttakeState(OUTTAKE_GOING_OUT);
+                                outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
+                                updateOuttake();
                             }
                             break;
                         case OUTTAKE_PRESET:
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            setOuttakeState(OUTTAKE_MOVING_OUTSIDE);
+                            outtakeMovementTime = OUTTAKE_ARM_OUT_PRESET_TIME;
+                            updateOuttake();
                             break;
                         case OUTTAKE_OUT:
-                            if (intakeArmOut.hasBeenRun()) intakeArmOut.reset();
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            if (extensionState == EXTENSION_AVOID) setExtensionState(EXTENSION_AVOID_RESET);
                             break;
-
-                        // TODO: fix up below
-
                         case OUTTAKE_GOING_IN:
-                            intakeState = INTAKE_GOING_OUT;
-                            updateIntake();
+                            setOuttakeState(OUTTAKE_GOING_OUT);
+                            outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
+                            updateOuttake();
                             break;
                         case OUTTAKE_GOING_OUT:
-                            if (extensionAvoid.hasBeenRun()) extensionAvoid.reset();
-                            intakeArmOut.run();
-                            // TODO: detect when the arm is in position and update the state to intake out
+                        case OUTTAKE_MOVING_OUTSIDE:
+                            outtakeArmOut.run();
+                            if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
+                                setOuttakeState(OUTTAKE_OUT);
+                                updateOuttake();
+                            }
                             break;
                     }
                     break;
                 case OUTTAKE_PRESET:
-                    // TODO: essentially make this the same as outtake out except with slightly different timings
+                    switch (outtakeState) {
+                        case OUTTAKE_IN:
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
+                            if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
+                                setIntakeState(INTAKE_AVOID);
+                                updateIntake();
+                            } else {
+                                setOuttakeState(OUTTAKE_GOING_OUT);
+                                outtakeMovementTime = OUTTAKE_ARM_PRESET_IN_TIME;
+                                updateOuttake();
+                            }
+                            break;
+                        case OUTTAKE_PRESET:
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            if (extensionState == EXTENSION_AVOID) setExtensionState(EXTENSION_AVOID_RESET);
+                            break;
+                        case OUTTAKE_OUT:
+                            outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
+                            setOuttakeState(OUTTAKE_MOVING_OUTSIDE);
+                            outtakeMovementTime = OUTTAKE_ARM_OUT_PRESET_TIME;
+                            updateOuttake();
+                            break;
+                        case OUTTAKE_GOING_IN:
+                            setOuttakeState(OUTTAKE_GOING_OUT);
+                            outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
+                            updateOuttake();
+                            break;
+                        case OUTTAKE_GOING_OUT:
+                        case OUTTAKE_MOVING_OUTSIDE:
+                            outtakeArmPreset.run();
+                            if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
+                                setOuttakeState(OUTTAKE_PRESET);
+                                updateOuttake();
+                            }
+                            break;
+                    }
                     break;
             }
         }

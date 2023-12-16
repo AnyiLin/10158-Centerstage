@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.util;
 
 public class RobotConstants {
+
+
     public static FeedForwardConstant
             liftGravityConstant = (double i) -> {return i;};
+
 
     public static CustomPIDFCoefficients
 
@@ -19,6 +22,7 @@ public class RobotConstants {
         0,
         0,
         0);
+
 
     public static int
 
@@ -40,6 +44,7 @@ public class RobotConstants {
     // position the extension slides extend to to avoid the outtake coming back in
     EXTENSION_AVOID_POSITION = 100; // TODO: set this later
 
+
     public static final int
     // states for mechanisms
     INTAKE_IN = 0,
@@ -55,7 +60,9 @@ public class RobotConstants {
     OUTTAKE_WAIT = 10,
     EXTENSION_NOMINAL = 11,
     EXTENSION_AVOID = 12,
-    EXTENSION_AVOID_RESET = 13;
+    EXTENSION_AVOID_RESET = 13,
+    OUTTAKE_MOVING_OUTSIDE = 14;
+
 
     /**
      * IMPORTANT: all arm servo positions are from the left side
@@ -85,7 +92,7 @@ public class RobotConstants {
 
 
     // how offset the right outtake arm is from the left
-    RIGHT_OUTTAKE_ARM_OFFSET = 0,
+    RIGHT_OUTTAKE_ARM_OFFSET = -0.025,
 
     // position for the outtake arm being in the robot
     OUTTAKE_ARM_IN_POSITION = 0, // TODO: SET LATER
@@ -143,4 +150,21 @@ public class RobotConstants {
 
     // plane launcher hold position
     PLANE_LAUNCHER_HOLD = 0.2;
+
+    /**
+     * These are all in milliseconds!
+     */
+    public static long
+
+    // the time it takes for the outtake arm to go in from the out position back into the robot
+    // timing should be the same both ways the arm moves though
+    OUTTAKE_ARM_OUT_IN_TIME = 1000,
+
+    // the time it takes for the outtake arm to go in the robot from the preset position back into the robot
+    // timing should be the same both ways the arm moves though
+    OUTTAKE_ARM_PRESET_IN_TIME = 1000,
+
+    // the time it takes for the outtake arm to go in the robot from the out position back to the preset position
+    // timing should be the same both ways the arm moves though
+    OUTTAKE_ARM_OUT_PRESET_TIME = 800;
 }
