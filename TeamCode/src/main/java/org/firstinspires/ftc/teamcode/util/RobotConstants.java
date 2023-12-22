@@ -2,11 +2,6 @@ package org.firstinspires.ftc.teamcode.util;
 
 public class RobotConstants {
 
-
-    public static FeedForwardConstant
-            liftGravityConstant = (double i) -> {return i;};
-
-
     public static CustomPIDFCoefficients
 
     // lift PIDF coefficients
@@ -14,7 +9,7 @@ public class RobotConstants {
             0,
             0,
             0,
-            liftGravityConstant),
+            0),
 
     // extension PIDF coefficients
     extensionPIDFCoefficients = new CustomPIDFCoefficients(
@@ -45,7 +40,13 @@ public class RobotConstants {
     EXTENSION_MAX_POSITION = 0, // TODO: check this later
 
     // position the extension slides extend to to avoid the outtake coming back in
-    EXTENSION_AVOID_POSITION = 100; // TODO: set this later
+    EXTENSION_AVOID_POSITION = 100, // TODO: set this later
+
+    // outtake arm fine adjust speed in degrees per second
+    OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND = 120,
+
+    // intake arm fine adjust speed in degrees per second
+    INTAKE_FINE_ADJUST_DEGREES_PER_SECOND = 40;
 
 
     public static final int
@@ -115,6 +116,12 @@ public class RobotConstants {
 
     // position for the outtake arm on the first tap of a preset
     OUTTAKE_ARM_PRESET_HOLD_POSITION = 0, // TODO: SET LATER
+
+    // upper bound for outtake arm fine adjustment
+    OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0, // TODO: SET LATER
+
+    // lower bound for outtake arm fine adjustment
+    OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0, // TODO: SET LATER
 
 
     // the position the wrist has to be at to be vertical when the outtake arm is in the robot
