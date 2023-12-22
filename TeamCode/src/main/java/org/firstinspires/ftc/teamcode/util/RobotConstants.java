@@ -29,6 +29,9 @@ public class RobotConstants {
     // max extension of the scoring slides
     LIFT_MAX_POSITION = 2000, // TODO: check this later
 
+    // the upper limit of the lift encoder to start transferring
+    LIFT_TRANSFER_UPPER_LIMIT = 10, // TODO: set this later
+
     // max extension of the scoring slides
     LIFT_LOW_PRESET_POSITION = 0, // TODO: set this later
 
@@ -61,7 +64,17 @@ public class RobotConstants {
     EXTENSION_NOMINAL = 11,
     EXTENSION_AVOID = 12,
     EXTENSION_AVOID_RESET = 13,
-    OUTTAKE_MOVING_OUTSIDE = 14;
+    OUTTAKE_MOVING_OUTSIDE = 14,
+    INTAKE_IDLE = 15,
+    OUTTAKE_IDLE = 16,
+    TRANSFER_IDLE = 17,
+    TRANSFER_POSITIONING = 18,
+    TRANSFER_TRANSFERRING = 19,
+    TRANSFER_PRESET_HOLD = 20,
+    TRANSFER_OUT = 21,
+    TRANSFER_RESET = 22,
+    TRANSFER_RESET_CLAW_DROP = 23,
+    TRANSFER_GRAB = 24;
 
 
     /**
@@ -166,5 +179,14 @@ public class RobotConstants {
 
     // the time it takes for the outtake arm to go in the robot from the out position back to the preset position
     // timing should be the same both ways the arm moves though
-    OUTTAKE_ARM_OUT_PRESET_TIME = 800;
+    OUTTAKE_ARM_OUT_PRESET_TIME = 800,
+
+    // roughly the time it takes for our outtake claws to close
+    OUTTAKE_CLAW_CLOSE_TIME = 250,
+
+    // roughly the time it takes for our outtake claws to drop something
+    OUTTAKE_CLAW_DROP_TIME = 200,
+
+    // the time it takes for the pixels to fall through the transfer
+    TRANSFER_DROP_TIME = 1000; // TODO: find this later
 }

@@ -15,6 +15,7 @@
  * updates to the FTC SDK into your code.
  */
 
+
 import java.util.regex.Pattern
 
 apply plugin: 'com.android.application'
@@ -47,9 +48,6 @@ android {
         }
     }
 
-    aaptOptions {
-        noCompress "tflite"
-    }
 
     defaultConfig {
         signingConfig signingConfigs.debug
