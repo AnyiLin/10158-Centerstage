@@ -43,10 +43,13 @@ public class RobotConstants {
     EXTENSION_AVOID_POSITION = 100, // TODO: set this later
 
     // outtake arm fine adjust speed in degrees per second
-    OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND = 120,
+    OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND = 120,
 
     // intake arm fine adjust speed in degrees per second
-    INTAKE_FINE_ADJUST_DEGREES_PER_SECOND = 40;
+    INTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND = 40,
+
+    // outtake wrist fine adjust speed in degrees per second
+    OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND = 40;
 
 
     public static final int
@@ -98,6 +101,12 @@ public class RobotConstants {
     // position for the intake arm being at the middle of a pixel stack
     INTAKE_ARM_STACK_MIDDLE_POSITION = 0, // TODO: SET LATER
 
+    // upper bound for intake arm fine adjustment
+    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0, // TODO: SET LATER
+
+    // lower bound for intake arm fine adjustment
+    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0, // TODO: SET LATER
+
     // angle at which the intake arm, when folded back, can pass back under the trusses and stage door
     INTAKE_ENCODER_SAFE_ANGLE = 0,// TODO: GET LATER
 
@@ -127,24 +136,30 @@ public class RobotConstants {
     // the position the wrist has to be at to be vertical when the outtake arm is in the robot
     OUTTAKE_WRIST_VERTICAL_OFFSET = 0,
 
+    // upper bound for outtake wrist fine adjustment
+    OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND = 0, // TODO: SET LATER
+
+    // lower bound for outtake wrist fine adjustment
+    OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND = -120, // TODO: SET LATER
+
 
     // conversion factor of servo position units to degrees for the intake arm
-    INTAKE_SERVO_TO_DEGREES = 0, // TODO: SET LATER
+    INTAKE_ARM_SERVO_TO_DEGREES = 355, // TODO: SET LATER
 
     // conversion factor of servo position units to degrees for the outtake arm
-    OUTTAKE_ARM_SERVO_TO_DEGREES = 0, // TODO: SET LATER
+    OUTTAKE_ARM_SERVO_TO_DEGREES = 270, // TODO: SET LATER
 
     // conversion factor of servo position units to degrees for the outtake wrist
-    OUTTAKE_WRIST_SERVO_TO_DEGREES = 0, // TODO: SET LATER
+    OUTTAKE_WRIST_SERVO_TO_DEGREES = 355, // TODO: SET LATER
 
     // conversion factor of degrees to servo position units for the intake arm
-    INTAKE_DEGREES_TO_SERVO = 0, // TODO: SET LATER
+    INTAKE_ARM_DEGREES_TO_SERVO = 1/355, // TODO: SET LATER
 
     // conversion factor of degrees to servo position units for the outtake arm
-    OUTTAKE_ARM_DEGREES_TO_SERVO = 0, // TODO: SET LATER
+    OUTTAKE_ARM_DEGREES_TO_SERVO = 1/270, // TODO: SET LATER
 
     // conversion factor of degrees to servo position units for the outtake wrist
-    OUTTAKE_WRIST_DEGREES_TO_SERVO = 0, // TODO: SET LATER
+    OUTTAKE_WRIST_DEGREES_TO_SERVO = 1/355, // TODO: SET LATER
 
 
     // open position of the outer scoring claw

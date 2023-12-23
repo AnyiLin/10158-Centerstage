@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.notcompetition.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
-
+@TeleOp(name = "Test TeleOp Enhancements", group = "Test4")
 public class TestTeleOpEnhancements extends OpMode {
     private Follower follower;
 
@@ -31,13 +32,33 @@ public class TestTeleOpEnhancements extends OpMode {
 
     @Override
     public void loop() {
-        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y, gamepad1.right_stick_x);
+        double throttle = 0.2 + 0.8 * gamepad1.right_trigger;
+
+        double strafe = 0;
+        if (gamepad1.left_bumper) {
+            strafe += 1;
+        }
+        if (gamepad1.right_bumper) {
+            strafe -= 1;
+        }
+
+        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y * throttle, strafe * throttle);
         driveVector.setMagnitude(MathFunctions.clamp(driveVector.getMagnitude(), 0, 1));
         driveVector.rotateVector(follower.getPose().getHeading());
 
-        headingVector.setComponents(-gamepad1.left_stick_x, follower.getPose().getHeading());
 
-        follower.setMovementVectors(follower.getCorrectiveVector(), driveVector, headingVector);
+        double rx = 0;
+        if (Math.abs(gamepad1.left_stick_x)>0.1) rx = -gamepad1.left_stick_x;
+        if (rx > 1-gamepad1.right_trigger*0.5) {
+            rx = 1-gamepad1.right_trigger*0.5;
+        } else if (rx<-1+gamepad1.right_trigger*0.5) {
+            rx = -1+gamepad1.right_trigger*0.5;
+        }
+        rx *= throttle;
+
+        headingVector.setComponents(rx, follower.getPose().getHeading());
+
+        follower.setMovementVectors(follower.getCentripetalForceCorrection(), headingVector, driveVector);
         follower.update();
     }
 

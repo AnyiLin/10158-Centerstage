@@ -8,22 +8,22 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathBuilder;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathCallback;
-import org.firstinspires.ftc.teamcode.util.PIDFController;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathBuilder;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathCallback;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
+import org.firstinspires.ftc.teamcode.util.PIDFController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +52,7 @@ public class Follower {
 
     private long[] pathStartTimes;
 
-    private boolean followingPathChain, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
+    private boolean followingPathChain, holdingPosition, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
 
     private double previousTangentVelocity;
 
@@ -69,10 +69,8 @@ public class Follower {
 
     private Pose2d averageDeltaPose, averagePreviousDeltaPose, averageDeltaDeltaPose;
 
-    private PIDFController smallTranslationalXPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
-            smallTranslationalYPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
-            largeTranslationalXPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
-            largeTranslationalYPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
+    private PIDFController smallTranslationalPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
+            largeTranslationalPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
             smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
             largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
             smallDrivePIDF = new PIDFController(FollowerConstants.smallDrivePIDFCoefficients),
@@ -136,6 +134,7 @@ public class Follower {
         for (int i = 0; i < DELTA_POSE_RECORD_LIMIT/2; i++) {
             deltaDeltaPoses.add(new Pose2d(0,0,0));
         }
+        calculateAverageDeltaPoses();
     }
 
     /**
@@ -172,6 +171,25 @@ public class Follower {
      */
     public void setStartingPose(Pose2d pose) {
         poseUpdater.setStartingPose(pose);
+    }
+
+
+    /**
+     * This holds a point
+     *
+     * @param point the point to stay at
+     * @param heading the direction to face
+     */
+    public void holdPoint(BezierPoint point, double heading) {
+        breakFollowing();
+        holdingPosition = true;
+        isBusy = true;
+        followingPathChain = false;
+        currentPath = new Path(point);
+        currentPath.setConstantHeadingInterpolation(heading);
+        closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), 1);
+        empiricalZeroPowerAccelerations.clear();
+        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
     }
 
 
@@ -215,39 +233,49 @@ public class Follower {
     public void update() {
         poseUpdater.update();
         if (auto) {
-            if (isBusy) {
-                closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-
-                if (followingPathChain) updateCallbacks();
+            if (holdingPosition) {
+                closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), 1);
 
                 drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
 
                 for (int i = 0; i < motors.size(); i++) {
                     motors.get(i).setPower(drivePowers[i]);
                 }
-            }
-            if (currentPath.isAtParametricEnd()) {
-                if (followingPathChain && chainIndex < currentPathChain.size() - 1) {
-                    // Not at last path, keep going
-                    breakFollowing();
-                    pathStartTimes[chainIndex] = System.currentTimeMillis();
-                    isBusy = true;
-                    followingPathChain = true;
-                    chainIndex++;
-                    currentPath = currentPathChain.getPath(chainIndex);
+            } else {
+                if (isBusy) {
                     closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-                    empiricalZeroPowerAccelerations.clear();
-                    empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
-                } else {
-                    // At last path, run some end detection stuff
-                    // set isBusy to false if at end
-                    if (!reachedParametricPathEnd) {
-                        reachedParametricPathEnd = true;
-                        reachedParametricPathEndTime = System.currentTimeMillis();
-                    }
 
-                    if ((System.currentTimeMillis() - reachedParametricPathEndTime > currentPath.getPathEndTimeout()) || (poseUpdater.getVelocity().getMagnitude() < currentPath.getPathEndVelocity() && MathFunctions.distance(poseUpdater.getPose(), closestPose) < currentPath.getPathEndTranslational() && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < currentPath.getPathEndHeading())) {
+                    if (followingPathChain) updateCallbacks();
+
+                    drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
+
+                    for (int i = 0; i < motors.size(); i++) {
+                        motors.get(i).setPower(drivePowers[i]);
+                    }
+                }
+                if (currentPath.isAtParametricEnd()) {
+                    if (followingPathChain && chainIndex < currentPathChain.size() - 1) {
+                        // Not at last path, keep going
                         breakFollowing();
+                        pathStartTimes[chainIndex] = System.currentTimeMillis();
+                        isBusy = true;
+                        followingPathChain = true;
+                        chainIndex++;
+                        currentPath = currentPathChain.getPath(chainIndex);
+                        closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
+                        empiricalZeroPowerAccelerations.clear();
+                        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
+                    } else {
+                        // At last path, run some end detection stuff
+                        // set isBusy to false if at end
+                        if (!reachedParametricPathEnd) {
+                            reachedParametricPathEnd = true;
+                            reachedParametricPathEndTime = System.currentTimeMillis();
+                        }
+
+                        if ((System.currentTimeMillis() - reachedParametricPathEndTime > currentPath.getPathEndTimeout()) || (poseUpdater.getVelocity().getMagnitude() < currentPath.getPathEndVelocity() && MathFunctions.distance(poseUpdater.getPose(), closestPose) < currentPath.getPathEndTranslational() && MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) < currentPath.getPathEndHeading())) {
+                            breakFollowing();
+                        }
                     }
                 }
             }
@@ -255,31 +283,42 @@ public class Follower {
             deltaPoses.add(poseUpdater.getDeltaPose());
             deltaPoses.remove(deltaPoses.get(deltaPoses.size() - 1));
 
-            averageDeltaPose = new Pose2d(0,0,0);
-            averagePreviousDeltaPose = new Pose2d(0,0,0);
-
-            for (int i = 0; i < deltaPoses.size()/2; i++) {
-                averageDeltaPose.plus(deltaPoses.get(i));
-            }
-            averageDeltaPose.div(deltaPoses.size()/2);
-
-            for (int i = deltaPoses.size()/2; i < deltaPoses.size(); i++) {
-                averagePreviousDeltaPose.plus(deltaPoses.get(i));
-            }
-            averagePreviousDeltaPose.div(deltaPoses.size()/2);
-
-            deltaDeltaPoses.add(averageDeltaPose.minus(averagePreviousDeltaPose));
-            deltaDeltaPoses.remove(deltaDeltaPoses.size() - 1);
-
-            averageDeltaDeltaPose = new Pose2d(0,0,0);
-
-            for (int i = 0; i < deltaDeltaPoses.size(); i++) {
-                averageDeltaDeltaPose.plus(deltaDeltaPoses.get(i));
-            }
-            averageDeltaDeltaPose.div(deltaDeltaPoses.size());
+            calculateAverageDeltaPoses();
 
             drivePowers = driveVectorScaler.getDrivePowers(teleOpMovementVectors[0], teleOpMovementVectors[1], teleOpMovementVectors[2], poseUpdater.getPose().getHeading());
+
+            for (int i = 0; i < motors.size(); i++) {
+                motors.get(i).setPower(drivePowers[i]);
+            }
         }
+    }
+
+    /**
+     * Calculates the average delta poses
+     */
+    public void calculateAverageDeltaPoses() {
+        averageDeltaPose = new Pose2d(0,0,0);
+        averagePreviousDeltaPose = new Pose2d(0,0,0);
+
+        for (int i = 0; i < deltaPoses.size()/2; i++) {
+            averageDeltaPose.plus(deltaPoses.get(i));
+        }
+        averageDeltaPose.div(deltaPoses.size()/2);
+
+        for (int i = deltaPoses.size()/2; i < deltaPoses.size(); i++) {
+            averagePreviousDeltaPose.plus(deltaPoses.get(i));
+        }
+        averagePreviousDeltaPose.div(deltaPoses.size()/2);
+
+        deltaDeltaPoses.add(averageDeltaPose.minus(averagePreviousDeltaPose));
+        deltaDeltaPoses.remove(deltaDeltaPoses.size() - 1);
+
+        averageDeltaDeltaPose = new Pose2d(0,0,0);
+
+        for (int i = 0; i < deltaDeltaPoses.size(); i++) {
+            averageDeltaDeltaPose.plus(deltaDeltaPoses.get(i));
+        }
+        averageDeltaDeltaPose.div(deltaDeltaPoses.size());
     }
 
     /**
@@ -308,6 +347,7 @@ public class Follower {
      * This resets the PIDFs and stops following
      */
     public void breakFollowing() {
+        holdingPosition = false;
         isBusy = false;
         reachedParametricPathEnd = false;
         recalculateZeroPowerAcceleration = false;
@@ -315,10 +355,8 @@ public class Follower {
         largeDrivePIDF.reset();
         smallHeadingPIDF.reset();
         largeHeadingPIDF.reset();
-        smallTranslationalXPIDF.reset();
-        smallTranslationalYPIDF.reset();
-        largeTranslationalXPIDF.reset();
-        largeTranslationalYPIDF.reset();
+        smallTranslationalPIDF.reset();
+        largeTranslationalPIDF.reset();
 
         for (int i = 0; i < motors.size(); i++) {
             motors.get(i).setPower(0);
@@ -495,13 +533,11 @@ public class Follower {
             momentumVector = MathFunctions.subtractVectors(momentumVector , new Vector(MathFunctions.dotProduct(momentumVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
         }
         if (MathFunctions.distance(poseUpdater.getPose(), closestPose) < translationalPIDFSwitch) {
-            smallTranslationalXPIDF.updateError(translationalVector.getXComponent());
-            smallTranslationalYPIDF.updateError(translationalVector.getYComponent());
-            translationalVector.setOrthogonalComponents(smallTranslationalXPIDF.runPIDF(), smallTranslationalYPIDF.runPIDF());
+            smallTranslationalPIDF.updateError(translationalVector.getMagnitude());
+            translationalVector.setMagnitude(smallTranslationalPIDF.runPIDF());
         } else {
-            largeTranslationalXPIDF.updateError(translationalVector.getXComponent());
-            largeTranslationalYPIDF.updateError(translationalVector.getYComponent());
-            translationalVector.setOrthogonalComponents(largeTranslationalXPIDF.runPIDF(), largeTranslationalYPIDF.runPIDF());
+            largeTranslationalPIDF.updateError(translationalVector.getMagnitude());
+            translationalVector.setMagnitude(largeTranslationalPIDF.runPIDF());
         }
 
         translationalVector = MathFunctions.subtractVectors(translationalVector, momentumVector);

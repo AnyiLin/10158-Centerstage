@@ -6,9 +6,14 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_AVOID
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_NOMINAL;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_DEGREES_TO_SERVO;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_FINE_ADJUST_LOWER_BOUND;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_FINE_ADJUST_UPPER_BOUND;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_IN_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_AVOID;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ENCODER_OUT_ANGLE;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ENCODER_SAFE_ANGLE;
@@ -36,7 +41,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_PRE
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_SERVO_TO_DEGREES;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_CLOSE_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_GOING_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_GOING_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IDLE;
@@ -46,8 +51,12 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_PRESET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WAIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_DEGREES_TO_SERVO;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_VERTICAL_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.PLANE_LAUNCHER_HOLD;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.PLANE_LAUNCHER_LAUNCH;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_INTAKE_ARM_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_ARM_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_DROP_TIME;
@@ -98,7 +107,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public PIDFController liftPIDF, extensionPIDF;
 
-    public SingleRunAction intakeArmIn, intakeArmOut, outtakeArmIn, outtakeArmOut, outtakeArmPreset, outtakeArmWait, extensionIn, extensionAvoid, liftManualControlReset, extensionManualControlReset, startTransfer, highPreset, middlePreset, lowPreset, resetPreset, intakeClawOpen, outtakeClawsClose, transferPresetHold, putOuttakeOut, outtakeClawsOpen, transferReset;
+    public SingleRunAction intakeArmOut, outtakeArmIn, outtakeArmOut, outtakeArmPreset, outtakeArmWait, liftManualControlReset, extensionManualControlReset, startTransfer, highPreset, middlePreset, lowPreset, resetPreset, intakeClawOpen, outtakeClawsClose, transferPresetHold, putOuttakeOut, outtakeClawsOpen, transferReset, intakeReset, intakeOut, innerClawToggle, outerClawToggle, intakeClawToggle;
 
     public Timer outtakeTimer, transferTimer;
 
@@ -133,7 +142,7 @@ public class TwoPersonDrive extends LinearOpMode {
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
         rightLift.setDirection(DcMotorSimple.Direction.REVERSE);
         leftExtension.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightExtension.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -176,6 +185,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
 
         follower = new Follower(hardwareMap, false);
+        follower.update();
         driveVector = new Vector();
         headingVector = new Vector();
 
@@ -187,11 +197,8 @@ public class TwoPersonDrive extends LinearOpMode {
         liftPresetTargetPosition = 0;
         extensionTargetPosition = 0;
 
-        extensionIn = new SingleRunAction(() -> setExtensionTargetPosition(0));
-        extensionAvoid = new SingleRunAction(() -> setExtensionTargetPosition(EXTENSION_AVOID_POSITION));
         liftManualControlReset = new SingleRunAction(() -> setLiftTargetPosition(liftEncoder.getCurrentPosition()));
         extensionManualControlReset = new SingleRunAction(() -> setExtensionTargetPosition(extensionEncoder.getCurrentPosition()));
-        intakeArmIn = new SingleRunAction(() -> setIntakeArmPosition(INTAKE_ARM_IN_POSITION));
         intakeArmOut = new SingleRunAction(() -> {
             setIntakeArmPosition(intakeArmOutPosition);
             intakeArmOutPosition = INTAKE_ARM_OUT_POSITION;
@@ -244,6 +251,32 @@ public class TwoPersonDrive extends LinearOpMode {
         });
         resetPreset = new SingleRunAction(() -> {
             setTransferState(TRANSFER_RESET);
+        });
+        intakeReset = new SingleRunAction(()-> {
+            setExtensionTargetPosition(0);
+            moveIntake(INTAKE_IN);
+        });
+        intakeOut = new SingleRunAction(()-> moveIntake(INTAKE_OUT));
+        innerClawToggle = new SingleRunAction(()-> {
+            if (innerOuttakeClaw.getPosition() == INNER_OUTTAKE_CLAW_CLOSED) {
+                innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_OPEN);
+            } else {
+                innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_CLOSED);
+            }
+        });
+        outerClawToggle = new SingleRunAction(()-> {
+            if (outerOuttakeClaw.getPosition() == OUTER_OUTTAKE_CLAW_CLOSED) {
+                outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+            } else {
+                outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_CLOSED);
+            }
+        });
+        intakeClawToggle = new SingleRunAction(()-> {
+            if (intakeClaw.getPosition() == INTAKE_CLAW_CLOSED) {
+                intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+            } else {
+                intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+            }
         });
 
         plane.setPosition(PLANE_LAUNCHER_HOLD);
@@ -305,26 +338,84 @@ public class TwoPersonDrive extends LinearOpMode {
     public void driverControls() {
         drive();
 
-        presetControls();
+        buttonControls();
 
         teleopLiftControlUpdate();
         teleopExtensionControlUpdate();
 
         updateServoMechanisms();
+
+        fineAdjustControls();
     }
 
     public void drive() {
-        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y, -gamepad1.right_stick_x);
+        double throttle = 0.2 + 0.8*gamepad1.right_trigger;
+
+        double strafe = 0;
+        if (gamepad1.left_bumper) {
+            strafe += 1;
+        }
+        if (gamepad1.right_bumper) {
+            strafe -= 1;
+        }
+
+        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y * throttle, strafe * throttle);
         driveVector.setMagnitude(MathFunctions.clamp(driveVector.getMagnitude(), 0, 1));
         driveVector.rotateVector(follower.getPose().getHeading());
 
-        headingVector.setComponents(-gamepad1.left_stick_x, follower.getPose().getHeading());
+        double rx = 0;
+        if (Math.abs(gamepad1.left_stick_x)>0.1) rx = -gamepad1.left_stick_x;
+        if (rx > 1-gamepad1.right_trigger*0.5) {
+            rx = 1-gamepad1.right_trigger*0.5;
+        } else if (rx < -1+gamepad1.right_trigger*0.5) {
+            rx = -1+gamepad1.right_trigger*0.5;
+        }
+        rx *= throttle;
 
-        follower.setMovementVectors(follower.getCorrectiveVector(), driveVector, headingVector);
+        headingVector.setComponents(rx, follower.getPose().getHeading());
+
+        follower.setMovementVectors(follower.getCentripetalForceCorrection(), headingVector, driveVector);
         follower.update();
     }
 
-    public void presetControls() {
+    public void buttonControls() {
+        // plane
+        if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_right || gamepad2.dpad_down) {
+            plane.setPosition(PLANE_LAUNCHER_LAUNCH);
+        }
+
+        // intake presets
+        if (gamepad1.circle || gamepad1.b) {
+            intakeReset.run();
+        } else {
+            intakeReset.reset();
+        }
+        if (gamepad1.square || gamepad1.x) {
+            intakeOut.run();
+        } else {
+            intakeOut.reset();
+        }
+
+        // intake claw controls
+        if (gamepad1.a || gamepad1.cross) {
+            intakeClawToggle.run();
+        } else {
+            intakeClawToggle.reset();
+        }
+
+        // outtake claw controls
+        if (gamepad2.left_bumper) {
+            innerClawToggle.run();
+        } else {
+            innerClawToggle.reset();
+        }
+        if (gamepad2.right_bumper) {
+            outerClawToggle.run();
+        } else {
+            outerClawToggle.reset();
+        }
+
+        // presets
         if (gamepad2.dpad_up) {
             highPreset.run();
         } else {
@@ -389,10 +480,19 @@ public class TwoPersonDrive extends LinearOpMode {
         updateOuttakeWrist();
     }
 
+    public void fineAdjustControls() {
+        fineAdjustOuttakeArm();
+        if (gamepad2.right_stick_button) {
+            fineAdjustOuttakeWrist();
+        } else {
+            fineAdjustOuttakeArm();
+        }
+    }
+
     public void fineAdjustOuttakeArm() {
         if (outtakeState == OUTTAKE_OUT) {
             if (leftOuttakeArm.getPosition() >= OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND && leftOuttakeArm.getPosition() <= OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                setOuttakeArmPosition(leftOuttakeArm.getPosition() - gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
+                setOuttakeArmPosition(leftOuttakeArm.getPosition() - gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
             } else {
                 if (leftIntakeArm.getPosition() > OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
                     setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND);
@@ -404,28 +504,28 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void fineAdjustOuttakeWrist() {
-        if (outtakeState == OUTTAKE_OUT) { // todo finish later
-            if (leftOuttakeArm.getPosition() >= OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND && leftOuttakeArm.getPosition() <= OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                setOuttakeArmPosition(leftOuttakeArm.getPosition() - gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
+        if (outtakeState == OUTTAKE_OUT) {
+            if (outtakeWristOffset >= OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND && outtakeWristOffset <= OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND) {
+                outtakeWristOffset -= gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_WRIST_DEGREES_TO_SERVO;
             } else {
-                if (leftIntakeArm.getPosition() > OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                    setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND);
-                } else if (leftOuttakeArm.getPosition() < OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND) {
-                    setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND);
+                if (outtakeWristOffset > OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND) {
+                    outtakeWristOffset = OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND;
+                } else if (outtakeWristOffset < OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND) {
+                    outtakeWristOffset = OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND;
                 }
             }
         }
     }
 
     public void fineAdjustIntakeArm() {
-        if (intakeState == INTAKE_OUT) { // todo finish later
-            if (leftOuttakeArm.getPosition() >= OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND && leftOuttakeArm.getPosition() <= OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                setOuttakeArmPosition(leftOuttakeArm.getPosition() - gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
+        if (intakeState == INTAKE_OUT) {
+            if (leftIntakeArm.getPosition() <= INTAKE_ARM_FINE_ADJUST_LOWER_BOUND && leftIntakeArm.getPosition() >= INTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
+                setIntakeArmPosition(leftIntakeArm.getPosition() + gamepad1.right_stick_y * deltaTimeSeconds * INTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND * INTAKE_ARM_DEGREES_TO_SERVO);
             } else {
-                if (leftIntakeArm.getPosition() > OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                    setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND);
-                } else if (leftOuttakeArm.getPosition() < OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND) {
-                    setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND);
+                if (leftIntakeArm.getPosition() < INTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
+                    setIntakeArmPosition(INTAKE_ARM_FINE_ADJUST_UPPER_BOUND);
+                } else if (leftOuttakeArm.getPosition() > INTAKE_ARM_FINE_ADJUST_LOWER_BOUND) {
+                    setIntakeArmPosition(INTAKE_ARM_FINE_ADJUST_LOWER_BOUND);
                 }
             }
         }
@@ -510,6 +610,7 @@ public class TwoPersonDrive extends LinearOpMode {
                     }
                     break;
                 case TRANSFER_RESET:
+                    outtakeWristOffset = 0;
                     if (outerOuttakeClaw.getPosition() == OUTER_OUTTAKE_CLAW_CLOSED || innerOuttakeClaw.getPosition() == INNER_OUTTAKE_CLAW_CLOSED) {
                         setTransferState(TRANSFER_RESET_CLAW_DROP);
                         break;
@@ -536,7 +637,6 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void resetIntakeActions() {
-        intakeArmIn.reset();
         intakeArmOut.reset();
     }
 
@@ -686,7 +786,6 @@ public class TwoPersonDrive extends LinearOpMode {
         updateOuttake();
     }
 
-    // todo dont allow for fine adjust movement control in teleop until the arm is out
     public void updateOuttake() {
         if (!(outtakeState == OUTTAKE_WAIT || outtakeState == OUTTAKE_IDLE)) {
             switch (outtakeArmTargetState) {
@@ -694,12 +793,13 @@ public class TwoPersonDrive extends LinearOpMode {
                     switch (outtakeState) {
                         case OUTTAKE_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
                             if (extensionState == EXTENSION_AVOID)
                                 setExtensionState(EXTENSION_AVOID_RESET);
                             break;
                         case OUTTAKE_PRESET:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
                                 setIntakeState(INTAKE_AVOID);
@@ -709,7 +809,7 @@ public class TwoPersonDrive extends LinearOpMode {
                             }
                             break;
                         case OUTTAKE_OUT:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
                                 setIntakeState(INTAKE_AVOID);
@@ -720,6 +820,7 @@ public class TwoPersonDrive extends LinearOpMode {
                             break;
                         case OUTTAKE_GOING_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakeArmIn.run();
                             if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
                                 setOuttakeState(OUTTAKE_IN);
@@ -727,7 +828,7 @@ public class TwoPersonDrive extends LinearOpMode {
                             break;
                         case OUTTAKE_GOING_OUT:
                         case OUTTAKE_MOVING_OUTSIDE:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
                             setOuttakeState(OUTTAKE_GOING_IN);
                             break;
@@ -737,6 +838,7 @@ public class TwoPersonDrive extends LinearOpMode {
                     switch (outtakeState) {
                         case OUTTAKE_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
                             if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
                                 setIntakeState(INTAKE_AVOID);
@@ -746,25 +848,26 @@ public class TwoPersonDrive extends LinearOpMode {
                             }
                             break;
                         case OUTTAKE_PRESET:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             outtakeMovementTime = OUTTAKE_ARM_OUT_PRESET_TIME;
                             setOuttakeState(OUTTAKE_MOVING_OUTSIDE);
                             break;
                         case OUTTAKE_OUT:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             if (extensionState == EXTENSION_AVOID)
                                 setExtensionState(EXTENSION_AVOID_RESET);
                             break;
                         case OUTTAKE_GOING_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
                             setOuttakeState(OUTTAKE_GOING_OUT);
                             break;
                         case OUTTAKE_GOING_OUT:
                         case OUTTAKE_MOVING_OUTSIDE:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakeArmOut.run();
                             if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
                                 setOuttakeState(OUTTAKE_OUT);
@@ -776,6 +879,7 @@ public class TwoPersonDrive extends LinearOpMode {
                     switch (outtakeState) {
                         case OUTTAKE_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
                             if ((intakeState == INTAKE_IN || intakeState == INTAKE_GOING_IN || intakeState == INTAKE_GOING_OUT) && (extensionTargetPosition < EXTENSION_AVOID_POSITION)) {
                                 setIntakeState(INTAKE_AVOID);
@@ -785,25 +889,26 @@ public class TwoPersonDrive extends LinearOpMode {
                             }
                             break;
                         case OUTTAKE_PRESET:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             if (extensionState == EXTENSION_AVOID)
                                 setExtensionState(EXTENSION_AVOID_RESET);
                             break;
                         case OUTTAKE_OUT:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakePreviousStaticPosition = OUTTAKE_ARM_PRESET_HOLD_POSITION;
                             outtakeMovementTime = OUTTAKE_ARM_OUT_PRESET_TIME;
                             setOuttakeState(OUTTAKE_MOVING_OUTSIDE);
                             break;
                         case OUTTAKE_GOING_IN:
                             setOuttakeWristDirection(0);
+                            outtakeWristOffset = 0;
                             outtakeMovementTime = OUTTAKE_ARM_OUT_IN_TIME;
                             setOuttakeState(OUTTAKE_GOING_OUT);
                             break;
                         case OUTTAKE_GOING_OUT:
                         case OUTTAKE_MOVING_OUTSIDE:
-                            setOuttakeWristDirection(120);
+                            setOuttakeWristDirection(-120);
                             outtakeArmPreset.run();
                             if (outtakeTimer.getElapsedTime() > outtakeMovementTime) {
                                 setOuttakeState(OUTTAKE_PRESET);
@@ -872,7 +977,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public double getIntakeArmPosition() {
         return intakeArmInput.getVoltage() / 3.3 * 360;
-    }
+    }// TODO: ask mason or veer on discord about analog input device stuff
 
     /**
      * This returns if the intake arm has reached a position where it can safely fold under the
@@ -913,7 +1018,7 @@ public class TwoPersonDrive extends LinearOpMode {
      * Updates the wrist's position so it keeps its angle as the outtake arm moves
      */
     public void updateOuttakeWrist() {
-        double position = outtakeWristDirection * OUTTAKE_WRIST_DEGREES_TO_SERVO + OUTTAKE_WRIST_VERTICAL_OFFSET + (OUTTAKE_ARM_IN_POSITION - leftOuttakeArm.getPosition()) * OUTTAKE_ARM_SERVO_TO_DEGREES * OUTTAKE_WRIST_DEGREES_TO_SERVO;
+        double position = (outtakeWristDirection + outtakeWristOffset) * OUTTAKE_WRIST_DEGREES_TO_SERVO + OUTTAKE_WRIST_VERTICAL_OFFSET + (OUTTAKE_ARM_IN_POSITION - leftOuttakeArm.getPosition()) * OUTTAKE_ARM_SERVO_TO_DEGREES * OUTTAKE_WRIST_DEGREES_TO_SERVO;
         if (outtakeWrist.getPosition() != position) outtakeWrist.setPosition(position);
     }
 
