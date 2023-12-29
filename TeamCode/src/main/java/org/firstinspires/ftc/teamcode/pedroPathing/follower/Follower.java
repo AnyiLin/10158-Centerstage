@@ -54,7 +54,7 @@ public class Follower {
 
     private boolean followingPathChain, holdingPosition, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
 
-    private double previousTangentVelocity;
+    private double previousTangentVelocity, previousSmallTranslationalIntegral, previousLargeTranslationalIntegral;
 
     private ArrayList<Double> empiricalZeroPowerAccelerations = new ArrayList<>();
 
@@ -70,11 +70,15 @@ public class Follower {
     private Pose2d averageDeltaPose, averagePreviousDeltaPose, averageDeltaDeltaPose;
 
     private PIDFController smallTranslationalPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients),
+            smallTranslationalIntegral = new PIDFController(FollowerConstants.smallTranslationalIntegral),
             largeTranslationalPIDF = new PIDFController(FollowerConstants.largeTranslationalPIDFCoefficients),
+            largeTranslationalIntegral = new PIDFController(FollowerConstants.largeTranslationalIntegral),
             smallHeadingPIDF = new PIDFController(FollowerConstants.smallHeadingPIDFCoefficients),
             largeHeadingPIDF = new PIDFController(FollowerConstants.largeHeadingPIDFCoefficients),
             smallDrivePIDF = new PIDFController(FollowerConstants.smallDrivePIDFCoefficients),
             largeDrivePIDF = new PIDFController(FollowerConstants.largeDrivePIDFCoefficients);
+
+    private Vector smallTranslationalIntegralVector, largeTranslationalIntegralVector;
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
@@ -356,7 +360,13 @@ public class Follower {
         smallHeadingPIDF.reset();
         largeHeadingPIDF.reset();
         smallTranslationalPIDF.reset();
+        smallTranslationalIntegral.reset();
+        smallTranslationalIntegralVector = new Vector();
+        previousSmallTranslationalIntegral = 0;
         largeTranslationalPIDF.reset();
+        largeTranslationalIntegral.reset();
+        largeTranslationalIntegralVector = new Vector();
+        previousLargeTranslationalIntegral = 0;
 
         for (int i = 0; i < motors.size(); i++) {
             motors.get(i).setPower(0);
@@ -528,16 +538,28 @@ public class Follower {
         double x = closestPose.getX() - poseUpdater.getPose().getX();
         double y = closestPose.getY() - poseUpdater.getPose().getY();
         translationalVector.setOrthogonalComponents(x, y);
+
         if (!(currentPath.isAtParametricEnd() || currentPath.isAtParametricStart())) {
             translationalVector = MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
             momentumVector = MathFunctions.subtractVectors(momentumVector , new Vector(MathFunctions.dotProduct(momentumVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
         }
+
         if (MathFunctions.distance(poseUpdater.getPose(), closestPose) < translationalPIDFSwitch) {
+            smallTranslationalIntegral.updateError(translationalVector.getMagnitude());
+            MathFunctions.addVectors(smallTranslationalIntegralVector, new Vector(smallTranslationalIntegral.runPIDF() - previousSmallTranslationalIntegral, translationalVector.getTheta()));
+            previousSmallTranslationalIntegral = smallTranslationalIntegral.runPIDF();
+
             smallTranslationalPIDF.updateError(translationalVector.getMagnitude());
             translationalVector.setMagnitude(smallTranslationalPIDF.runPIDF());
+            translationalVector = MathFunctions.addVectors(translationalVector, smallTranslationalIntegralVector);
         } else {
+            largeTranslationalIntegral.updateError(translationalVector.getMagnitude());
+            MathFunctions.addVectors(largeTranslationalIntegralVector, new Vector(largeTranslationalIntegral.runPIDF() - previousLargeTranslationalIntegral, translationalVector.getTheta()));
+            previousLargeTranslationalIntegral = largeTranslationalIntegral.runPIDF();
+
             largeTranslationalPIDF.updateError(translationalVector.getMagnitude());
             translationalVector.setMagnitude(largeTranslationalPIDF.runPIDF());
+            translationalVector = MathFunctions.addVectors(translationalVector, largeTranslationalIntegralVector);
         }
 
         translationalVector = MathFunctions.subtractVectors(translationalVector, momentumVector);

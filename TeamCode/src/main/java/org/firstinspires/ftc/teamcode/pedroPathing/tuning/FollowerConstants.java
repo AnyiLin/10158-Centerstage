@@ -38,15 +38,29 @@ public class FollowerConstants {
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
             0.3,
+            0,
+            0,
+            0);
+
+    // Small translational Integral value
+    public static CustomPIDFCoefficients smallTranslationalIntegral = new CustomPIDFCoefficients(
+            0,
             0.8,
             0,
             0);
 
     public static double translationalPIDFSwitch = 3;
 
-    // Small translational PIDF coefficients
+    // Large translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
             0.6,
+            0,
+            0,
+            0);
+
+    // Large translational Integral
+    public static CustomPIDFCoefficients largeTranslationalIntegral = new CustomPIDFCoefficients(
+            0,
             0,
             0,
             0);

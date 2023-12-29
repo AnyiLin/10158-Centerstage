@@ -243,4 +243,27 @@ public class MathFunctions {
     public static double crossProduct(Vector one, Vector two) {
         return one.getXComponent()*two.getYComponent() - one.getYComponent()*two.getXComponent();
     }
+
+    /**
+     * This returns whether one is within two by plus/minus accuracy amount.
+     *
+     * @param one first number
+     * @param two second number
+     * @param accuracy how close is acceptable
+     * @return returns if one is close enough to two
+     */
+    public static boolean roughlyEquals(double one, double two, double accuracy) {
+        return (one < two + accuracy && one > two - accuracy);
+    }
+
+    /**
+     * This returns whether one is within two by plus/minus 0.0001.
+     *
+     * @param one first number
+     * @param two second number
+     * @return returns if one is within plus/minus 0.0001 of two
+     */
+    public static boolean roughlyEquals(double one, double two) {
+        return roughlyEquals(one, two, 0.0001);
+    }
 }

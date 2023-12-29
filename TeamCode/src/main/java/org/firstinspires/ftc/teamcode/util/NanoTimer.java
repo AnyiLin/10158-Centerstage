@@ -15,7 +15,7 @@ public class NanoTimer {
         return System.nanoTime() - startTime;
     }
 
-    public long getElapsedTimeSeconds() {
-        return (long)(getElapsedTime() / Math.pow(10.0,9));
+    public double getElapsedTimeSeconds() {
+        return (getElapsedTime() / Math.pow(10.0,9));
     }
 }

@@ -15,7 +15,7 @@ public class Timer {
         return System.currentTimeMillis() - startTime;
     }
 
-    public long getElapsedTimeSeconds() {
-        return (long)(getElapsedTime() / 1000.0);
+    public double getElapsedTimeSeconds() {
+        return (getElapsedTime() / 1000.0);
     }
 }
