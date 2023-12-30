@@ -34,6 +34,9 @@ public class RobotConstants {
     // a small buffer on the extension avoid position to make it work better
     EXTENSION_AVOID_POSITION_BUFFER = 10,
 
+    // a the maximum activation range of the extension reset
+    EXTENSION_ZERO_RESET_LIMIT = 20,
+
     // the speed at which the extension target position is manually adjusted in ticks per second
     EXTENSION_MANUAL_ADJUST_SPEED = 200,
 
@@ -196,7 +199,10 @@ public class RobotConstants {
     OUTTAKE_CLAW_DROP_TIME = 200,
 
     // the time it takes for the pixels to fall through the transfer
-    TRANSFER_DROP_TIME = 300; // TODO: find this later
+    TRANSFER_DROP_TIME = 300, // TODO: find this later
+
+    // the time allowed for the backwards running of the motors during extension zero reset
+    EXTENSION_ZERO_RESET_TIME = 500;
 
     public static CustomPIDFCoefficients
 

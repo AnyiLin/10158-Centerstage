@@ -9,7 +9,9 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_MAX_P
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_NOMINAL;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_TRANSFER_UPPER_LIMIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_ZERO_RESET;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_ZERO_RESET_LIMIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_ZERO_RESET_READY;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.EXTENSION_ZERO_RESET_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_DEGREES_TO_SERVO;
@@ -109,7 +111,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public PIDFController liftPIDF, extensionPIDF;
 
-    public SingleRunAction intakeArmOut, intakeArmIn, outtakeArmIn, outtakeArmOut, outtakeArmWait, liftManualControlReset, extensionManualControlReset, extensionManualControlSafety, startTransfer, highPreset, middlePreset, lowPreset, resetPreset, intakeClawOpen, innerOuttakeClawClose, outerOuttakeClawClose, transferPresetHold, putOuttakeOut, outtakeClawsOpen, transferReset, intakeReset, intakeOut, innerClawToggle, outerClawToggle, intakeClawToggle;
+    public SingleRunAction intakeArmOut, intakeArmIn, outtakeArmIn, outtakeArmOut, outtakeArmWait, liftManualControlReset, extensionAvoid, startTransfer, highPreset, middlePreset, lowPreset, resetPreset, intakeClawOpen, innerOuttakeClawClose, outerOuttakeClawClose, transferPresetHold, putOuttakeOut, outtakeClawsOpen, transferReset, intakeReset, intakeOut, innerClawToggle, outerClawToggle, intakeClawToggle;
 
     public Timer outtakeTimer, transferTimer, extensionResetTimer;
 
@@ -199,9 +201,7 @@ public class TwoPersonDrive extends LinearOpMode {
         extensionTargetPosition = 0;
 
         liftManualControlReset = new SingleRunAction(() -> setLiftTargetPosition(liftEncoder.getCurrentPosition()));
-        extensionManualControlReset = new SingleRunAction(() -> setExtensionTargetPosition(extensionEncoder.getCurrentPosition()));
-        extensionManualControlSafety = new SingleRunAction(() -> {
-            setExtensionState(EXTENSION_NOMINAL);
+        extensionAvoid = new SingleRunAction(() -> {
             setExtensionTargetPosition(EXTENSION_AVOID_POSITION + EXTENSION_AVOID_POSITION_BUFFER);
         });
         intakeArmOut = new SingleRunAction(() -> {
@@ -300,7 +300,7 @@ public class TwoPersonDrive extends LinearOpMode {
         intakeArmTargetPosition = leftIntakeArm.getPosition();
         outtakePreviousStaticPosition = OUTTAKE_ARM_IN_POSITION;
         intakeArmOutPosition = INTAKE_ARM_OUT_POSITION;
-        extensionState = EXTENSION_NOMINAL;
+        extensionState = EXTENSION_ZERO_RESET_READY;
         transferState = TRANSFER_IDLE;
 
         setEncoderMotors();
@@ -371,7 +371,8 @@ public class TwoPersonDrive extends LinearOpMode {
         buttonControls();
 
         teleopLiftControlUpdate();
-        teleopExtensionControlUpdate();
+
+        updateExtension();
 
         updateServoMechanisms();
 
@@ -479,17 +480,8 @@ public class TwoPersonDrive extends LinearOpMode {
         }
     }
 
-    public void teleopExtensionControlUpdate() {
-        if (intakeState != INTAKE_AVOID) {
-            extensionManualControlSafety.reset();
-        }
-        if ((gamepad1.left_trigger > 0 || (gamepad1.triangle || gamepad1.y) || (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0))) {
-            if (extensionState == EXTENSION_ZERO_RESET) setExtensionState(EXTENSION_ZERO_RESET_READY);
-
-            if (extensionEncoder.getCurrentPosition() < EXTENSION_AVOID_POSITION && intakeState == INTAKE_AVOID) {
-                extensionManualControlSafety.run();
-                return;
-            }
+    public void extensionMovementUpdate() {
+        if (extensionManualControlsActive()) {
             if (!(gamepad1.left_trigger > 0 || (gamepad1.triangle || gamepad1.y))) {
                 // yoyi controls
                 extensionTargetPosition += (gamepad2.right_trigger - gamepad2.left_trigger) * deltaTimeSeconds * EXTENSION_MANUAL_ADJUST_SPEED;
@@ -505,14 +497,18 @@ public class TwoPersonDrive extends LinearOpMode {
                     if (extensionEncoder.getCurrentPosition() < EXTENSION_MAX_POSITION) {
                         leftExtension.setPower(gamepad1.left_trigger);
                         rightExtension.setPower(gamepad1.left_trigger);
-                        extensionManualControlReset.reset();
+                        extensionTargetPosition = extensionEncoder.getCurrentPosition();
                     }
                 }
             }
-        } else {
-            extensionManualControlReset.run();
+        }
+        else {
             updateExtensionPIDF();
         }
+    }
+
+    public boolean extensionManualControlsActive() {
+        return gamepad1.left_trigger > 0 || (gamepad1.triangle || gamepad1.y) || (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0);
     }
 
     public void updateServoMechanisms() {
@@ -615,7 +611,7 @@ public class TwoPersonDrive extends LinearOpMode {
                         break;
                     }
                     startTransfer.run();
-                    if (intakeState == INTAKE_IN && outtakeState == OUTTAKE_IN && (extensionState == EXTENSION_NOMINAL || extensionState == EXTENSION_ZERO_RESET) && extensionEncoder.getCurrentPosition() < EXTENSION_TRANSFER_UPPER_LIMIT && liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
+                    if (intakeState == INTAKE_IN && outtakeState == OUTTAKE_IN && (extensionState == EXTENSION_NOMINAL || extensionState == EXTENSION_ZERO_RESET || extensionState == EXTENSION_ZERO_RESET_READY) && extensionEncoder.getCurrentPosition() < EXTENSION_TRANSFER_UPPER_LIMIT && liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
                         setTransferState(TRANSFER_TRANSFERRING);
                     }
                     break;
@@ -921,7 +917,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public void updateAllSlides() {
         updateLift();
-        updateExtensionPIDF();
+        updateExtension();
     }
 
     public void updateLift() {
@@ -931,20 +927,41 @@ public class TwoPersonDrive extends LinearOpMode {
         rightLift.setPower(liftPower);
     }
 
-    // todo make the extension function as a state machine entirely and move the call to the teleop update here
-    // do i need to move the teleop update method in here? perhaps just make a new method that calls both in order
-    // todo also make it so that there is a separate mode that is functionally the same as nominal except when it gets the chance it does a reset, then switches to nominal afterwards.
-
     public void updateExtension() {
-        teleopExtensionControlUpdate();
         switch (extensionState) {
             case EXTENSION_NOMINAL:
+                extensionMovementUpdate();
                 break;
-            case EXTENSION_ZERO_RESET_READY: // todo rework
+            case EXTENSION_ZERO_RESET_READY:
+                if (extensionEncoder.getCurrentPosition() < EXTENSION_ZERO_RESET_LIMIT) {
+                    setExtensionState(EXTENSION_ZERO_RESET);
+                    break;
+                }
+                extensionMovementUpdate();
                 break;
             case EXTENSION_ZERO_RESET:
+                if (transferTimer.getElapsedTime() > EXTENSION_ZERO_RESET_TIME) {
+                    extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    setExtensionState(EXTENSION_NOMINAL);
+                    break;
+                }
+                if (extensionManualControlsActive()) {
+                    setExtensionState(EXTENSION_ZERO_RESET_READY);
+                    break;
+                }
                 break;
             case EXTENSION_AVOID:
+                if (extensionTargetPosition < EXTENSION_AVOID_POSITION) {
+                    extensionAvoid.run();
+                    break;
+                } else {
+                    extensionAvoid.reset();
+                }
+                if (extensionEncoder.getCurrentPosition() >= EXTENSION_AVOID_POSITION) {
+                    extensionMovementUpdate();
+                    break;
+                }
                 break;
         }
     }
@@ -974,14 +991,11 @@ public class TwoPersonDrive extends LinearOpMode {
         updateExtensionPIDF();
     }
 
-    // TODO: add some sort of reset zero for the extension
     public void setExtensionState(int state) {
         switch (state) {
+            case EXTENSION_ZERO_RESET_READY:
             case EXTENSION_NOMINAL:
                 extensionState = state;
-                updateExtensionPIDF();
-                break;
-            case EXTENSION_ZERO_RESET_READY: // todo rework
                 break;
             case EXTENSION_ZERO_RESET:
                 extensionResetTimer.resetTimer();
@@ -993,10 +1007,16 @@ public class TwoPersonDrive extends LinearOpMode {
                 setExtensionTargetPosition(EXTENSION_AVOID_POSITION + EXTENSION_AVOID_POSITION_BUFFER);
                 break;
             case EXTENSION_AVOID_RESET:
-                extensionState = EXTENSION_NOMINAL;
-                setExtensionTargetPosition(0);
+                extensionState = EXTENSION_ZERO_RESET_READY;
+                if (extensionTargetPosition == EXTENSION_AVOID_POSITION + EXTENSION_AVOID_POSITION_BUFFER) setExtensionTargetPosition(0);
                 break;
         }
+        resetExtensionActions();
+        updateExtension();
+    }
+
+    public void resetExtensionActions() {
+        extensionAvoid.reset();
     }
 
     public void setIntakeArmPosition(double position) {
