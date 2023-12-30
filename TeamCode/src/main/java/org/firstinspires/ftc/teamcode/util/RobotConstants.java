@@ -90,7 +90,7 @@ public class RobotConstants {
     public static double
 
     // how offset the right intake arm is from the left
-    RIGHT_INTAKE_ARM_OFFSET = 0,
+    RIGHT_INTAKE_ARM_OFFSET = 0.003,
 
     // position for the intake arm being in the robot
     INTAKE_ARM_IN_POSITION = 0.79, // TODO: SET LATER
@@ -160,13 +160,13 @@ public class RobotConstants {
     OUTER_OUTTAKE_CLAW_OPEN = 0.45,
 
     // closed position of the outer scoring claw
-    OUTER_OUTTAKE_CLAW_CLOSED = 0,
+    OUTER_OUTTAKE_CLAW_CLOSED = 0.27,
 
     // open position of the inner scoring claw
     INNER_OUTTAKE_CLAW_OPEN = 0.4,
 
     // closed position of the inner scoring claw
-    INNER_OUTTAKE_CLAW_CLOSED = 1,
+    INNER_OUTTAKE_CLAW_CLOSED = 0.57,
 
     // open position of the intake claw
     INTAKE_CLAW_OPEN = 0.76,

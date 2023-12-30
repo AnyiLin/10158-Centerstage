@@ -86,9 +86,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.util.NanoTimer;
 import org.firstinspires.ftc.teamcode.util.PIDFController;
 import org.firstinspires.ftc.teamcode.util.SingleRunAction;
@@ -102,10 +100,6 @@ public class TwoPersonDrive extends LinearOpMode {
     public Servo leftIntakeArm, rightIntakeArm, intakeClaw, leftOuttakeArm, rightOuttakeArm, outtakeWrist, outerOuttakeClaw, innerOuttakeClaw, plane;
 
     public AnalogInput intakeArmInput;
-
-    public Follower follower;
-
-    public Vector driveVector, headingVector;
 
     public Telemetry telemetryA;
 
@@ -184,13 +178,8 @@ public class TwoPersonDrive extends LinearOpMode {
 
         outtakeTimer = new Timer();
         transferTimer = new Timer();
+        extensionResetTimer = new Timer();
         frameTimer = new NanoTimer();
-
-
-        follower = new Follower(hardwareMap, false);
-        follower.update();
-        driveVector = new Vector();
-        headingVector = new Vector();
 
 
         liftPIDF = new PIDFController(liftPIDFCoefficients);
@@ -341,6 +330,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
         frameTimer.resetTimer();
 
+
         while (opModeIsActive()) {
             updateFrameTime();
 
@@ -353,6 +343,7 @@ public class TwoPersonDrive extends LinearOpMode {
     public void telemetry() {
         telemetryA.addData("Intake State", intakeState);
         telemetryA.addData("Outtake State", outtakeState);
+        telemetryA.addData("Extension State", extensionState);
         telemetryA.addData("Transfer State", transferState);
         telemetryA.addData("Lift Position", liftEncoder.getCurrentPosition());
         telemetryA.addData("Lift Target Position", liftTargetPosition);
@@ -362,6 +353,8 @@ public class TwoPersonDrive extends LinearOpMode {
         telemetryA.addData("Extension Current", extensionEncoder.getCurrent(CurrentUnit.MILLIAMPS));
         telemetryA.addData("Outtake Wrist Offset", outtakeWristOffset);
         telemetryA.addData("Intake Arm Position", leftIntakeArm.getPosition());
+        telemetryA.addData("Intake Arm PWM Status", leftIntakeArm.getController().getPwmStatus());
+        telemetryA.addData("Intake Arm Connection Info", leftIntakeArm.getConnectionInfo());
         telemetryA.update();
     }
 
@@ -380,33 +373,32 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void drive() {
-        double throttle = 0.2 + 0.8*gamepad1.right_trigger;
+        double throttle = 0.4 + 0.6*gamepad1.right_trigger;
 
-        double strafe = 0;
+
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+
+        double x = 0; // this is strafing
         if (gamepad1.left_bumper) {
-            strafe += 1;
+            x -= 1;
         }
         if (gamepad1.right_bumper) {
-            strafe -= 1;
+            x += 1;
         }
-
-        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y * throttle, strafe * throttle);
-        driveVector.setMagnitude(MathFunctions.clamp(driveVector.getMagnitude(), 0, 1));
-        driveVector.rotateVector(follower.getPose().getHeading());
 
         double rx = 0;
-        if (Math.abs(gamepad1.left_stick_x)>0.1) rx = -gamepad1.left_stick_x;
-        if (rx > 1-gamepad1.right_trigger*0.5) {
-            rx = 1-gamepad1.right_trigger*0.5;
-        } else if (rx < -1+gamepad1.right_trigger*0.5) {
-            rx = -1+gamepad1.right_trigger*0.5;
-        }
-        rx *= throttle;
+        if (Math.abs(gamepad1.left_stick_x)>0.1) rx = gamepad1.left_stick_x * throttle;
 
-        headingVector.setComponents(rx, follower.getPose().getHeading());
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftRearPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightRearPower = (y + x - rx) / denominator;
 
-        follower.setMovementVectors(follower.getCentripetalForceCorrection(), headingVector, driveVector);
-        follower.update();
+        leftFront.setPower(leftFrontPower);
+        leftRear.setPower(leftRearPower);
+        rightFront.setPower(rightFrontPower);
+        rightRear.setPower(rightRearPower);
     }
 
     public void buttonControls() {
@@ -941,8 +933,13 @@ public class TwoPersonDrive extends LinearOpMode {
                 break;
             case EXTENSION_ZERO_RESET:
                 if (transferTimer.getElapsedTime() > EXTENSION_ZERO_RESET_TIME) {
+                    leftExtension.setPower(0.01);
+                    rightExtension.setPower(0.01);
+                }
+                if (transferTimer.getElapsedTime() > EXTENSION_ZERO_RESET_TIME+200) {
                     extensionEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     extensionEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    extensionTargetPosition = 0;
                     setExtensionState(EXTENSION_NOMINAL);
                     break;
                 }
@@ -974,6 +971,7 @@ public class TwoPersonDrive extends LinearOpMode {
         } else {
             extensionPIDF.updateError(error);
             double extensionPower = extensionPIDF.runPIDF();
+            if (extensionEncoder.getCurrent(CurrentUnit.MILLIAMPS) > 3000) extensionPower /= 2;
             leftExtension.setPower(extensionPower);
             rightExtension.setPower(extensionPower);
         }
@@ -998,6 +996,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 extensionState = state;
                 break;
             case EXTENSION_ZERO_RESET:
+                extensionState = state;
                 extensionResetTimer.resetTimer();
                 leftExtension.setPower(-1);
                 rightExtension.setPower(-1);

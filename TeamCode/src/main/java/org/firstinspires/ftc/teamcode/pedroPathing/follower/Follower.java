@@ -542,11 +542,14 @@ public class Follower {
         if (!(currentPath.isAtParametricEnd() || currentPath.isAtParametricStart())) {
             translationalVector = MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
             momentumVector = MathFunctions.subtractVectors(momentumVector , new Vector(MathFunctions.dotProduct(momentumVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
+
+            smallTranslationalIntegralVector = MathFunctions.subtractVectors(smallTranslationalIntegralVector, new Vector(MathFunctions.dotProduct(smallTranslationalIntegralVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
+            largeTranslationalIntegralVector = MathFunctions.subtractVectors(largeTranslationalIntegralVector, new Vector(MathFunctions.dotProduct(largeTranslationalIntegralVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
         }
 
         if (MathFunctions.distance(poseUpdater.getPose(), closestPose) < translationalPIDFSwitch) {
             smallTranslationalIntegral.updateError(translationalVector.getMagnitude());
-            MathFunctions.addVectors(smallTranslationalIntegralVector, new Vector(smallTranslationalIntegral.runPIDF() - previousSmallTranslationalIntegral, translationalVector.getTheta()));
+            smallTranslationalIntegralVector = MathFunctions.addVectors(smallTranslationalIntegralVector, new Vector(smallTranslationalIntegral.runPIDF() - previousSmallTranslationalIntegral, translationalVector.getTheta()));
             previousSmallTranslationalIntegral = smallTranslationalIntegral.runPIDF();
 
             smallTranslationalPIDF.updateError(translationalVector.getMagnitude());
@@ -554,7 +557,7 @@ public class Follower {
             translationalVector = MathFunctions.addVectors(translationalVector, smallTranslationalIntegralVector);
         } else {
             largeTranslationalIntegral.updateError(translationalVector.getMagnitude());
-            MathFunctions.addVectors(largeTranslationalIntegralVector, new Vector(largeTranslationalIntegral.runPIDF() - previousLargeTranslationalIntegral, translationalVector.getTheta()));
+            largeTranslationalIntegralVector = MathFunctions.addVectors(largeTranslationalIntegralVector, new Vector(largeTranslationalIntegral.runPIDF() - previousLargeTranslationalIntegral, translationalVector.getTheta()));
             previousLargeTranslationalIntegral = largeTranslationalIntegral.runPIDF();
 
             largeTranslationalPIDF.updateError(translationalVector.getMagnitude());

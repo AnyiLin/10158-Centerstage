@@ -21,7 +21,7 @@ public class FollowerConstants {
 
     // Large heading error PIDF coefficients
     public static CustomPIDFCoefficients largeHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            3,
+            6,
             0,
             0,
             0);
@@ -30,14 +30,14 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            4,
-            8.5,
-            0.15,
+            5,
+            20,
+            0.2,
             0);
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.3,
+            0.6,
             0,
             0,
             0);
@@ -53,7 +53,7 @@ public class FollowerConstants {
 
     // Large translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.6,
+            1,
             0,
             0,
             0);
@@ -67,16 +67,16 @@ public class FollowerConstants {
 
     // Small drive PIDF coefficients
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.15,
+            0.2,
             0,
             0,
             0);
 
-    public static double drivePIDFSwitch = 0.5;
+    public static double drivePIDFSwitch = 3;
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.07,
+            0.1,
             0,
             0,
             0);
@@ -85,10 +85,10 @@ public class FollowerConstants {
     public static double centrifugalScaling = 1.5;
 
     // Angular momentum (roughly) to heading scaling
-    public static double angularMomentumScaling = 0.0075;
+    public static double angularMomentumScaling = 0;
 
     // Linear momentum to translational scaling
-    public static double linearMomentumScaling = 0.01;
+    public static double linearMomentumScaling = 0.005;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
