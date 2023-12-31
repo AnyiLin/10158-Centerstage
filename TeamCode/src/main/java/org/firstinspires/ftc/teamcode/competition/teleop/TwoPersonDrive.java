@@ -332,9 +332,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            updateFrameTime();
-
-            driverControls();
+            driverControlUpdate();
 
             telemetry();
         }
@@ -358,7 +356,9 @@ public class TwoPersonDrive extends LinearOpMode {
         telemetryA.update();
     }
 
-    public void driverControls() {
+    public void driverControlUpdate() {
+        updateFrameTime();
+
         drive();
 
         buttonControls();
@@ -370,6 +370,16 @@ public class TwoPersonDrive extends LinearOpMode {
         updateServoMechanisms();
 
         fineAdjustControls();
+    }
+
+    public void autonomousControlUpdate() {
+        updateFrameTime();
+
+        updateLift();
+
+        updateExtension();
+
+        updateServoMechanisms();
     }
 
     public void drive() {

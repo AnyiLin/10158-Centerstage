@@ -178,7 +178,10 @@ public class RobotConstants {
     PLANE_LAUNCHER_LAUNCH = 0,
 
     // plane launcher hold position
-    PLANE_LAUNCHER_HOLD = 0.2;
+    PLANE_LAUNCHER_HOLD = 0.2,
+
+    // the length from the middle of the robot to the back
+    ROBOT_BACK_LENGTH = 9;
 
     /**
      * These are all in milliseconds!
