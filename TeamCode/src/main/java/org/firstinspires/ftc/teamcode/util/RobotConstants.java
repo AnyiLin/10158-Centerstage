@@ -8,7 +8,7 @@ public class RobotConstants {
     public static int
 
     // max extension of the scoring slides
-    LIFT_MAX_POSITION = 2000, // TODO: check this later
+    LIFT_MAX_POSITION = 2700, // TODO: check this later
 
     // the upper limit of the lift encoder to start transferring
     LIFT_TRANSFER_UPPER_LIMIT = 20, // TODO: set this later
@@ -17,13 +17,13 @@ public class RobotConstants {
     EXTENSION_TRANSFER_UPPER_LIMIT = 10, // TODO: set this later
 
     // max extension of the scoring slides
-    LIFT_LOW_PRESET_POSITION = 500, // TODO: set this later
+    LIFT_LOW_PRESET_POSITION = 850, // TODO: set this later
 
     // max extension of the scoring slides
-    LIFT_MIDDLE_PRESET_POSITION = 1000, // TODO: set this later
+    LIFT_MIDDLE_PRESET_POSITION = 1400, // TODO: set this later
 
     // max extension of the scoring slides
-    LIFT_HIGH_PRESET_POSITION = 1600, // TODO: set this later
+    LIFT_HIGH_PRESET_POSITION = 2400, // TODO: set this later
 
     // max extension of the extension slides
     EXTENSION_MAX_POSITION = 1600, // TODO: check this later
@@ -90,10 +90,10 @@ public class RobotConstants {
     public static double
 
     // how offset the right intake arm is from the left
-    RIGHT_INTAKE_ARM_OFFSET = 0.003,
+    RIGHT_INTAKE_ARM_OFFSET = 0,
 
     // position for the intake arm being in the robot
-    INTAKE_ARM_IN_POSITION = 0.79, // TODO: SET LATER
+    INTAKE_ARM_IN_POSITION = 0.794, // TODO: SET LATER
 
     // position for the intake arm being out of the robot at ground level
     INTAKE_ARM_OUT_POSITION = 0.165,
@@ -118,7 +118,7 @@ public class RobotConstants {
     OUTTAKE_ARM_IN_POSITION = 0.9,
 
     // position for the outtake arm being out of the robot
-    OUTTAKE_ARM_OUT_POSITION = 0.25,
+    OUTTAKE_ARM_OUT_POSITION = 0.38,
 
     // upper bound for outtake arm fine adjustment
     OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5,
@@ -181,7 +181,7 @@ public class RobotConstants {
     PLANE_LAUNCHER_HOLD = 0.2,
 
     // the length from the middle of the robot to the back
-    ROBOT_BACK_LENGTH = 9;
+    ROBOT_BACK_LENGTH = 15;
 
     /**
      * These are all in milliseconds!

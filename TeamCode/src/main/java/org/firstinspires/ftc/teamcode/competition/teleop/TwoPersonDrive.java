@@ -83,6 +83,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -102,6 +103,8 @@ public class TwoPersonDrive extends LinearOpMode {
     public AnalogInput intakeArmInput;
 
     public Telemetry telemetryA;
+
+    public VoltageSensor controlHubVoltageSensor;
 
     public PIDFController liftPIDF, extensionPIDF;
 
@@ -293,6 +296,8 @@ public class TwoPersonDrive extends LinearOpMode {
         transferState = TRANSFER_IDLE;
 
         setEncoderMotors();
+
+        controlHubVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
     }
 
     public void setEncoderMotors() {
@@ -329,6 +334,8 @@ public class TwoPersonDrive extends LinearOpMode {
         initialize();
 
         frameTimer.resetTimer();
+        leftIntakeArm.getController().pwmEnable();
+        rightIntakeArm.getController().pwmEnable();
 
 
         while (opModeIsActive()) {
@@ -386,7 +393,7 @@ public class TwoPersonDrive extends LinearOpMode {
         double throttle = 0.4 + 0.6*gamepad1.right_trigger;
 
 
-        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double y = -gamepad1.left_stick_y * throttle; // Remember, this is reversed!
 
         double x = 0; // this is strafing
         if (gamepad1.left_bumper) {
@@ -395,11 +402,17 @@ public class TwoPersonDrive extends LinearOpMode {
         if (gamepad1.right_bumper) {
             x += 1;
         }
+        x *= throttle;
 
         double rx = 0;
         if (Math.abs(gamepad1.left_stick_x)>0.1) rx = gamepad1.left_stick_x * throttle;
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        if (controlHubVoltageSensor.getVoltage() < 8.5) {
+            denominator *= 2;
+        }
+
         double leftFrontPower = (y + x + rx) / denominator;
         double leftRearPower = (y - x + rx) / denominator;
         double rightFrontPower = (y - x - rx) / denominator;
@@ -510,7 +523,7 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public boolean extensionManualControlsActive() {
-        return gamepad1.left_trigger > 0 || (gamepad1.triangle || gamepad1.y) || (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0);
+        return (!autonomous) && (gamepad1.left_trigger > 0 || (gamepad1.triangle || gamepad1.y) || (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0));
     }
 
     public void updateServoMechanisms() {
@@ -532,7 +545,7 @@ public class TwoPersonDrive extends LinearOpMode {
     public void fineAdjustOuttakeArm() {
         if (outtakeState == OUTTAKE_OUT) {
             if (leftOuttakeArm.getPosition() >= OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND && leftOuttakeArm.getPosition() <= OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
-                setOuttakeArmPosition(leftOuttakeArm.getPosition() - gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
+                setOuttakeArmPosition(leftOuttakeArm.getPosition() + gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND * OUTTAKE_ARM_DEGREES_TO_SERVO);
             } else {
                 if (leftOuttakeArm.getPosition() > OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND) {
                     setOuttakeArmPosition(OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND);
@@ -708,8 +721,12 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void moveToCustomIntakeOutPosition(double position) {
-        intakeArmOutPosition = position;
-        moveIntake(INTAKE_OUT);
+        if (intakeState == INTAKE_OUT) {
+            setIntakeArmPosition(position);
+        } else {
+            intakeArmOutPosition = position;
+            moveIntake(INTAKE_OUT);
+        }
     }
 
     public void setIntakeState(int state) {
@@ -719,6 +736,7 @@ public class TwoPersonDrive extends LinearOpMode {
             case INTAKE_AVOID:
             case INTAKE_GOING_IN:
             case INTAKE_GOING_OUT:
+            //case INTAKE_MOVING_OUT:
             case INTAKE_IDLE:
                 intakeState = state;
                 resetIntakeActions();

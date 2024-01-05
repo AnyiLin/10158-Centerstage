@@ -21,7 +21,7 @@ public class FollowerConstants {
 
     // Large heading error PIDF coefficients
     public static CustomPIDFCoefficients largeHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            6,
+            4,
             0,
             0,
             0);
@@ -30,9 +30,9 @@ public class FollowerConstants {
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            5,
-            20,
-            0.2,
+            6,
+            4,
+            0.3,
             0);
 
     // Small translational PIDF coefficients

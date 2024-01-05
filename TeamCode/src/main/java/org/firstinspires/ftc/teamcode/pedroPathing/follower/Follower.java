@@ -54,7 +54,7 @@ public class Follower {
 
     private boolean followingPathChain, holdingPosition, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
 
-    private double previousTangentVelocity, previousSmallTranslationalIntegral, previousLargeTranslationalIntegral;
+    private double maxPower = 1, previousTangentVelocity, previousSmallTranslationalIntegral, previousLargeTranslationalIntegral;
 
     private ArrayList<Double> empiricalZeroPowerAccelerations = new ArrayList<>();
 
@@ -139,6 +139,24 @@ public class Follower {
             deltaDeltaPoses.add(new Pose2d(0,0,0));
         }
         calculateAverageDeltaPoses();
+    }
+
+    /**
+     * Sets the maximum power the motors are allowed to use
+     */
+    public void setMaxPower(double set) {
+        maxPower = MathFunctions.clamp(set, 0, 1);
+    }
+
+    /**
+     * Limits the powers of the drive power array to the max power
+     */
+    public void limitDrivePowers() {
+        for (int i = 0; i < drivePowers.length; i++) {
+            if (Math.abs(drivePowers[i]) > maxPower) {
+                drivePowers[i] = maxPower * MathFunctions.getSign(drivePowers[i]);
+            }
+        }
     }
 
     /**
@@ -242,6 +260,8 @@ public class Follower {
 
                 drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
 
+                limitDrivePowers();
+
                 for (int i = 0; i < motors.size(); i++) {
                     motors.get(i).setPower(drivePowers[i]);
                 }
@@ -252,6 +272,8 @@ public class Follower {
                     if (followingPathChain) updateCallbacks();
 
                     drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
+
+                    limitDrivePowers();
 
                     for (int i = 0; i < motors.size(); i++) {
                         motors.get(i).setPower(drivePowers[i]);
@@ -290,6 +312,8 @@ public class Follower {
             calculateAverageDeltaPoses();
 
             drivePowers = driveVectorScaler.getDrivePowers(teleOpMovementVectors[0], teleOpMovementVectors[1], teleOpMovementVectors[2], poseUpdater.getPose().getHeading());
+
+            limitDrivePowers();
 
             for (int i = 0; i < motors.size(); i++) {
                 motors.get(i).setPower(drivePowers[i]);
@@ -450,7 +474,7 @@ public class Follower {
     /**
      * This returns the velocity the robot needs to be at to make it to the end of the trajectory
      *
-     * @return returns the projected distance
+     * @return returns the projected velocity
      */
     public double getDriveVelocityGoal() {
         double distanceToGoal;
