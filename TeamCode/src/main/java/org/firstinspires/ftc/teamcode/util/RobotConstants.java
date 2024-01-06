@@ -82,6 +82,7 @@ public class RobotConstants {
     TRANSFER_GRAB = 24,
     EXTENSION_ZERO_RESET = 25,
     EXTENSION_ZERO_RESET_READY = 26;
+    //INTAKE_OUT_ADJUSTING = 27;
 
 
     /**
@@ -96,7 +97,7 @@ public class RobotConstants {
     INTAKE_ARM_IN_POSITION = 0.794, // TODO: SET LATER
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.165,
+    INTAKE_ARM_OUT_POSITION = 0.153,
 
     // position for the intake arm being at the top of a pixel stack
     INTAKE_ARM_STACK_TOP_POSITION = 0.191,
@@ -108,11 +109,14 @@ public class RobotConstants {
     INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5, // TODO: SET LATER
 
     // lower bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.165, // TODO: SET LATER
+    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.153, // TODO: SET LATER
+
+    // reference for the vertical position of the intake arm
+    INTAKE_ARM_VERTICAL_POSITION = 0.55, // TODO: SET LATER
 
 
     // how offset the right outtake arm is from the left
-    RIGHT_OUTTAKE_ARM_OFFSET = -0.025,
+    RIGHT_OUTTAKE_ARM_OFFSET = -0.019,
 
     // position for the outtake arm being in the robot
     OUTTAKE_ARM_IN_POSITION = 0.9,
@@ -172,16 +176,16 @@ public class RobotConstants {
     INTAKE_CLAW_OPEN = 0.76,
 
     // closed position of the intake claw
-    INTAKE_CLAW_CLOSED = 0.5,
+    INTAKE_CLAW_CLOSED = 0.58,
 
     // plane launcher launch position
-    PLANE_LAUNCHER_LAUNCH = 0,
+    PLANE_LAUNCHER_LAUNCH = 0.5,
 
     // plane launcher hold position
-    PLANE_LAUNCHER_HOLD = 0.2,
+    PLANE_LAUNCHER_HOLD = 0.23,
 
     // the length from the middle of the robot to the back
-    ROBOT_BACK_LENGTH = 15;
+    ROBOT_BACK_LENGTH = 14;
 
     /**
      * These are all in milliseconds!
@@ -211,7 +215,7 @@ public class RobotConstants {
 
     // lift PIDF coefficients
     liftPIDFCoefficients = new CustomPIDFCoefficients(
-            0.011,
+            0.01,
             0,
             0.0001,
             0),

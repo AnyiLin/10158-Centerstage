@@ -70,6 +70,7 @@ import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.TOP_LINE_POS
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -82,6 +83,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.util.OldRobotConstants;
 
+@Disabled
 @TeleOp(name = "Old Two Person Drive", group = "Not Comp Drive")
 public class OldTwoPersonDrive extends LinearOpMode {
 
