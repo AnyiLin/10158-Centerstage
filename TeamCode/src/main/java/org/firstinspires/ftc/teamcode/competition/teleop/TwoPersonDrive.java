@@ -256,10 +256,13 @@ public class TwoPersonDrive extends LinearOpMode {
             moveIntake(INTAKE_IN);
         });
         intakeOut = new SingleRunAction(()-> {
+            /*
             intakeArmOutPosition = INTAKE_ARM_OUT_POSITION;
             intakeArmTargetPosition = INTAKE_ARM_OUT_POSITION;
-            setIntakeArmInterpolation(INTAKE_ARM_OUT_POSITION);
             moveIntake(INTAKE_OUT);
+             */
+            // todo see if this works
+            moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_POSITION);
         });
         innerClawToggle = new SingleRunAction(()-> {
             if (MathFunctions.roughlyEquals(innerOuttakeClaw.getPosition(), INNER_OUTTAKE_CLAW_CLOSED)) {
@@ -341,6 +344,10 @@ public class TwoPersonDrive extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
+        work();
+    }
+
+    public void work() {
         while (!isStarted() && !isStopRequested()) {
         }
 
@@ -454,12 +461,12 @@ public class TwoPersonDrive extends LinearOpMode {
         } else {
             intakeOut.reset();
         }
-        if (gamepad1.left_stick_button) {
+        if (gamepad1.right_stick_button) {
             intakeArmMoveUpOnePixel.run();
         } else {
             intakeArmMoveUpOnePixel.reset();
         }
-        if (gamepad1.right_stick_button) {
+        if (gamepad1.left_stick_button) {
             intakeArmMoveDownOnePixel.run();
         } else {
             intakeArmMoveDownOnePixel.reset();
@@ -1109,7 +1116,7 @@ public class TwoPersonDrive extends LinearOpMode {
     }
 
     public void setOuttakeArmPosition(double position) {
-        if (MathFunctions.roughlyEquals(leftOuttakeArm.getPosition(), position)) {
+        if (!MathFunctions.roughlyEquals(leftOuttakeArm.getPosition(), position)) {
             leftOuttakeArm.setPosition(position);
             rightOuttakeArm.setPosition(1 - position + RIGHT_OUTTAKE_ARM_OFFSET);
             updateOuttakeWrist();

@@ -97,7 +97,7 @@ public class RobotConstants {
     INTAKE_ARM_IN_POSITION = 0.794, // TODO: SET LATER
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.153,
+    INTAKE_ARM_OUT_POSITION = 0.156,
 
     // position for the intake arm being at the top of a pixel stack
     INTAKE_ARM_STACK_TOP_POSITION = 0.191,
@@ -109,10 +109,13 @@ public class RobotConstants {
     INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5, // TODO: SET LATER
 
     // lower bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.153, // TODO: SET LATER
+    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.1569, // TODO: SET LATER
 
     // reference for the vertical position of the intake arm
-    INTAKE_ARM_VERTICAL_POSITION = 0.55, // TODO: SET LATER
+    INTAKE_ARM_VERTICAL_POSITION = 0.537, // TODO: SET LATER
+
+    // a position where the arm doesn't hit the beacon or the stage door
+    INTAKE_ARM_OUT_AUTO_AVOID_POSITION = 0.23,
 
 
     // how offset the right outtake arm is from the left
@@ -185,7 +188,7 @@ public class RobotConstants {
     PLANE_LAUNCHER_HOLD = 0.23,
 
     // the length from the middle of the robot to the back
-    ROBOT_BACK_LENGTH = 14;
+    ROBOT_BACK_LENGTH = 12;
 
     /**
      * These are all in milliseconds!

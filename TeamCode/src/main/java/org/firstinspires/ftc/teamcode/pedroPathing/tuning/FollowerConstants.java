@@ -82,7 +82,7 @@ public class FollowerConstants {
             0);
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 1.5;
+    public static double centrifugalScaling = 10;
 
     // Angular momentum (roughly) to heading scaling
     public static double angularMomentumScaling = 0;
@@ -123,7 +123,7 @@ public class FollowerConstants {
     // When the path is considered at its end parametrically, then the follower has this many
     // seconds to further correct by default.
     // This can be custom set for each path
-    public static double pathEndTimeout = 1;
+    public static double pathEndTimeout = 1.5;
 
     // When the drive power vector is less than this in magnitude, then
     public static double recalculateZeroPowerAccelerationLimit = 0.001;
