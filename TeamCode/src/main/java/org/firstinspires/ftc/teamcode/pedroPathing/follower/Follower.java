@@ -493,11 +493,11 @@ public class Follower {
         } else {
             Vector offset = new Vector();
             offset.setOrthogonalComponents(getPose().getX() - currentPath.getLastControlPoint().getX(), getPose().getY() - currentPath.getLastControlPoint().getY());
-            distanceToGoal = -MathFunctions.dotProduct(currentPath.getEndTangent(), offset);
+            distanceToGoal = MathFunctions.dotProduct(currentPath.getEndTangent(), offset);
         }
 
         Vector distanceToGoalVector = MathFunctions.scalarMultiplyVector(MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector()), distanceToGoal);
-        Vector velocity = new Vector(MathFunctions.dotProduct(getVelocity(), currentPath.getClosestPointTangentVector()), currentPath.getClosestPointTangentVector().getTheta());
+        Vector velocity = new Vector(MathFunctions.dotProduct(getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta());
         Vector forwardHeadingVector = new Vector(1.0, poseUpdater.getPose().getHeading());
         double forwardVelocity = MathFunctions.dotProduct(forwardHeadingVector, velocity);
         double forwardDistanceToGoal = MathFunctions.dotProduct(forwardHeadingVector, distanceToGoalVector);

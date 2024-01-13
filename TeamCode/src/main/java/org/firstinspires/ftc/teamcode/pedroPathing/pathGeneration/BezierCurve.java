@@ -14,7 +14,7 @@ public class BezierCurve {
 
     private Vector endTangent = new Vector();
 
-    private final int APPROXIMATION_STEPS = 5000;
+    private final int APPROXIMATION_STEPS = 1000;
 
     private double UNIT_TO_TIME, length, zeroPowerAcceleration = FollowerConstants.curvedZeroPowerAcceleration;
 
@@ -106,6 +106,7 @@ public class BezierCurve {
         for (int i = 1; i <= APPROXIMATION_STEPS; i++) {
             currentPoint = getPoint(i/(double)APPROXIMATION_STEPS);
             approxLength += previousPoint.distanceFrom(currentPoint);
+            previousPoint = currentPoint;
         }
         return approxLength;
     }

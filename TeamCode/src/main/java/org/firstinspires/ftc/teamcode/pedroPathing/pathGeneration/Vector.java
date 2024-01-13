@@ -31,11 +31,10 @@ public class Vector {
      * @param theta sets the theta value of this vector
      */
     public void setComponents(double magnitude, double theta) {
-        double pi = Math.PI;
         double[] orthogonalComponents;
         if (magnitude<0) {
             this.magnitude = -magnitude;
-            this.theta = MathFunctions.normalizeAngle(theta+pi);
+            this.theta = MathFunctions.normalizeAngle(theta+Math.PI);
         } else {
             this.magnitude = magnitude;
             this.theta = MathFunctions.normalizeAngle(theta);

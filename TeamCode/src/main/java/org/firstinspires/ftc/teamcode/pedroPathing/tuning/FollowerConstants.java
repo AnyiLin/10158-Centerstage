@@ -75,22 +75,22 @@ public class FollowerConstants {
 
     // Small drive PIDF coefficients
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.2,
+            0.06,
             0,
-            0,
+            0.0001,
             0);
 
     public static double drivePIDFSwitch = 3;
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.04,
             0,
-            0,
+            0.0001,
             0);
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 25;
+    public static double centrifugalScaling = 0.0015;
 
     // Angular momentum (roughly) to heading scaling
     public static double angularMomentumScaling = 0;
