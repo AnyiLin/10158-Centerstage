@@ -95,15 +95,20 @@ public class Point {
      * @return this returns an array of doubles of length 2 with the r and theta values in that order in it
      */
     public static double[] cartesianToPolar(double x, double y) {
-        if (x < 0) return new double[] {x*x+y*y, Math.PI+Math.atan(y/x)};
         if (x == 0) {
             if (y > 0) {
-                return new double[] {y*y, Math.PI/2};
+                return new double[] {y, Math.PI/2};
             } else {
-                return new double[] {y*y, -Math.PI/2};
+                return new double[] {-y, (3 * Math.PI) / 2};
             }
         }
-        return new double[] {x*x+y*y, Math.atan(y/x)};
+        double r = Math.sqrt(x*x+y*y);
+        if (x < 0) return new double[] {r, Math.PI+Math.atan(y/x)};
+        if (y > 0) {
+            return new double[]{r, Math.atan(y / x)};
+        } else {
+            return new double[]{r, (2*Math.PI) + Math.atan(y / x)};
+        }
     }
 
     /**

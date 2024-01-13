@@ -14,7 +14,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private int middleTotal, rightTotal;
 
-    private int rightLeftBound, rightTopBound, middleLeftBound, middleTopBound;
+    private int rightLeftBound, rightRightBound, rightTopBound, middleLeftBound, middleRightBound, middleTopBound;
 
     private int minDetected;
 
@@ -36,10 +36,12 @@ public class TeamPropPipeline extends OpenCvPipeline {
         WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
-        rightLeftBound = 470;
-        rightTopBound = 225;
-        middleLeftBound = 160;
-        middleTopBound = 220;
+        rightLeftBound = 210;
+        rightRightBound = 255;
+        rightTopBound = 360;
+        middleLeftBound = 235;
+        middleRightBound = 280;
+        middleTopBound = 85;
         minDetected = 40000;
     }
 
@@ -77,7 +79,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
         //middle column
         middleTotal = 0;
         for (int counter = middleTopBound; counter < middleTopBound + HEIGHT; counter+=3) {
-            for (int counter2 = middleLeftBound; counter2 < middleLeftBound + WIDTH; counter2+=2) {
+            for (int counter2 = middleLeftBound; counter2 < middleRightBound; counter2+=2) {
                 if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
                     middleTotal += (output.get(counter, counter2)[COLOR]);
 
@@ -89,7 +91,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
         //right column
         rightTotal = 0;
         for (int counter = rightTopBound; counter < rightTopBound + HEIGHT; counter+=3) {
-            for (int counter2 = rightLeftBound; counter2 < rightLeftBound + WIDTH; counter2+=2) {
+            for (int counter2 = rightLeftBound; counter2 < rightRightBound; counter2+=2) {
                 if (!(hsv.get(counter, counter2)[1] < GRAY_ERROR)) {
                     rightTotal += (output.get(counter, counter2)[COLOR]);
                     if (draw)
@@ -99,15 +101,17 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
             }
         }
-        if (middleTotal > minDetected || rightTotal > minDetected){
-            if (rightTotal == Math.max(rightTotal, middleTotal)) navigation = "right";
-            if (middleTotal == Math.max(rightTotal, middleTotal)) navigation = "middle";
-        } else {
-            navigation = "left";
-        }/*
+            if (middleTotal > minDetected || rightTotal > minDetected) {
+                if (rightTotal == Math.max(rightTotal, middleTotal)) navigation = "right";
+                if (middleTotal == Math.max(rightTotal, middleTotal)) navigation = "middle";
+            } else {
+                navigation = "left";
+            }
+        /*
         if (leftTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "left";
         if (middleTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "middle";
         if (rightTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "right";*/
+
 
         if (draw) writeOnScreen();
 

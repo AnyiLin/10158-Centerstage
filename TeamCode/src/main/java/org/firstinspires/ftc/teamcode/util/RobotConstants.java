@@ -13,9 +13,6 @@ public class RobotConstants {
     // the upper limit of the lift encoder to start transferring
     LIFT_TRANSFER_UPPER_LIMIT = 20, // TODO: set this later
 
-    // the upper limit of the lift encoder to start transferring
-    EXTENSION_TRANSFER_UPPER_LIMIT = 10, // TODO: set this later
-
     // max extension of the scoring slides
     LIFT_LOW_PRESET_POSITION = 850, // TODO: set this later
 
@@ -24,21 +21,6 @@ public class RobotConstants {
 
     // max extension of the scoring slides
     LIFT_HIGH_PRESET_POSITION = 2400, // TODO: set this later
-
-    // max extension of the extension slides
-    EXTENSION_MAX_POSITION = 1600, // TODO: check this later
-
-    // position the extension slides extend to to avoid the outtake coming back in
-    EXTENSION_AVOID_POSITION = 130, // TODO: set this later
-
-    // a small buffer on the extension avoid position to make it work better
-    EXTENSION_AVOID_POSITION_BUFFER = 10,
-
-    // a the maximum activation range of the extension reset
-    EXTENSION_ZERO_RESET_LIMIT = 20,
-
-    // the speed at which the extension target position is manually adjusted in ticks per second
-    EXTENSION_MANUAL_ADJUST_SPEED = 200,
 
     // outtake arm fine adjust speed in degrees per second
     OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND = 120,
@@ -50,39 +32,27 @@ public class RobotConstants {
     OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND = 60,
 
     // intake arm speed for preset movements in degrees per second
-    INTAKE_ARM_PRESET_SPEED = 180;
+    INTAKE_ARM_PRESET_SPEED = 300;
 
 
     public static final int
     // states for mechanisms
     INTAKE_IN = 0,
-    INTAKE_GOING_OUT = 1,
-    INTAKE_OUT = 2,
-    INTAKE_GOING_IN = 3,
-    OUTTAKE_IN = 4,
-    OUTTAKE_GOING_OUT = 5,
-    OUTTAKE_OUT = 6,
-    OUTTAKE_GOING_IN = 7,
-    INTAKE_AVOID = 8,
-    //OUTTAKE_PRESET = 9,
-    OUTTAKE_WAIT = 10,
-    EXTENSION_NOMINAL = 11,
-    EXTENSION_AVOID = 12,
-    EXTENSION_AVOID_RESET = 13,
-    //OUTTAKE_MOVING_OUTSIDE = 14,
-    INTAKE_IDLE = 15,
-    OUTTAKE_IDLE = 16,
-    TRANSFER_IDLE = 17,
-    TRANSFER_POSITIONING = 18,
-    TRANSFER_TRANSFERRING = 19,
-    TRANSFER_PRESET_HOLD = 20,
-    TRANSFER_OUT = 21,
-    TRANSFER_RESET = 22,
-    TRANSFER_RESET_CLAW_DROP = 23,
-    TRANSFER_GRAB = 24,
-    EXTENSION_ZERO_RESET = 25,
-    EXTENSION_ZERO_RESET_READY = 26;
-    //INTAKE_OUT_ADJUSTING = 27;
+    INTAKE_OUT = 1,
+    OUTTAKE_IN = 2,
+    OUTTAKE_GOING_OUT = 3,
+    OUTTAKE_OUT = 4,
+    OUTTAKE_GOING_IN = 5,
+    INTAKE_AVOID = 6,
+    OUTTAKE_WAIT = 7,
+    TRANSFER_IDLE = 8,
+    TRANSFER_POSITIONING = 9,
+    TRANSFER_DROPPING = 10,
+    TRANSFER_PRESET_HOLD = 11,
+    TRANSFER_OUT = 12,
+    TRANSFER_RESET = 13,
+    TRANSFER_RESET_CLAW_DROP = 14,
+    TRANSFER_GRAB = 15;
 
 
     /**
@@ -94,28 +64,28 @@ public class RobotConstants {
     RIGHT_INTAKE_ARM_OFFSET = 0,
 
     // position for the intake arm being in the robot
-    INTAKE_ARM_IN_POSITION = 0.794, // TODO: SET LATER
+    INTAKE_ARM_IN_POSITION = 0.7, // TODO: SET LATER
+
+    // position for the intake arm to avoid the outtake arm
+    INTAKE_ARM_AVOID_POSITION = 0.6, // todo set this
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.156,
+    INTAKE_ARM_OUT_POSITION = 0.185,
 
     // position for the intake arm being at the top of a pixel stack
-    INTAKE_ARM_STACK_TOP_POSITION = 0.191,
+    INTAKE_ARM_STACK_TOP_POSITION = 0.237,
 
     // position for the intake arm being at the middle of a pixel stack
-    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.173,
+    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.204,
 
     // upper bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5, // TODO: SET LATER
+    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5,
 
     // lower bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.1569, // TODO: SET LATER
+    INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = INTAKE_ARM_OUT_POSITION,
 
     // reference for the vertical position of the intake arm
-    INTAKE_ARM_VERTICAL_POSITION = 0.537, // TODO: SET LATER
-
-    // a position where the arm doesn't hit the beacon or the stage door
-    INTAKE_ARM_OUT_AUTO_AVOID_POSITION = 0.23,
+    INTAKE_ARM_VERTICAL_POSITION = 0.55, // TODO: SET LATER
 
 
     // how offset the right outtake arm is from the left
@@ -125,7 +95,7 @@ public class RobotConstants {
     OUTTAKE_ARM_IN_POSITION = 0.9,
 
     // position for the outtake arm being out of the robot
-    OUTTAKE_ARM_OUT_POSITION = 0.38,
+    OUTTAKE_ARM_OUT_POSITION = 0.2835,
 
     // upper bound for outtake arm fine adjustment
     OUTTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.5,
@@ -160,7 +130,7 @@ public class RobotConstants {
     OUTTAKE_ARM_DEGREES_TO_SERVO = 1.0/270,
 
     // conversion factor of degrees to servo position units for the outtake wrist
-    OUTTAKE_WRIST_DEGREES_TO_SERVO = 1.0/180,
+    OUTTAKE_WRIST_DEGREES_TO_SERVO = 1.0/355,
 
 
     // open position of the outer scoring claw
@@ -170,7 +140,7 @@ public class RobotConstants {
     OUTER_OUTTAKE_CLAW_CLOSED = 0.27,
 
     // open position of the inner scoring claw
-    INNER_OUTTAKE_CLAW_OPEN = 0.4,
+    INNER_OUTTAKE_CLAW_OPEN = 0.41,
 
     // closed position of the inner scoring claw
     INNER_OUTTAKE_CLAW_CLOSED = 0.57,
@@ -178,17 +148,26 @@ public class RobotConstants {
     // open position of the intake claw
     INTAKE_CLAW_OPEN = 0.76,
 
+    // open position of the intake claw used for the transfer
+    INTAKE_CLAW_TRANSFER_OPEN = 0.62, // todo test later
+
     // closed position of the intake claw
     INTAKE_CLAW_CLOSED = 0.58,
 
     // plane launcher launch position
     PLANE_LAUNCHER_LAUNCH = 0.5,
 
+    // up position for the gate
+    GATE_UP = 0.5, // todo set this later
+
+    // down position for the gate
+    GATE_DOWN = 0.5, // todo set this later
+
     // plane launcher hold position
     PLANE_LAUNCHER_HOLD = 0.23,
 
     // the length from the middle of the robot to the back
-    ROBOT_BACK_LENGTH = 12;
+    ROBOT_BACK_LENGTH = 10.5;
 
     /**
      * These are all in milliseconds!
@@ -202,33 +181,27 @@ public class RobotConstants {
     // roughly the time it takes for our outtake claws to close
     OUTTAKE_CLAW_CLOSE_TIME = 250,
 
+    // roughly the time it takes for our intake claw to close
+    INTAKE_CLAW_CLOSE_TIME = 250,
+
     // the delay between the inner outtake claw closing and the outer outtake claw closing on transfer
-    OUTER_OUTTAKE_CLAW_TRANSFER_DELAY = 50,
+    OUTER_OUTTAKE_CLAW_TRANSFER_DELAY = 35,
+
+    // the delay after putting the intake arm in to transfer
+    INTAKE_ARM_IN_TRANSFER_WAIT = 250,
 
     // roughly the time it takes for our outtake claws to drop something
     OUTTAKE_CLAW_DROP_TIME = 200,
 
     // the time it takes for the pixels to fall through the transfer
-    TRANSFER_DROP_TIME = 300, // TODO: find this later
-
-    // the time allowed for the backwards running of the motors during extension zero reset
-    EXTENSION_ZERO_RESET_TIME = 500;
+    TRANSFER_DROP_TIME = 300; // TODO: find this later
 
     public static CustomPIDFCoefficients
 
     // lift PIDF coefficients
     liftPIDFCoefficients = new CustomPIDFCoefficients(
-            0.01,
+            0.01 ,
             0,
-            0.0001,
-            0),
-
-    // extension PIDF coefficients
-    extensionPIDFCoefficients = new CustomPIDFCoefficients(
-            0.01,
-            0.01,
-            0.001,
+            -0.000001,
             0);
-
-
 }

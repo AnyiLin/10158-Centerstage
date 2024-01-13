@@ -20,20 +20,24 @@ import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous (name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
-public class ForwardVelocityTuner extends OpMode {
-    private ArrayList<Double> velocities = new ArrayList<Double>();
+@Autonomous (name = "Lateral Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
+public class LateralZeroPowerAccelerationTuner extends OpMode {
+    private ArrayList<Double> accelerations = new ArrayList<Double>();
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftExtension, rightExtension;
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
     private List<DcMotorEx> motors;
 
     private PoseUpdater poseUpdater;
 
-    public static double DISTANCE = 40, RECORD_NUMBER = 10;
+    public static double VELOCITY = 10;
+
+    private double previousVelocity;
+
+    private long previousTimeNano;
 
     private Telemetry telemetryA;
 
-    private boolean end;
+    private boolean stopping, end;
 
     @Override
     public void init() {
@@ -59,16 +63,11 @@ public class ForwardVelocityTuner extends OpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         }
 
-        for (int i = 0; i < RECORD_NUMBER; i++) {
-            velocities.add(new Double(0));
-        }
-
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
-        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
+        telemetryA.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second");
+        telemetryA.addLine("Make sure you have enough room");
         telemetryA.addLine("Press cross or A to stop");
         telemetryA.update();
-
     }
 
     @Override
@@ -78,10 +77,9 @@ public class ForwardVelocityTuner extends OpMode {
     @Override
     public void start() {
         leftFront.setPower(1);
-        leftRear.setPower(1);
-        rightFront.setPower(1);
+        leftRear.setPower(-1);
+        rightFront.setPower(-1);
         rightRear.setPower(1);
-        end = false;
     }
 
     @Override
@@ -91,29 +89,34 @@ public class ForwardVelocityTuner extends OpMode {
         }
 
         poseUpdater.update();
+        Vector heading = new Vector(1.0, poseUpdater.getPose().getHeading() - Math.PI/2);
         if (!end) {
-            if (Math.abs(poseUpdater.getPose().getX()) > DISTANCE) {
-                end = true;
-                for (DcMotorEx motor : motors) {
+            if (!stopping) {
+                if (MathFunctions.dotProduct(poseUpdater.getVelocity(), heading) > VELOCITY) {
+                    previousVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), heading);
+                    previousTimeNano = System.nanoTime();
+                    stopping = true;
+                    for (DcMotorEx motor : motors) {
                         motor.setPower(0);
+                    }
                 }
             } else {
-                double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));
-                velocities.add(new Double(currentVelocity));
-                velocities.remove(0);
-                /*
+                double currentVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), heading);
+                accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))));
+                previousVelocity = currentVelocity;
+                previousTimeNano = System.nanoTime();
                 if (currentVelocity < FollowerConstants.pathEndVelocity) {
                     end = true;
-                }*/
+                }
             }
         } else {
             double average = 0;
-            for (Double velocity : velocities) {
-                average += velocity.doubleValue();
+            for (Double acceleration : accelerations) {
+                average += acceleration.doubleValue();
             }
-            average /= (double) velocities.size();
+            average /= (double)accelerations.size();
 
-            telemetryA.addData("forward velocity:", average);
+            telemetryA.addData("average acceleration:", average);
             telemetryA.update();
         }
     }

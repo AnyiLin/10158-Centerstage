@@ -12,14 +12,16 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Config
-@Autonomous (name = "Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
-public class ZeroPowerAccelerationTuner extends OpMode {
+@Autonomous (name = "Forward Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
+public class ForwardZeroPowerAccelerationTuner extends OpMode {
     private ArrayList<Double> accelerations = new ArrayList<Double>();
 
     private DcMotorEx leftFront, leftRear, rightFront, rightRear;
@@ -86,10 +88,11 @@ public class ZeroPowerAccelerationTuner extends OpMode {
         }
 
         poseUpdater.update();
+        Vector heading = new Vector(1.0, poseUpdater.getPose().getHeading());
         if (!end) {
             if (!stopping) {
-                if (poseUpdater.getVelocity().getMagnitude() > VELOCITY) {
-                    previousVelocity = poseUpdater.getVelocity().getMagnitude();
+                if (MathFunctions.dotProduct(poseUpdater.getVelocity(), heading) > VELOCITY) {
+                    previousVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), heading);
                     previousTimeNano = System.nanoTime();
                     stopping = true;
                     for (DcMotorEx motor : motors) {
@@ -97,7 +100,7 @@ public class ZeroPowerAccelerationTuner extends OpMode {
                     }
                 }
             } else {
-                double currentVelocity = poseUpdater.getVelocity().getMagnitude();
+                double currentVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), heading);
                 accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
