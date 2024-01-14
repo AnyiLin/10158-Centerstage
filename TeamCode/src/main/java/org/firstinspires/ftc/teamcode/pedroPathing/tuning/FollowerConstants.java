@@ -92,22 +92,6 @@ public class FollowerConstants {
     // Centrifugal force to power scaling
     public static double centrifugalScaling = 0.0015;
 
-    // Angular momentum (roughly) to heading scaling
-    public static double angularMomentumScaling = 0;
-
-    // Linear momentum to translational scaling
-    public static double linearMomentumScaling = 0;
-
-    // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
-    // if not negative, then the robot thinks that its going to go faster under 0 power
-    // this is for straight lines
-    public static double lineZeroPowerAcceleration = -50;
-
-    // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
-    // if not negative, then the robot thinks that its going to go faster under 0 power
-    // this is for curves
-    public static double curvedZeroPowerAcceleration = -1;
-
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power
     // this is for curves
@@ -142,7 +126,4 @@ public class FollowerConstants {
     // seconds to further correct by default.
     // This can be custom set for each path
     public static double pathEndTimeout = 1.5;
-
-    // When the drive power vector is less than this in magnitude, then
-    public static double recalculateZeroPowerAccelerationLimit = 0.001;
 }

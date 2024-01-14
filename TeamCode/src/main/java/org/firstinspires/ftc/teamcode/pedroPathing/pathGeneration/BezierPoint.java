@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
-
 import java.util.ArrayList;
 
 public class BezierPoint extends BezierCurve {
@@ -10,7 +8,7 @@ public class BezierPoint extends BezierCurve {
 
     private Vector endTangent = new Vector();
 
-    private double UNIT_TO_TIME, length, zeroPowerAcceleration = FollowerConstants.lineZeroPowerAcceleration;
+    private double UNIT_TO_TIME, length;
 
     /**
      * This creates a new BezierPoint with specified start and end points
@@ -168,15 +166,5 @@ public class BezierPoint extends BezierCurve {
     @Override
     public double UNIT_TO_TIME() {
         return 0;
-    }
-
-    /**
-     * Returns the zero power acceleration for this Bezier line
-     *
-     * @return returns the zero power acceleration for this Bezier line
-     */
-    @Override
-    public double getZeroPowerAcceleration() {
-        return zeroPowerAcceleration;
     }
 }

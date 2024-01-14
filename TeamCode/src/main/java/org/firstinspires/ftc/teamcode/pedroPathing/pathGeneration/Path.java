@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 
 import java.util.ArrayList;
@@ -354,14 +353,5 @@ public class Path {
      */
     public double getPathEndTimeout() {
         return pathEndTimeout;
-    }
-
-    /**
-     * Returns the zero power acceleration for this path
-     *
-     * @return returns the zero power acceleration for this path
-     */
-    public double getZeroPowerAcceleration() {
-        return curve.getZeroPowerAcceleration();
     }
 }

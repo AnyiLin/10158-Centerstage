@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.competition.autonomous;
+package org.firstinspires.ftc.teamcode.notcompetition.autonomous;
 
 
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_CLOSED;
@@ -41,8 +41,8 @@ import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Disabled
-@Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
-public class RedRightInnerAuto extends OpMode {
+@Autonomous(name = "Extendo Red Right Inner Auto", group = "Autonomous")
+public class ExtendoRedRightInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 

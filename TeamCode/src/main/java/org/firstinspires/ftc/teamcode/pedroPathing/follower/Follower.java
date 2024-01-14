@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.angularMomentumScaling;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.drivePIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.forwardZeroPowerAcceleration;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFSwitch;
@@ -57,13 +56,11 @@ public class Follower {
 
     private long[] pathStartTimes;
 
-    private boolean followingPathChain, holdingPosition, isBusy, auto = true, recalculateZeroPowerAcceleration, reachedParametricPathEnd;
+    private boolean followingPathChain, holdingPosition, isBusy, auto = true, reachedParametricPathEnd;
 
-    private double maxPower = 1, previousTangentVelocity, previousSmallTranslationalIntegral, previousLargeTranslationalIntegral;
+    private double maxPower = 1, previousSmallTranslationalIntegral, previousLargeTranslationalIntegral;
 
-    private ArrayList<Double> empiricalZeroPowerAccelerations = new ArrayList<>();
-
-    private long previousTangentVelocityNanoTime, reachedParametricPathEndTime;
+    private long reachedParametricPathEndTime;
 
     private double[] drivePowers;
 
@@ -217,8 +214,6 @@ public class Follower {
         currentPath = new Path(point);
         currentPath.setConstantHeadingInterpolation(heading);
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), 1);
-        empiricalZeroPowerAccelerations.clear();
-        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
     }
 
 
@@ -233,8 +228,6 @@ public class Follower {
         followingPathChain = false;
         currentPath = path;
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-        empiricalZeroPowerAccelerations.clear();
-        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
     }
 
     /**
@@ -252,8 +245,6 @@ public class Follower {
         currentPathChain = pathChain;
         currentPath = pathChain.getPath(chainIndex);
         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-        empiricalZeroPowerAccelerations.clear();
-        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
     }
 
     /**
@@ -296,8 +287,6 @@ public class Follower {
                         chainIndex++;
                         currentPath = currentPathChain.getPath(chainIndex);
                         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
-                        empiricalZeroPowerAccelerations.clear();
-                        empiricalZeroPowerAccelerations.add(currentPath.getZeroPowerAcceleration());
                     } else {
                         // At last path, run some end detection stuff
                         // set isBusy to false if at end
@@ -385,7 +374,6 @@ public class Follower {
         holdingPosition = false;
         isBusy = false;
         reachedParametricPathEnd = false;
-        recalculateZeroPowerAcceleration = false;
         smallDrivePIDF.reset();
         largeDrivePIDF.reset();
         smallHeadingPIDF.reset();
@@ -438,12 +426,6 @@ public class Follower {
             return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
 
-        if (recalculateZeroPowerAcceleration) {
-            recalculateZeroPowerAcceleration = false;
-            empiricalZeroPowerAccelerations.add((MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())) - previousTangentVelocity) / ((System.nanoTime() - previousTangentVelocityNanoTime) / Math.pow(10.0, 9)));
-            return new Vector();
-        }
-
         double driveError = getDriveVelocityError();
 
         if (Math.abs(driveError) < drivePIDFSwitch) {
@@ -466,19 +448,6 @@ public class Follower {
     // TODO: remove
     public double zxcv() {
         return getDriveVelocityError();
-    }
-
-    /**
-     * This returns the average of all the measured and initial zero power accelerations
-     *
-     * @return returns the average of the zero power accelerations
-     */
-    public double getEmpiricalZeroPowerAcceleration() {
-        double num = 0;
-        for (Double accel : empiricalZeroPowerAccelerations) {
-            num += accel;
-        }
-        return num / ((double)(empiricalZeroPowerAccelerations.size()));
     }
 
     /**
@@ -513,25 +482,6 @@ public class Follower {
     }
 
     /**
-     * This returns the distance the robot is projected to go when all power is cut from the drivetrain
-     * as a vector
-     *
-     * @return returns the projected distance vector
-     */
-    public Vector getZeroPowerDistanceVector() {
-        return new Vector(getZeroPowerDistance(), poseUpdater.getVelocity().getTheta());
-    }
-
-    /**
-     * This returns the distance the robot is projected to go when all power is cut from the drivetrain
-     *
-     * @return returns the projected distance
-     */
-    public double getZeroPowerDistance() {
-        return -Math.pow(poseUpdater.getVelocity().getMagnitude(), 2) / (2 * getEmpiricalZeroPowerAcceleration());
-    }
-
-    /**
      * This returns a Vector in the direction of the robot that contains the heading correction
      * as its magnitude
      *
@@ -541,14 +491,13 @@ public class Follower {
      */
     public Vector getHeadingVector() {
         if (!useHeading) return new Vector();
-        double angularMomentum = poseUpdater.getAngularVelocity() * FollowerConstants.mass;
         double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
         if (Math.abs(headingError) < headingPIDFSwitch) {
             smallHeadingPIDF.updateError(headingError);
-            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF() - angularMomentum * angularMomentumScaling + smallHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF() + smallHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
         }
         largeHeadingPIDF.updateError(headingError);
-        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() - angularMomentum * angularMomentumScaling + largeHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() + largeHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
     }
 
     /**
@@ -582,14 +531,12 @@ public class Follower {
     public Vector getTranslationalCorrection() {
         if (!useTranslational) return new Vector();
         Vector translationalVector = new Vector();
-        Vector momentumVector = MathFunctions.scalarMultiplyVector(poseUpdater.getVelocity(), FollowerConstants.linearMomentumScaling * FollowerConstants.mass);
         double x = closestPose.getX() - poseUpdater.getPose().getX();
         double y = closestPose.getY() - poseUpdater.getPose().getY();
         translationalVector.setOrthogonalComponents(x, y);
 
         if (!(currentPath.isAtParametricEnd() || currentPath.isAtParametricStart())) {
             translationalVector = MathFunctions.subtractVectors(translationalVector, new Vector(MathFunctions.dotProduct(translationalVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
-            momentumVector = MathFunctions.subtractVectors(momentumVector , new Vector(MathFunctions.dotProduct(momentumVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
 
             smallTranslationalIntegralVector = MathFunctions.subtractVectors(smallTranslationalIntegralVector, new Vector(MathFunctions.dotProduct(smallTranslationalIntegralVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
             largeTranslationalIntegralVector = MathFunctions.subtractVectors(largeTranslationalIntegralVector, new Vector(MathFunctions.dotProduct(largeTranslationalIntegralVector, MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), currentPath.getClosestPointTangentVector().getTheta()));
@@ -613,7 +560,6 @@ public class Follower {
             translationalVector = MathFunctions.addVectors(translationalVector, largeTranslationalIntegralVector);
         }
 
-        translationalVector = MathFunctions.subtractVectors(translationalVector, momentumVector);
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
 
         return translationalVector;

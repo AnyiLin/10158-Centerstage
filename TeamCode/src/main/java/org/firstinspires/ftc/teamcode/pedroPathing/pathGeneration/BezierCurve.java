@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 
-import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
-
 import java.util.ArrayList;
 
 public class BezierCurve {
@@ -16,7 +14,7 @@ public class BezierCurve {
 
     private final int APPROXIMATION_STEPS = 1000;
 
-    private double UNIT_TO_TIME, length, zeroPowerAcceleration = FollowerConstants.curvedZeroPowerAcceleration;
+    private double UNIT_TO_TIME, length;
 
     /**
      * This creates an empty Bezier curve.
@@ -264,14 +262,5 @@ public class BezierCurve {
      */
     public double UNIT_TO_TIME() {
         return UNIT_TO_TIME;
-    }
-
-    /**
-     * Returns the zero power acceleration for this Bezier curve
-     *
-     * @return returns the zero power acceleration for this Bezier curve
-     */
-    public double getZeroPowerAcceleration() {
-        return zeroPowerAcceleration;
     }
 }
