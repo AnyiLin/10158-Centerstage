@@ -87,8 +87,6 @@ public class Follower {
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
-    // TODO: after lm5, use -D values in the translational pid and add a 0.1 ff value
-
     /**
      * This creates a new follower given a hardware map
      *

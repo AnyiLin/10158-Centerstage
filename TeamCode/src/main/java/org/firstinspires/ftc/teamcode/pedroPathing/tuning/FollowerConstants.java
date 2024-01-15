@@ -34,7 +34,7 @@ public class FollowerConstants {
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
             5,
             0,
-            0.1,
+            0.075,
             0);
 
     public static double smallHeadingPIDFFeedForward = 0.02;

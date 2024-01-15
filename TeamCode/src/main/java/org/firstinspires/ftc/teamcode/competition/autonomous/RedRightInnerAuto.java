@@ -108,24 +108,30 @@ public class RedRightInnerAuto extends OpMode {
         secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
 
         Path firstCycleScoreOnBackdropOne = new Path(new BezierLine(new Point(firstCycleStackPose), new Point(84, 79, Point.CARTESIAN)));
-        firstCycleScoreOnBackdropOne.setReversed(true);
+        //firstCycleScoreOnBackdropOne.setReversed(true);
+        firstCycleScoreOnBackdropOne.setConstantHeadingInterpolation(Math.PI * 1.5);
         Path firstCycleScoreOnBackdropTwo = new Path(new BezierCurve(firstCycleScoreOnBackdropOne.getLastControlPoint(), new Point(84, 107, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)));
         firstCycleScoreOnBackdropTwo.setPathEndTimeout(2.5);
-        firstCycleScoreOnBackdropTwo.setReversed(true);
+        //firstCycleScoreOnBackdropTwo.setReversed(true);
+        firstCycleScoreOnBackdropTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
 
         firstCycleScoreOnBackdrop = new PathChain(firstCycleScoreOnBackdropOne, firstCycleScoreOnBackdropTwo);
 
 
         Path secondCycleToStackOne = new Path(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(84, 107, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
+        secondCycleToStackOne.setConstantHeadingInterpolation(Math.PI * 1.5);
         Path secondCycleToStackTwo = new Path(new BezierLine(secondCycleToStackOne.getLastControlPoint(), new Point(secondCycleStackPose)));
+        secondCycleToStackTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
 
         secondCycleToStack = new PathChain(secondCycleToStackOne, secondCycleToStackTwo);
 
         Path secondCycleScoreOnBackdropOne = new Path(new BezierLine(new Point(secondCycleStackPose), new Point(84, 79, Point.CARTESIAN)));
-        secondCycleScoreOnBackdropOne.setReversed(true);
+        //secondCycleScoreOnBackdropOne.setReversed(true);
+        secondCycleScoreOnBackdropOne.setConstantHeadingInterpolation(Math.PI * 1.5);
         Path secondCycleScoreOnBackdropTwo = new Path(new BezierCurve(secondCycleScoreOnBackdropOne.getLastControlPoint(), new Point(84, 107, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)));
         secondCycleScoreOnBackdropTwo.setPathEndTimeout(2.5);
-        secondCycleScoreOnBackdropTwo.setReversed(true);
+        //secondCycleScoreOnBackdropTwo.setReversed(true);
+        secondCycleScoreOnBackdropTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
 
         secondCycleScoreOnBackdrop = new PathChain(secondCycleScoreOnBackdropOne, secondCycleScoreOnBackdropTwo);
     }
@@ -185,7 +191,9 @@ public class RedRightInnerAuto extends OpMode {
 
 
         Path firstCycleToStackOne = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(84, 107, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
+        firstCycleToStackOne.setConstantHeadingInterpolation(Math.PI * 1.5);
         Path firstCycleToStackTwo = new Path(new BezierLine(firstCycleToStackOne.getLastControlPoint(), new Point(firstCycleStackPose)));
+        firstCycleToStackTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
 
         firstCycleToStack = new PathChain(firstCycleToStackOne, firstCycleToStackTwo);
     }
@@ -283,7 +291,7 @@ public class RedRightInnerAuto extends OpMode {
                     follower.followPath(secondCycleToStack);
                     // todo remove
                     twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
-                    setPathState(12);
+                    setPathState(31);
                 }
                 break;
             case 31: // once the robot is in position, then run extension out

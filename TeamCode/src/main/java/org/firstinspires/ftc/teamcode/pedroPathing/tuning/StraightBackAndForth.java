@@ -82,6 +82,10 @@ public class StraightBackAndForth extends OpMode {
         telemetryA.addData("y", follower.getPose().getY());
         telemetryA.addData("drive error", follower.zxcv());
         telemetryA.addData("pose", follower.getClosestPose().getX() + ", " + follower.getClosestPose().getY());
+        double[] motorPowers = follower.motorPowers();
+        for (int i = 0; i < motorPowers.length; i++) {
+            telemetryA.addData("motor " + i, motorPowers[i]);
+        }
         telemetryA.update();
     }
 

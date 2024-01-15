@@ -16,7 +16,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private int rightLeftBound, rightRightBound, rightTopBound, middleLeftBound, middleRightBound, middleTopBound;
 
-    private int minDetected;
+    private int minDetected, minMultiple;
 
     private String navigation = "middle";
 
@@ -43,6 +43,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
         middleRightBound = 280;
         middleTopBound = 85;
         minDetected = 40000;
+        minMultiple = 10;
     }
 
     // color corresponds with RGB values, with 0 being red, 1 being green, and 2 being blue
@@ -101,12 +102,15 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
             }
         }
-            if (middleTotal > minDetected || rightTotal > minDetected) {
-                if (rightTotal == Math.max(rightTotal, middleTotal)) navigation = "right";
-                if (middleTotal == Math.max(rightTotal, middleTotal)) navigation = "middle";
-            } else {
-                navigation = "left";
-            }
+
+        if (middleTotal > rightTotal * minMultiple){
+            navigation = "middle";
+        } else if (rightTotal > middleTotal * minMultiple){
+            navigation = "right";
+        } else {
+            navigation = "left";
+        }
+
         /*
         if (leftTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "left";
         if (middleTotal == Math.max(leftTotal, Math.max(middleTotal, rightTotal))) navigation = "middle";
