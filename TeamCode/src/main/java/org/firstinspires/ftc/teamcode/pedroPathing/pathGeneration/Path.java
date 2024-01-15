@@ -354,4 +354,11 @@ public class Path {
     public double getPathEndTimeout() {
         return pathEndTimeout;
     }
+
+    /**
+     * This returns the path type
+     */
+    public String pathType() {
+        return curve.pathType();
+    }
 }

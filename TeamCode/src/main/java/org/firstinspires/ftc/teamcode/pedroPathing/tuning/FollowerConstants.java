@@ -75,19 +75,23 @@ public class FollowerConstants {
 
     // Small drive PIDF coefficients
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.06,
+            0.03,
             0,
-            0.0001,
+            0.0000001,
             0);
 
-    public static double drivePIDFSwitch = 3;
+    public static double smallDrivePIDFFeedForward = 0.02;
+
+    public static double drivePIDFSwitch = 10;
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.04,
+            0.025,
             0,
-            0.0001,
+            0.0003,
             0);
+
+    public static double largeDrivePIDFFeedForward = 0.02;
 
     // Centrifugal force to power scaling
     public static double centrifugalScaling = 0.0015;
@@ -101,6 +105,11 @@ public class FollowerConstants {
     // if not negative, then the robot thinks that its going to go faster under 0 power
     // this is for curves
     public static double lateralZeroPowerAcceleration = -78.15554;
+
+    // A multiplier for the zero power acceleration to increase the speed of the robot.
+    // increasing this will cause the robot to drive faster, at the risk of end of path overshoots or localization slippage
+    // decreasing this will cause the deceleration at the end of the path to be less, making the robot slower but reducing risk of end of path overshoots or localization slippage
+    public static double zeroPowerAccelerationMultiplier = 4;
 
     // When the drivetrain is at the end of its current path or path chain and the velocity goes
     // below this value, then end the path. This is in inches/second

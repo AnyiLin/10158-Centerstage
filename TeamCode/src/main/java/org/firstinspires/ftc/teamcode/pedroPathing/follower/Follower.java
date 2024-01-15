@@ -3,12 +3,15 @@ package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.drivePIDFSwitch;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.forwardZeroPowerAcceleration;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFSwitch;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.largeDrivePIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.largeHeadingPIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.largeTranslationalPIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.lateralZeroPowerAcceleration;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.smallDrivePIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.smallHeadingPIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.smallTranslationalPIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.translationalPIDFSwitch;
+import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.zeroPowerAccelerationMultiplier;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -430,19 +433,11 @@ public class Follower {
 
         if (Math.abs(driveError) < drivePIDFSwitch) {
             smallDrivePIDF.updateError(driveError);
-            /*
-            if (Math.abs(smallDrivePIDF.runPIDF()) < recalculateZeroPowerAccelerationLimit) {
-                recalculateZeroPowerAcceleration = true;
-                previousTangentVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector()));
-                previousTangentVelocityNanoTime = System.nanoTime();
-            }
-
-             */
-            return new Vector(MathFunctions.clamp(smallDrivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+            return new Vector(MathFunctions.clamp(smallDrivePIDF.runPIDF() + smallDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
         }
 
         largeDrivePIDF.updateError(driveError);
-        return new Vector(MathFunctions.clamp(largeDrivePIDF.runPIDF(), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+        return new Vector(MathFunctions.clamp(largeDrivePIDF.runPIDF() + largeDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
     }
 
     // TODO: remove
@@ -474,8 +469,8 @@ public class Follower {
         double lateralVelocity = MathFunctions.dotProduct(lateralHeadingVector, velocity);
         double lateralDistanceToGoal = MathFunctions.dotProduct(lateralHeadingVector, distanceToGoalVector);
 
-        Vector forwardVelocityError = new Vector(MathFunctions.getSign(forwardDistanceToGoal) * Math.sqrt(Math.abs(-2 * forwardZeroPowerAcceleration * forwardDistanceToGoal)) - forwardVelocity, forwardHeadingVector.getTheta());
-        Vector lateralVelocityError = new Vector(MathFunctions.getSign(lateralDistanceToGoal) * Math.sqrt(Math.abs(-2 * lateralZeroPowerAcceleration * lateralDistanceToGoal)) - lateralVelocity, lateralHeadingVector.getTheta());
+        Vector forwardVelocityError = new Vector(MathFunctions.getSign(forwardDistanceToGoal) * Math.sqrt(Math.abs(-2 * zeroPowerAccelerationMultiplier * forwardZeroPowerAcceleration * forwardDistanceToGoal)) - forwardVelocity, forwardHeadingVector.getTheta());
+        Vector lateralVelocityError = new Vector(MathFunctions.getSign(lateralDistanceToGoal) * Math.sqrt(Math.abs(-2 * zeroPowerAccelerationMultiplier * lateralZeroPowerAcceleration * lateralDistanceToGoal)) - lateralVelocity, lateralHeadingVector.getTheta());
         Vector velocityErrorVector = MathFunctions.addVectors(forwardVelocityError, lateralVelocityError);
 
         return velocityErrorVector.getMagnitude() * MathFunctions.getSign(MathFunctions.dotProduct(velocityErrorVector, currentPath.getClosestPointTangentVector()));

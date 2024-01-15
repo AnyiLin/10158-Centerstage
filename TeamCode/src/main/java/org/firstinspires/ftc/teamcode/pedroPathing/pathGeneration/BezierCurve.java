@@ -263,4 +263,13 @@ public class BezierCurve {
     public double UNIT_TO_TIME() {
         return UNIT_TO_TIME;
     }
+
+    /**
+     * Returns the type of path
+     *
+     * @return returns the type of path
+     */
+    public String pathType() {
+        return "curve";
+    }
 }

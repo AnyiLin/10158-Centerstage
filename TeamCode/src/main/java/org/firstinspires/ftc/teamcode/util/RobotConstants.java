@@ -167,7 +167,10 @@ public class RobotConstants {
     PLANE_LAUNCHER_HOLD = 0.23,
 
     // the length from the middle of the robot to the back
-    ROBOT_BACK_LENGTH = 10.5;
+    ROBOT_BACK_LENGTH = 14,
+
+    // the length from the middle of the robot to an extended intake arm
+    ROBOT_FRONT_LENGTH = 12;
 
     /**
      * These are all in milliseconds!

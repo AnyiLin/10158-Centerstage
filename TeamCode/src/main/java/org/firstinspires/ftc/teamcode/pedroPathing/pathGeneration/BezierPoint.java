@@ -167,4 +167,14 @@ public class BezierPoint extends BezierCurve {
     public double UNIT_TO_TIME() {
         return 0;
     }
+
+    /**
+     * Returns the type of path
+     *
+     * @return returns the type of path
+     */
+    @Override
+    public String pathType() {
+        return "point";
+    }
 }
