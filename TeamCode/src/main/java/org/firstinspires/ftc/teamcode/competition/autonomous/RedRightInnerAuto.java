@@ -11,21 +11,18 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPE
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MIDDLE_PRESET_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_BACK_LENGTH;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_FRONT_LENGTH;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_POSITIONING;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_RESET;
 
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -43,8 +40,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Disabled
-@Autonomous(name = "Extendo Red Right Inner Auto", group = "Autonomous")
+@Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
 public class RedRightInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
@@ -105,76 +101,11 @@ public class RedRightInnerAuto extends OpMode {
 
     private int pathState;
 
-    public void setBackdropGoalPose() {
-        switch (navigation) {
-            case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 6, redRightSideLeftSpikeMark.getY(), Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                firstCycleBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 2, redRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                secondCycleBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 2, redRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                break;
-            case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-4, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.5, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
-                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                break;
-            case "right":
-                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY(), Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 3, redRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                break;
-        }
-    }
-
-    public void buildPaths() {
-        Point scoreSpikeMarkMidPoint;
-        double scoreSpikeMarkMidToSpikeDistance;
-        switch (navigation) {
-            case "left":
-                scoreSpikeMarkMidPoint = new Point(116, 95, Point.CARTESIAN);
-                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
-                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() + Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
-                break;
-            case "middle":
-                scoreSpikeMarkMidPoint = new Point(122, 84.5, Point.CARTESIAN);
-                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
-                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() + Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
-                break;
-            case "right":
-                scoreSpikeMarkMidPoint = new Point(122, 84.5, Point.CARTESIAN);
-                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
-                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() - Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
-                break;
-        }
-        scoreSpikeMark.setConstantHeadingInterpolation(Math.PI * 1.5);
-
-        switch (navigation) {
-            case "left":
-                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(scoreSpikeMark.getLastControlPoint().getX(), 98, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 109.5, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
-                break;
-            case "middle":
-                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(119, 103.5, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 106, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
-                break;
-            case "right":
-                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(135, 98, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 106, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
-                break;
-        }
-        initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        initialScoreOnBackdrop.setPathEndTimeout(2.5);
-
-
-        Path firstCycleToStackOne = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(84, 107, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
-        Path firstCycleToStackTwo = new Path(new BezierLine(firstCycleToStackOne.getLastControlPoint(), new Point(firstCycleStackPose)));
-
-        firstCycleToStack = new PathChain(firstCycleToStackOne, firstCycleToStackTwo);
+    public void preBuildPaths() {
+        firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
+        firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
+        secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 6);
+        secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
 
         Path firstCycleScoreOnBackdropOne = new Path(new BezierLine(new Point(firstCycleStackPose), new Point(84, 79, Point.CARTESIAN)));
         firstCycleScoreOnBackdropOne.setReversed(true);
@@ -199,6 +130,66 @@ public class RedRightInnerAuto extends OpMode {
         secondCycleScoreOnBackdrop = new PathChain(secondCycleScoreOnBackdropOne, secondCycleScoreOnBackdropTwo);
     }
 
+    public void setBackdropGoalPose() {
+        switch (navigation) {
+            case "left":
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 6, redRightSideLeftSpikeMark.getY(), Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                break;
+            case "middle":
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-4, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.5, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
+                break;
+            case "right":
+                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY(), Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 3, redRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                break;
+        }
+    }
+
+    public void buildPaths() {
+        Point scoreSpikeMarkMidPoint;
+        double scoreSpikeMarkMidToSpikeDistance;
+        switch (navigation) {
+            case "left":
+                scoreSpikeMarkMidPoint = new Point(116, 95, Point.CARTESIAN);
+                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
+                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() + Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
+                break;
+            case "middle":
+                scoreSpikeMarkMidPoint = new Point(122, 84.5, Point.CARTESIAN);
+                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
+                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() + Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
+                break;
+            case "right":
+                scoreSpikeMarkMidPoint = new Point(122, 84.5, Point.CARTESIAN);
+                scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
+                scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() - Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
+                break;
+        }
+        //scoreSpikeMark.setConstantHeadingInterpolation(Math.PI * 1.5);
+
+        switch (navigation) {
+            case "left":
+                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(scoreSpikeMark.getLastControlPoint().getX(), 98, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 109.5, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
+                break;
+            case "middle":
+                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(119, 103.5, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 106, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
+                break;
+            case "right":
+                initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(135, 98, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 106, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
+                break;
+        }
+        initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
+        initialScoreOnBackdrop.setPathEndTimeout(2.5);
+
+
+        Path firstCycleToStackOne = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(84, 107, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
+        Path firstCycleToStackTwo = new Path(new BezierLine(firstCycleToStackOne.getLastControlPoint(), new Point(firstCycleStackPose)));
+
+        firstCycleToStack = new PathChain(firstCycleToStackOne, firstCycleToStackTwo);
+    }
+
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 10: // starts following the first path to score on the spike mark
@@ -221,235 +212,191 @@ public class RedRightInnerAuto extends OpMode {
             case 13: // moves mechanisms into position to score and pick up from stack as well as starts moving to score
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.moveOuttake(OUTTAKE_OUT);
-                    twoPersonDrive.setLiftTargetPosition(LIFT_MIDDLE_PRESET_POSITION);
-                    follower.followPath(initialScoreOnBackdrop);
-                    setPathState(3);
-                }
-                break;
-            case 3: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 400) {
-                    moveIntakeToAvoidBeaconPosition.run();
-                }
-                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    follower.holdPoint(new BezierPoint(new Point(initialScoreOnBackdrop.getLastControlPoint().getX(), initialScoreOnBackdrop.getLastControlPoint().getY() + 3.25, Point.CARTESIAN)), Math.PI * 1.5);
-                    moveIntakeToAvoidBeaconPosition.reset();
-                    setPathState(-2);
-                }
-                break;
-            case -2: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 2000 && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.setTransferState(TRANSFER_RESET);
-                    setPathState(25);
-                    /*
-                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_AUTO_AVOID_POSITION);
-                    setPathState(4);
-                     */
-                }
-                break;
-
-
-            case 4: // starts the robot off on to the first stack once the pixels have been dropped
-                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
-                    follower.followPath(firstCycleToStack);
-                    setPathState(5);
-                }
-                break;
-            case 5: // once the robot is in position, then run extension out
-                if (!follower.isBusy()) {
+                    //twoPersonDrive.setLiftTargetPosition(LIFT_MIDDLE_PRESET_POSITION);
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
-                    follower.holdPoint(new BezierPoint(firstCycleToStack.getLastControlPoint()), Math.PI * 1.5);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 50);
-                    setPathState(6);
-                }
-                break;
-            case 6: // once the extension is within like 20 or so or if the velocity is less than some value, then grab
-                if (true/*(twoPersonDrive.extensionEncoder.getCurrentPosition() >= EXTENSION_MAX_POSITION - 20) || (twoPersonDrive.extensionEncoder.getVelocity() < 4 && twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_MAX_POSITION/2)*/) {
-                    //twoPersonDrive.setExtensionTargetPosition(twoPersonDrive.extensionEncoder.getCurrentPosition());
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
-                    setPathState(7);
-                }
-                break;
-            case 7: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
-                if (pathTimer.getElapsedTime() > 200) {
-                    follower.breakFollowing();
-                    twoPersonDrive.moveIntake(INTAKE_IN);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 300); // todo adjust this
-                    setPathState(8);
-                }
-                break;
-            case 8: // once the intake is in, then pull everything back in and start following the scoring path
-                if (twoPersonDrive.intakeState == INTAKE_IN) {
-                    //twoPersonDrive.setExtensionTargetPosition(0);
-                    twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
-                    follower.followPath(firstCycleScoreOnBackdrop);
-                    setPathState(9);
-                }
-                break;
-            case 9: // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
-                if (follower.atParametricEnd()) {
-                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
-                    follower.holdPoint(new BezierPoint(new Point(firstCycleScoreOnBackdrop.getLastControlPoint().getX(), firstCycleScoreOnBackdrop.getLastControlPoint().getY() + 2.5, Point.CARTESIAN)), Math.PI * 1.5);
-                    setPathState(-3);
-                }
-                break;
-            case -3: // detects for end of the path and outtake out and drops pixel
-                if (MathFunctions.roughlyEquals(twoPersonDrive.outerOuttakeClaw.getPosition(), OUTER_OUTTAKE_CLAW_CLOSED) && MathFunctions.roughlyEquals(twoPersonDrive.innerOuttakeClaw.getPosition(), INNER_OUTTAKE_CLAW_CLOSED)) {
-                    moveIntakeToAvoidBeaconPosition.run();
-                }
-                if (twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
-                    moveIntakeToAvoidBeaconPosition.reset();
-                    //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_AUTO_AVOID_POSITION);
-                    setPathState(10);
-                }
-                break;
-            case 10: // once the outer pixel has dropped, drop the inner one and fold up
-                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
-                    twoPersonDrive.setTransferState(TRANSFER_RESET);
-                    setPathState(25);
-                    break;
-                    // todo remove for later
-                    //setPathState(11);
-                }
-                break;
-
-
-            case 11: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
-                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME/* && twoPersonDrive.extensionEncoder.getCurrentPosition() < EXTENSION_TRANSFER_UPPER_LIMIT*/) {
-                    follower.followPath(secondCycleToStack);
-                    setPathState(12);
-                }
-                break;
-            case 12: // once the robot is in position, then run extension out
-                if (!follower.isBusy()) {
-                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
-                    follower.holdPoint(new BezierPoint(secondCycleToStack.getLastControlPoint()), Math.PI * 1.5);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 50);
-                    setPathState(13);
-                }
-                break;
-            case 13: // once the extension is within like 20 or so or if the velocity is less than some value, then grab
-                /*
-                if ((twoPersonDrive.extensionEncoder.getCurrentPosition() >= EXTENSION_MAX_POSITION - 20) || (twoPersonDrive.extensionEncoder.getVelocity() < 4 && twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_MAX_POSITION/2)) {
-                    twoPersonDrive.setExtensionTargetPosition(twoPersonDrive.extensionEncoder.getCurrentPosition());
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    follower.followPath(initialScoreOnBackdrop);
                     setPathState(14);
                 }
-
-                 */
                 break;
-            case 14: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
-                if (pathTimer.getElapsedTime() > 200) {
-                    follower.breakFollowing();
-                    twoPersonDrive.moveIntake(INTAKE_IN);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 300); // todo adjust this
+            case 14: // detects for end of the path and outtake out and drops pixel
+                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    follower.holdPoint(new BezierPoint(new Point(initialScoreOnBackdrop.getLastControlPoint().getX(), initialScoreOnBackdrop.getLastControlPoint().getY(), Point.CARTESIAN)), Math.PI * 1.5);
                     setPathState(15);
                 }
                 break;
-            case 15: // once the intake is in, then pull everything back in and start following the scoring path
-                if (twoPersonDrive.intakeState == INTAKE_IN) {
-                    //twoPersonDrive.setExtensionTargetPosition(0);
-                    twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
-                    follower.followPath(secondCycleScoreOnBackdrop);
-                    setPathState(16);
-                }
-                break;
-            case 16: // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
-                if (follower.atParametricEnd()) {
-                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
-                    follower.holdPoint(new BezierPoint(new Point(secondCycleScoreOnBackdrop.getLastControlPoint().getX(), secondCycleScoreOnBackdrop.getLastControlPoint().getY() + 2.5, Point.CARTESIAN)), Math.PI * 1.5);
-                    setPathState(-4);
-                }
-                break;
-            case -4: // detects for end of the path and outtake out and drops pixel
-                if (MathFunctions.roughlyEquals(twoPersonDrive.outerOuttakeClaw.getPosition(), OUTER_OUTTAKE_CLAW_CLOSED) && MathFunctions.roughlyEquals(twoPersonDrive.innerOuttakeClaw.getPosition(), INNER_OUTTAKE_CLAW_CLOSED)) {
-                    moveIntakeToAvoidBeaconPosition.run();
-                }
-                if (twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
-                    moveIntakeToAvoidBeaconPosition.reset();
-                    //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_AUTO_AVOID_POSITION);
-                    setPathState(17);
-                }
-                break;
-            case 17: // once the outer pixel has dropped, drop the inner one and fold up
-                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+            case 15: // detects for end of the path and outtake out and drops pixel
+                if (pathTimer.getElapsedTime() > 200 && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
-                    setPathState(18);
-                }
-                break;
-
-
-            case 18: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
-                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME /*&& twoPersonDrive.extensionEncoder.getCurrentPosition() < EXTENSION_TRANSFER_UPPER_LIMIT*/) {
-                    if (opmodeTimer.getElapsedTimeSeconds() > 22) {
-                        setPathState(25);
-                        break;
-                    }
-                    follower.followPath(thirdCycleToStack);
-                    setPathState(19);
-                }
-                break;
-            case 19: // once the robot is in position, then run extension out
-                if (!follower.isBusy()) {
-                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
-                    follower.holdPoint(new BezierPoint(thirdCycleToStack.getLastControlPoint()), Math.PI * 1.5);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 50);
                     setPathState(20);
                 }
                 break;
-            case 20: // once the extension is within like 20 or so or if the velocity is less than some value, then grab
-                /*
-                if ((twoPersonDrive.extensionEncoder.getCurrentPosition() >= EXTENSION_MAX_POSITION - 20) || (twoPersonDrive.extensionEncoder.getVelocity() < 4 && twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_MAX_POSITION/2)) {
-                    twoPersonDrive.setExtensionTargetPosition(twoPersonDrive.extensionEncoder.getCurrentPosition());
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+
+
+            case 20: // starts the robot off on to the first stack once the pixels have been dropped
+                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+                    follower.followPath(firstCycleToStack);
                     setPathState(21);
                 }
-
-                 */
                 break;
-            case 21: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
-                if (pathTimer.getElapsedTime() > 200) {
-                    follower.breakFollowing();
-                    twoPersonDrive.moveIntake(INTAKE_IN);
-                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 300); // todo adjust this
+            case 21: // once the robot is in position, grab
+                if (!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(firstCycleToStack.getPath(1).getLastControlPoint()), Math.PI * 1.5);
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
                     setPathState(22);
                 }
                 break;
-            case 22: // once the intake is in, then pull everything back in and start following the scoring path
-                if (twoPersonDrive.intakeState == INTAKE_IN) {
-                    //twoPersonDrive.setExtensionTargetPosition(0);
+            case 22: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+                if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
+                    twoPersonDrive.moveIntake(INTAKE_IN);
                     twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
-                    follower.followPath(thirdCycleScoreOnBackdrop);
+                    follower.followPath(firstCycleScoreOnBackdrop);
                     setPathState(23);
                 }
-                break;
-            case 23: // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
+                break; // todo set callback for transfer start
+            /*
+            case 9: // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
                 if (follower.atParametricEnd()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdCycleScoreOnBackdrop.getLastControlPoint().getX(), thirdCycleScoreOnBackdrop.getLastControlPoint().getY() + 3, Point.CARTESIAN)), Math.PI * 1.5);
                     twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
-                    setPathState(-5);
+                    setPathState(-3);
                 }
                 break;
-            case -5:
-                if (twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+             */
+            case 23: // detects for end of the path and outtake out and drops pixel
+                if (!follower.isBusy() && true || twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
+                    follower.holdPoint(new BezierPoint(new Point(firstCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getX(), firstCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getY(), Point.CARTESIAN)), Math.PI * 1.5);
                     setPathState(24);
                 }
-            break;
+                break;
             case 24: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
-                    setPathState(25);
+                    setPathState(30);
+                    break;
                 }
                 break;
 
 
-            case 25: // move the intake in
-                twoPersonDrive.moveIntake(INTAKE_IN);
-                setPathState(26);
+            case 30: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
+                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+                    follower.followPath(secondCycleToStack);
+                    // todo remove
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+                    setPathState(12);
+                }
                 break;
-            case 26: // once the robot is nice and folded up, request stop
+            case 31: // once the robot is in position, then run extension out
+                if (!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(secondCycleToStack.getPath(1).getLastControlPoint()), Math.PI * 1.5);
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    setPathState(32);
+                }
+                break;
+            case 32: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+                if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
+                    twoPersonDrive.moveIntake(INTAKE_IN);
+                    twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
+                    follower.followPath(secondCycleScoreOnBackdrop);
+                    setPathState(33);
+                }
+                break; // todo set callback for transfer start
+                /*
+            case : // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
+                if (follower.atParametricEnd()) {
+                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
+                    follower.holdPoint(new BezierPoint(new Point(secondCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getX(), secondCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getY(), Point.CARTESIAN)), Math.PI * 1.5);
+                    setPathState(-4);
+                }
+                break;
+                 */
+            case 33: // detects for end of the path and outtake out and drops pixel
+                if (!follower.isBusy() && true || twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
+                    follower.holdPoint(new BezierPoint(new Point(secondCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getX(), secondCycleScoreOnBackdrop.getPath(1).getLastControlPoint().getY(), Point.CARTESIAN)), Math.PI * 1.5);
+                    setPathState(34);
+                }
+                break;
+            case 34: // once the outer pixel has dropped, drop the inner one and fold up
+                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+                    twoPersonDrive.setTransferState(TRANSFER_RESET);
+                    setPathState(40);
+                }
+                break;
+
+//
+//            case 18: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
+//                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME /*&& twoPersonDrive.extensionEncoder.getCurrentPosition() < EXTENSION_TRANSFER_UPPER_LIMIT*/) {
+//                    if (opmodeTimer.getElapsedTimeSeconds() > 22) {
+//                        setPathState(25);
+//                        break;
+//                    }
+//                    follower.followPath(thirdCycleToStack);
+//                    setPathState(19);
+//                }
+//                break;
+//            case 19: // once the robot is in position, then run extension out
+//                if (!follower.isBusy()) {
+//                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
+//                    follower.holdPoint(new BezierPoint(thirdCycleToStack.getLastControlPoint()), Math.PI * 1.5);
+//                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 50);
+//                    setPathState(20);
+//                }
+//                break;
+//            case 20: // once the extension is within like 20 or so or if the velocity is less than some value, then grab
+//                /*
+//                if ((twoPersonDrive.extensionEncoder.getCurrentPosition() >= EXTENSION_MAX_POSITION - 20) || (twoPersonDrive.extensionEncoder.getVelocity() < 4 && twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_MAX_POSITION/2)) {
+//                    twoPersonDrive.setExtensionTargetPosition(twoPersonDrive.extensionEncoder.getCurrentPosition());
+//                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+//                    setPathState(21);
+//                }
+//
+//                 */
+//                break;
+//            case 21: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+//                if (pathTimer.getElapsedTime() > 200) {
+//                    follower.breakFollowing();
+//                    twoPersonDrive.moveIntake(INTAKE_IN);
+//                    //twoPersonDrive.setExtensionTargetPosition(EXTENSION_MAX_POSITION - 300); // todo adjust this
+//                    setPathState(22);
+//                }
+//                break;
+//            case 22: // once the intake is in, then pull everything back in and start following the scoring path
+//                if (twoPersonDrive.intakeState == INTAKE_IN) {
+//                    //twoPersonDrive.setExtensionTargetPosition(0);
+//                    twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
+//                    follower.followPath(thirdCycleScoreOnBackdrop);
+//                    setPathState(23);
+//                }
+//                break;
+//            case 23: // detects for end of path and outtake out, and then drops outer pixel as well as putting the intake out
+//                if (follower.atParametricEnd()) {
+//                    follower.holdPoint(new BezierPoint(new Point(thirdCycleScoreOnBackdrop.getLastControlPoint().getX(), thirdCycleScoreOnBackdrop.getLastControlPoint().getY() + 3, Point.CARTESIAN)), Math.PI * 1.5);
+//                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
+//                    setPathState(-5);
+//                }
+//                break;
+//            case -5:
+//                if (twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+//                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+//                    setPathState(24);
+//                }
+//            break;
+//            case 24: // once the outer pixel has dropped, drop the inner one and fold up
+//                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+//                    twoPersonDrive.setTransferState(TRANSFER_RESET);
+//                    setPathState(25);
+//                }
+//                break;
+
+
+
+            case 40: // move the intake in
+                twoPersonDrive.moveIntake(INTAKE_IN);
+                setPathState(41);
+                break;
+            case 41: // once the robot is nice and folded up, request stop
                 if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.outtakeState == OUTTAKE_IN/* && twoPersonDrive.extensionState == EXTENSION_NOMINAL*/) {
                     setPathState(-1);
                 }
@@ -478,6 +425,10 @@ public class RedRightInnerAuto extends OpMode {
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
+        double[] motorPowers = follower.motorPowers();
+        for (int i = 0; i < motorPowers.length; i++) {
+            telemetry.addData("motor " + i, motorPowers[i]);
+        }
         telemetry.update();
     }
 
@@ -508,9 +459,10 @@ public class RedRightInnerAuto extends OpMode {
         //moveExtensionToSpikeMarkDrop = new SingleRunAction(()-> twoPersonDrive.setExtensionTargetPosition(EXTENSION_SPIKE_MARK_POSITION));
         moveIntakeToTopStackPosition = new SingleRunAction(()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION));
         moveIntakeToMiddleStackPosition = new SingleRunAction(()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION));
-        //moveIntakeToAvoidBeaconPosition = new SingleRunAction(()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_AUTO_AVOID_POSITION));
 
         twoPersonDrive.initialize();
+
+        preBuildPaths();
 
         try {
             Thread.sleep(3000);

@@ -19,6 +19,7 @@ import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -34,6 +35,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+@Disabled
 @Autonomous(name = "LM5 Red Auto", group = "Autonomous")
 public class LM5_RedAuto extends OpMode {
 
