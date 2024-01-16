@@ -84,6 +84,9 @@ public class DriveVectorScaler {
             }
         }
 
+        truePathingVectors[0] = MathFunctions.scalarMultiplyVector(truePathingVectors[0], 2.0);
+        truePathingVectors[1] = MathFunctions.scalarMultiplyVector(truePathingVectors[1], 2.0);
+
         // TODO: remove
         leftSidePath = MathFunctions.copyVector(truePathingVectors[0]);
         rightSidePath = MathFunctions.copyVector(truePathingVectors[1]);
