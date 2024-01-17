@@ -672,7 +672,7 @@ public class TwoPersonDrive extends LinearOpMode {
                 case TRANSFER_PRESET_HOLD:
                     transferPresetHold.run();
                     break;
-                case TRANSFER_OUT:
+                case TRANSFER_OUT: // todo: FOR AUTO: perhaps make the outtake out position for the transfer kinda close so that we can move the outtake to a farther out position later and place
                     putOuttakeOut.run();
                     if (outtakeState != OUTTAKE_WAIT && intakeState != INTAKE_AVOID) {
                         setLiftTargetPosition(liftPresetTargetPosition);

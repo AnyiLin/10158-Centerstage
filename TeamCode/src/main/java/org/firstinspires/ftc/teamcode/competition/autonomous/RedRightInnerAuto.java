@@ -97,68 +97,27 @@ public class RedRightInnerAuto extends OpMode {
 
     private Follower follower;
 
-    private Path scoreSpikeMark, initialScoreOnBackdrop, thirdCycleToStack, thirdCycleScoreOnBackdrop;
+    private Path scoreSpikeMark, initialScoreOnBackdrop, preBuildFirstCycleBackdrop, preBuildSecondCycleStack, preBuildSecondCycleBackdrop;
     private PathChain firstCycleToStack, firstCycleScoreOnBackdrop, secondCycleToStack, secondCycleScoreOnBackdrop;
 
     private int pathState;
 
     public void preBuildPaths() {
-        firstCycleStackPose = new Pose2d(redInnerStack.getX()+1.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4);
         firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-        secondCycleStackPose = new Pose2d(redInnerStack.getX()+1.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4);
         secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
-/*
-        Path firstCycleScoreOnBackdropOne = new Path(new BezierLine(new Point(firstCycleStackPose), new Point(84, 79, Point.CARTESIAN)));
-        firstCycleScoreOnBackdropOne.setConstantHeadingInterpolation(Math.PI * 1.5);
-        Path firstCycleScoreOnBackdropTwo = new Path(new BezierCurve(firstCycleScoreOnBackdropOne.getLastControlPoint(), new Point(78, 124, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)));
-        firstCycleScoreOnBackdropTwo.setPathEndTimeout(2.5);
-        firstCycleScoreOnBackdropTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
-        firstCycleScoreOnBackdrop = new PathChain(firstCycleScoreOnBackdropOne, firstCycleScoreOnBackdropTwo);
-        */
-        firstCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(84, 79, Point.CARTESIAN)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierCurve(new Point(84, 79, Point.CARTESIAN), new Point(78, 124, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .setPathEndTimeout(2.5)
-                .build();
 
-/*
-        Path secondCycleToStackOne = new Path(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(78, 124, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
-        secondCycleToStackOne.setConstantHeadingInterpolation(Math.PI * 1.5);
-        Path secondCycleToStackTwo = new Path(new BezierLine(secondCycleToStackOne.getLastControlPoint(), new Point(secondCycleStackPose)));
-        secondCycleToStackTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
-        secondCycleToStack = new PathChain(secondCycleToStackOne, secondCycleToStackTwo);
- */
-        secondCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), /*new Point(firstCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN),*/ new Point(76.5, 106, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(secondCycleStackPose)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION))
-                .build();
+        preBuildFirstCycleBackdrop = new Path(new BezierCurve(new Point(84, 79, Point.CARTESIAN), new Point(76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)));
 
-        /*
-        Path secondCycleScoreOnBackdropOne = new Path(new BezierLine(new Point(secondCycleStackPose), new Point(84, 79, Point.CARTESIAN)));
-        secondCycleScoreOnBackdropOne.setConstantHeadingInterpolation(Math.PI * 1.5);
-        Path secondCycleScoreOnBackdropTwo = new Path(new BezierCurve(secondCycleScoreOnBackdropOne.getLastControlPoint(), new Point(78, 124, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)));
-        secondCycleScoreOnBackdropTwo.setPathEndTimeout(2.5);
-        secondCycleScoreOnBackdropTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
-        secondCycleScoreOnBackdrop = new PathChain(secondCycleScoreOnBackdropOne, secondCycleScoreOnBackdropTwo);
-         */
-        secondCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(84, 79, Point.CARTESIAN)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierCurve(new Point(84, 79, Point.CARTESIAN), new Point(78, 124, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
-                .setPathEndTimeout(2.5)
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .build();
+        preBuildSecondCycleStack = new Path(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(76.5, 106, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
+
+        preBuildSecondCycleBackdrop = new Path(new BezierCurve(new Point(84, 79, Point.CARTESIAN), new Point(76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)));
     }
 
     public void setBackdropGoalPose() {
         switch (navigation) {
+            default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX(), redRightSideLeftSpikeMark.getY(), Math.PI/2);
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()-2.5, redRightSideLeftSpikeMark.getY(), Math.PI/2);
                 initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
             case "middle":
@@ -166,7 +125,7 @@ public class RedRightInnerAuto extends OpMode {
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.5, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX(), redRightSideRightSpikeMark.getY(), Math.PI/2);
+                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-2.5, redRightSideRightSpikeMark.getY(), Math.PI/2);
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 3, redRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
         }
@@ -194,10 +153,8 @@ public class RedRightInnerAuto extends OpMode {
                 break;
         }
 
-        telemetry.addData("end point x", scoreSpikeMark.getLastControlPoint().getX());
-        telemetry.addData("end point y", scoreSpikeMark.getLastControlPoint().getY());
-
         switch (navigation) {
+            default:
             case "left":
                 initialScoreOnBackdrop = new Path(new BezierCurve(scoreSpikeMark.getLastControlPoint(), new Point(scoreSpikeMark.getLastControlPoint().getX(), 98, Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 109.5, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
                 break;
@@ -211,19 +168,52 @@ public class RedRightInnerAuto extends OpMode {
         initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
         initialScoreOnBackdrop.setPathEndTimeout(2.5);
 
-/*
-        Path firstCycleToStackOne = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 107, Point.CARTESIAN), new Point(78, 124, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)));
-        firstCycleToStackOne.setConstantHeadingInterpolation(Math.PI * 1.5);
-        Path firstCycleToStackTwo = new Path(new BezierLine(firstCycleToStackOne.getLastControlPoint(), new Point(firstCycleStackPose)));
-        firstCycleToStackTwo.setConstantHeadingInterpolation(Math.PI * 1.5);
-        firstCycleToStack = new PathChain(firstCycleToStackOne, firstCycleToStackTwo);
- */
+        switch (navigation) {
+            default:
+            case "left":
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                break;
+            case "middle":
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                break;
+            case "right":
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                break;
+        }
+
         firstCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), /*new Point(initialBackdropGoalPose.getX(), 107, Point.CARTESIAN),*/ new Point(76.5, 106, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(76.5, 106, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(firstCycleStackPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION))
+                .build();
+
+        firstCycleScoreOnBackdrop = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(84, 79, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addPath(preBuildFirstCycleBackdrop)
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .setPathEndTimeout(2.5)
+                .build();
+
+        secondCycleToStack = follower.pathBuilder()
+                .addPath(preBuildSecondCycleStack)
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(secondCycleStackPose)))
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION))
+                .build();
+
+        secondCycleScoreOnBackdrop = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(84, 79, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addPath(preBuildSecondCycleBackdrop)
+                .setPathEndTimeout(2.5)
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .build();
     }
 

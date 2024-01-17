@@ -354,7 +354,7 @@ public class Follower {
             if (!callback.hasBeenRun()) {
                 if (callback.getType() == PathCallback.PARAMETRIC) {
                     // parametric call back
-                    if (chainIndex == callback.getIndex() && getCurrentTValue() >= callback.getStartCondition()) {
+                    if (chainIndex == callback.getIndex() && (getCurrentTValue() >= callback.getStartCondition() || MathFunctions.roughlyEquals(getCurrentTValue(), callback.getStartCondition()))) {
                         callback.run();
                     }
                 } else {
