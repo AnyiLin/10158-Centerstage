@@ -26,22 +26,22 @@ public class FollowerConstants {
             0,
             0);
 
-    public static double largeHeadingPIDFFeedForward = 0.02;
+    public static double largeHeadingPIDFFeedForward = 0.01;
 
     public static double headingPIDFSwitch = Math.PI/20;
 
     // Small heading error PIDF coefficients
     public static CustomPIDFCoefficients smallHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            5,
+            4,
             0,
-            0.075,
+            0.08,
             0);
 
-    public static double smallHeadingPIDFFeedForward = 0.02;
+    public static double smallHeadingPIDFFeedForward = 0.01;
 
     // Small translational PIDF coefficients
     public static CustomPIDFCoefficients smallTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.4,
+            0.3,
             0,
             0.01,
             0);
@@ -53,18 +53,18 @@ public class FollowerConstants {
             0,
             0);
 
-    public static double smallTranslationalPIDFFeedForward = 0.035;
+    public static double smallTranslationalPIDFFeedForward = 0.015;
 
     public static double translationalPIDFSwitch = 3;
 
     // Large translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.05,
             0,
             0,
             0);
 
-    public static double largeTranslationalPIDFFeedForward = 0.035;
+    public static double largeTranslationalPIDFFeedForward = 0.015;
 
     // Large translational Integral
     public static CustomPIDFCoefficients largeTranslationalIntegral = new CustomPIDFCoefficients(
@@ -77,24 +77,24 @@ public class FollowerConstants {
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
             0.03,
             0,
-            0.0000001,
+            0,
             0);
 
-    public static double smallDrivePIDFFeedForward = 0.02;
+    public static double smallDrivePIDFFeedForward = 0.01;
 
     public static double drivePIDFSwitch = 10;
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.025,
+            0.03,
             0,
-            0.0003,
+            0,
             0);
 
-    public static double largeDrivePIDFFeedForward = 0.02;
+    public static double largeDrivePIDFFeedForward = 0.01;
 
     // Centrifugal force to power scaling
-    public static double centrifugalScaling = 0.0015;
+    public static double centrifugalScaling = 0.001;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power

@@ -36,14 +36,14 @@ public class TeamPropPipeline extends OpenCvPipeline {
         WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
-        rightLeftBound = 210;
+        rightLeftBound = 230;
         rightRightBound = 255;
         rightTopBound = 360;
-        middleLeftBound = 235;
+        middleLeftBound = 201;
         middleRightBound = 280;
         middleTopBound = 85;
         minDetected = 40000;
-        minMultiple = 10;
+        minMultiple = 30;
     }
 
     // color corresponds with RGB values, with 0 being red, 1 being green, and 2 being blue
@@ -103,9 +103,9 @@ public class TeamPropPipeline extends OpenCvPipeline {
             }
         }
 
-        if (middleTotal > rightTotal * minMultiple){
+        if (middleTotal > 15000){//rightTotal * minMultiple){
             navigation = "middle";
-        } else if (rightTotal > middleTotal * minMultiple){
+        } else if (rightTotal > 15000){//middleTotal * minMultiple){
             navigation = "right";
         } else {
             navigation = "left";

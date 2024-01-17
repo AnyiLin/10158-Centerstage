@@ -69,6 +69,9 @@ public class RobotConstants {
     // position for the intake arm to avoid the outtake arm
     INTAKE_ARM_AVOID_POSITION = 0.5, // todo set this
 
+    // position for the intake arm to avoid the beacon in auto
+    INTAKE_ARM_AUTO_AVOID_POSITION = 0.4, // todo set this
+
     // position for the intake arm being out of the robot at ground level
     INTAKE_ARM_OUT_POSITION = 0.185,
 
@@ -170,7 +173,7 @@ public class RobotConstants {
     ROBOT_BACK_LENGTH = 14,
 
     // the length from the middle of the robot to an extended intake arm
-    ROBOT_FRONT_LENGTH = 14;
+    ROBOT_FRONT_LENGTH = 16.25;
 
     /**
      * These are all in milliseconds!
