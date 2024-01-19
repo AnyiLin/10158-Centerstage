@@ -52,7 +52,9 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_F
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_WRIST_VERTICAL_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.PLANE_LAUNCHER_HOLD;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.PLANE_LAUNCHER_LAUNCH;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_INTAKE_ARM_OFFSET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.RIGHT_OUTTAKE_ARM_OFFSET;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_DROPPING;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_DROP_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_GRAB;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_IDLE;
@@ -61,7 +63,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_POSITI
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_PRESET_HOLD;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_RESET;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_RESET_CLAW_DROP;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_DROPPING;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.liftPIDFCoefficients;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -246,23 +247,23 @@ public class TwoPersonDrive extends LinearOpMode {
                 intakeClaw.setPosition(INTAKE_CLAW_OPEN);
                 if (!autonomous && intakeState == INTAKE_OUT) {
                     pickUpAdjustIntakeArm = true;
-                    pickUpAdjustDirection = 1;
+                    pickUpAdjustDirection = -1;
                     pickUpAdjustTimer.resetTimer();
                 }
             } else {
                 intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
                 if (!autonomous && intakeState == INTAKE_OUT) {
                     pickUpAdjustIntakeArm = true;
-                    pickUpAdjustDirection = -1;
+                    pickUpAdjustDirection = 1;
                     pickUpAdjustTimer.resetTimer();
                 }
             }
         });
         intakeArmMoveUpOnePixel = new SingleRunAction(() -> {
-            if (intakeState == INTAKE_OUT) moveIntakeArmOnePixel(1);
+            if (intakeState == INTAKE_OUT) moveIntakeArmOnePixel(-1);
         });
         intakeArmMoveDownOnePixel = new SingleRunAction(() -> {
-            if (intakeState == INTAKE_OUT) moveIntakeArmOnePixel(-1);
+            if (intakeState == INTAKE_OUT) moveIntakeArmOnePixel(1);
         });
         intakeTransferInTimerReset = new SingleRunAction(() -> transferTimer.resetTimer());
         setOuttakeWait = new SingleRunAction(() -> setOuttakeState(OUTTAKE_WAIT));
@@ -935,8 +936,8 @@ public class TwoPersonDrive extends LinearOpMode {
     public void setIntakeArmPosition(double position) {
         if (true){// || !MathFunctions.roughlyEquals(leftIntakeArm.getPosition(), position)) {
             leftIntakeArm.setPosition(position);
-            //rightIntakeArm.setPosition(1 - position + RIGHT_INTAKE_ARM_OFFSET);
-            rightIntakeArm.setPosition(position);
+            rightIntakeArm.setPosition(1 - position + RIGHT_INTAKE_ARM_OFFSET);
+            //rightIntakeArm.setPosition(position);
         }
     }
 
@@ -964,7 +965,8 @@ public class TwoPersonDrive extends LinearOpMode {
     public void setOuttakeArmPosition(double position) {
         if (!MathFunctions.roughlyEquals(leftOuttakeArm.getPosition(), position)) {
             leftOuttakeArm.setPosition(position);
-            rightOuttakeArm.setPosition(1 - position + RIGHT_OUTTAKE_ARM_OFFSET);
+            //rightOuttakeArm.setPosition(1 - position + RIGHT_OUTTAKE_ARM_OFFSET);
+            rightOuttakeArm.setPosition(position + RIGHT_OUTTAKE_ARM_OFFSET);
             updateOuttakeWrist();
         }
     }

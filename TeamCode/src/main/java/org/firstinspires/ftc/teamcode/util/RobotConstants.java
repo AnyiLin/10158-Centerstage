@@ -92,7 +92,7 @@ public class RobotConstants {
 
 
     // how offset the right outtake arm is from the left
-    RIGHT_OUTTAKE_ARM_OFFSET = -0.019,
+    RIGHT_OUTTAKE_ARM_OFFSET = -0.01,
 
     // position for the outtake arm being in the robot
     OUTTAKE_ARM_IN_POSITION = 0.9,

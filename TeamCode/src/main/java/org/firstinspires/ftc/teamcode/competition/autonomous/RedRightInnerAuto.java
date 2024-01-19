@@ -171,16 +171,16 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.5);
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2.75, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75);
                 break;
         }
 
@@ -189,7 +189,7 @@ public class RedRightInnerAuto extends OpMode {
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(firstCycleStackPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION))
+                //.addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION))
                 .build();
 
         firstCycleScoreOnBackdrop = follower.pathBuilder()
@@ -205,7 +205,7 @@ public class RedRightInnerAuto extends OpMode {
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(secondCycleStackPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION))
+                //.addParametricCallback(0, ()-> twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION))
                 .build();
 
         secondCycleScoreOnBackdrop = follower.pathBuilder()
@@ -267,11 +267,17 @@ public class RedRightInnerAuto extends OpMode {
             case 21: // once the robot is in position, grab
                 if (!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(firstCycleToStack.getPath(1).getLastControlPoint()), Math.PI * 1.5);
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
                     setPathState(22);
                 }
                 break;
-            case 22: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+            case 22:
+                if (twoPersonDrive.intakeArmAtTargetPosition()) {
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    setPathState(23);
+                }
+                break;
+            case 23: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.moveIntake(INTAKE_IN);
                     twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
@@ -287,7 +293,7 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
              */
-            case 23: // detects for end of the path and outtake out and drops pixel
+            case 24: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && true || twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
@@ -295,7 +301,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(24);
                 }
                 break;
-            case 24: // once the outer pixel has dropped, drop the inner one and fold up
+            case 25: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     setPathState(30);
@@ -315,11 +321,17 @@ public class RedRightInnerAuto extends OpMode {
             case 31: // once the robot is in position, then run extension out
                 if (!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(secondCycleToStack.getPath(1).getLastControlPoint()), Math.PI * 1.5);
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
                     setPathState(32);
                 }
                 break;
-            case 32: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+            case 32:
+                if (twoPersonDrive.intakeArmAtTargetPosition()) {
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                    setPathState(33);
+                }
+                break;
+            case 33: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.moveIntake(INTAKE_IN);
                     twoPersonDrive.liftPresetTargetPosition = LIFT_MIDDLE_PRESET_POSITION;
@@ -336,7 +348,7 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
                  */
-            case 33: // detects for end of the path and outtake out and drops pixel
+            case 34: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && true || twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
@@ -344,7 +356,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(34);
                 }
                 break;
-            case 34: // once the outer pixel has dropped, drop the inner one and fold up
+            case 35: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     setPathState(40);

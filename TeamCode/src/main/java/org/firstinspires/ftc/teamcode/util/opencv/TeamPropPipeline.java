@@ -60,6 +60,15 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
     public Mat actualProcessFrame(Mat input) {
+        for (int x = 0; x < 640; x++){
+            for (int y = 0; y < 480; y++){
+                if (y > 480 - 2.2 * (x - 195) && x < 240 && y < 480 - 2.2 * (x - 208)){
+                    if (draw){
+                        Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
+                    }
+                }
+            }
+        }
         output = input.clone();
 
         Imgproc.cvtColor(output, hsv, Imgproc.COLOR_RGB2HSV);
@@ -102,6 +111,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
             }
         }
+
 
         if (middleTotal > 15000){//rightTotal * minMultiple){
             navigation = "middle";
