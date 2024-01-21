@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -23,6 +22,8 @@ public class PoseUpdater {
     private Pose2d startingPose = new Pose2d(0,0,0);
 
     private Pose2d previousPose = startingPose;
+
+    private double xOffset = 0, yOffset = 0, headingOffset = 0;
 
     private long previousPoseTime, currentPoseTime;
 
@@ -47,7 +48,7 @@ public class PoseUpdater {
      * Updates the robot's pose
      */
     public void update() {
-        previousPose = localizer.getPoseEstimate();
+        previousPose = applyOffset(localizer.getPoseEstimate());
         previousPoseTime = currentPoseTime;
         currentPoseTime = System.nanoTime();
         localizer.update();
@@ -66,13 +67,47 @@ public class PoseUpdater {
         localizer.setPoseEstimate(set);
     }
 
+    public void setXOffset(double offset) {
+        xOffset = offset;
+    }
+
+    public void setYOffset(double offset) {
+        yOffset = offset;
+    }
+
+    public void setHeadingOffset(double offset) {
+        headingOffset = offset;
+    }
+
+    public double getXOffset() {
+        return xOffset;
+    }
+
+    public double getYOffset() {
+        return yOffset;
+    }
+
+    public double getHeadingOffset() {
+        return headingOffset;
+    }
+
+    public Pose2d applyOffset(Pose2d pose) {
+        return new Pose2d(pose.getX()+xOffset, pose.getY()+yOffset, pose.getHeading()+headingOffset);
+    }
+
+    public void resetOffset() {
+        setXOffset(0);
+        setYOffset(0);
+        setHeadingOffset(0);
+    }
+
     /**
      * This returns the current pose
      *
      * @return returns the current pose
      */
     public Pose2d getPose() {
-        return localizer.getPoseEstimate();
+        return applyOffset(localizer.getPoseEstimate());
     }
 
     /**
@@ -81,6 +116,7 @@ public class PoseUpdater {
      * @param set the pose to set the current pose to
      */
     public void setPose(Pose2d set) {
+        resetOffset();
         localizer.setPoseEstimate(set);
     }
 

@@ -45,7 +45,7 @@ public class Follower {
 
     private DriveVectorScaler driveVectorScaler;
 
-    private PoseUpdater poseUpdater;
+    public PoseUpdater poseUpdater;
 
     private Pose2d closestPose;
 
@@ -86,6 +86,8 @@ public class Follower {
     private Vector smallTranslationalIntegralVector, largeTranslationalIntegralVector;
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
+
+    public static double holdPointTranslationalScaling = 0.7, holdPointHeadingScaling = 0.7;
 
     /**
      * This creates a new follower given a hardware map
@@ -173,6 +175,10 @@ public class Follower {
         return poseUpdater.getPose();
     }
 
+    public void setPose(Pose2d pose) {
+        poseUpdater.setPose(pose);
+    }
+
     /**
      * This returns the current velocity
      *
@@ -257,7 +263,7 @@ public class Follower {
             if (holdingPosition) {
                 closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), 1);
 
-                drivePowers = driveVectorScaler.getDrivePowers(getCorrectiveVector(), getHeadingVector(), getDriveVector(), poseUpdater.getPose().getHeading());
+                drivePowers = driveVectorScaler.getDrivePowers(MathFunctions.scalarMultiplyVector(getCorrectiveVector(), holdPointTranslationalScaling), MathFunctions.scalarMultiplyVector(getHeadingVector(), holdPointHeadingScaling), new Vector(), poseUpdater.getPose().getHeading());
 
                 limitDrivePowers();
 

@@ -12,7 +12,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MIDDLE_PRESET_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_TRANSFER_DELAY;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_CLAW_DELAY;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.ROBOT_BACK_LENGTH;
@@ -278,7 +278,7 @@ public class LM5_BlueAuto extends OpMode {
         twoPersonDrive.innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_CLOSED);
 
         try {
-            Thread.sleep(OUTER_OUTTAKE_CLAW_TRANSFER_DELAY);
+            Thread.sleep(TRANSFER_CLAW_DELAY);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
