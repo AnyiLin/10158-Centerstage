@@ -551,11 +551,8 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public void fineAdjustControls() {
         fineAdjustIntakeArm();
-        if (gamepad2.right_stick_button) {
-            fineAdjustOuttakeWrist();
-        } else {
-            fineAdjustOuttakeArm();
-        }
+        fineAdjustOuttakeArm();
+        fineAdjustOuttakeWrist();
     }
 
     public void fineAdjustOuttakeArm() {
@@ -575,7 +572,7 @@ public class TwoPersonDrive extends LinearOpMode {
     public void fineAdjustOuttakeWrist() {
         if (outtakeState == OUTTAKE_OUT) {
             if (outtakeWristOffset <= OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND && outtakeWristOffset >= OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND) {
-                outtakeWristOffset += gamepad2.right_stick_y * deltaTimeSeconds * OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND;
+                outtakeWristOffset += (gamepad2.right_trigger - gamepad2.left_trigger) * deltaTimeSeconds * OUTTAKE_WRIST_FINE_ADJUST_DEGREES_PER_SECOND;
             } else {
                 if (outtakeWristOffset < OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND) {
                     outtakeWristOffset = OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND;

@@ -84,7 +84,7 @@ public class RobotConstants {
     INTAKE_ARM_STACK_TOP_POSITION = 0.68,
 
     // position for the intake arm being at the middle of a pixel stack
-    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.725,
+    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.718,
 
     // upper bound for intake arm fine adjustment
     INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.4,
@@ -119,7 +119,7 @@ public class RobotConstants {
     OUTTAKE_WRIST_VERTICAL_OFFSET = 0.845,
 
     // upper bound for outtake wrist fine adjustment
-    OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND = 60,
+    OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND = -60,
 
     // lower bound for outtake wrist fine adjustment
     OUTTAKE_WRIST_FINE_ADJUST_LOWER_BOUND = 180,

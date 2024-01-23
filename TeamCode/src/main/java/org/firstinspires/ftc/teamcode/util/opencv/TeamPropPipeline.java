@@ -39,8 +39,8 @@ public class TeamPropPipeline extends OpenCvPipeline {
         rightLeftBound = 230;
         rightRightBound = 255;
         rightTopBound = 360;
-        middleLeftBound = 201;
-        middleRightBound = 280;
+        middleLeftBound = 200;
+        middleRightBound = 285;
         middleTopBound = 85;
         minDetected = 40000;
         minMultiple = 30;

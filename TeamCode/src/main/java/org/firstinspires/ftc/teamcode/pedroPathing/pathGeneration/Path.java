@@ -11,7 +11,7 @@ public class Path {
 
     private double startHeading, endHeading, closestPointCurvature, closestPointTValue;
 
-    private Vector closestPointTangentVector;
+    private Vector closestPointTangentVector, closestPointNormalVector;
 
     private boolean isTangentHeadingInterpolation = true, followTangentReversed;
 
@@ -101,6 +101,8 @@ public class Path {
 
         closestPointTangentVector = curve.getDerivative(closestPointTValue);
 
+        closestPointNormalVector = curve.getSecondDerivative(closestPointTValue);
+
         closestPointCurvature = curve.getCurvature(closestPointTValue);
 
         return new Pose2d(returnPoint.getX(), returnPoint.getY(), getClosestPointHeadingGoal());
@@ -170,6 +172,15 @@ public class Path {
      */
     public double getClosestPointCurvature() {
         return closestPointCurvature;
+    }
+
+    /**
+     * This returns the normal vector at the closest point
+     *
+     * @return returns the normal vector at the closest point
+     */
+    public Vector getClosestPointNormalVector() {
+        return MathFunctions.copyVector(closestPointNormalVector);
     }
 
     /**
