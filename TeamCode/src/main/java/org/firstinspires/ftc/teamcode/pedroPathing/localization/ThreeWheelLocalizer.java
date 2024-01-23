@@ -56,12 +56,12 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
         // TODO: redo the configs here
         leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftRear"));
         rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
-        strafeEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightRear"));
+        strafeEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "strafeEncoder"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
         rightEncoder.setDirection(Encoder.Direction.REVERSE);
-        strafeEncoder.setDirection(Encoder.Direction.REVERSE);
+        strafeEncoder.setDirection(Encoder.Direction.FORWARD);
     }
 
     public void resetHeading(double heading) {

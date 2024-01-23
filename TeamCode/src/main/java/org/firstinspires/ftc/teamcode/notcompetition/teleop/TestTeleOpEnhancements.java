@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.notcompetition.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
@@ -10,11 +12,22 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 public class TestTeleOpEnhancements extends OpMode {
     private Follower follower;
 
+    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
     private Vector driveVector, headingVector;
 
     @Override
     public void init() {
         follower = new Follower(hardwareMap, false);
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         driveVector = new Vector();
         headingVector = new Vector();

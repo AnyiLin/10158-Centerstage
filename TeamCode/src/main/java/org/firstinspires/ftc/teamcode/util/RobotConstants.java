@@ -35,7 +35,7 @@ public class RobotConstants {
     INTAKE_ARM_PRESET_SPEED = 300,
 
     // outtake arm speed for preset movements in degrees per second
-    OUTTAKE_ARM_PRESET_SPEED = 300;
+    OUTTAKE_ARM_PRESET_SPEED = 260;
 
 
     public static final int
@@ -184,7 +184,8 @@ public class RobotConstants {
 
     // the time it takes for the outtake arm to go in from the out position back into the robot
     // timing should be the same both ways the arm moves though
-    OUTTAKE_ARM_OUT_IN_TIME = 1000,
+    MIN_OUTTAKE_ARM_OUT_IN_TIME = 1000,
+    MAX_OUTTAKE_ARM_OUT_IN_TIME = 1000,
 
     // roughly the time it takes for our outtake claws to close
     OUTTAKE_CLAW_CLOSE_TIME = 250,
