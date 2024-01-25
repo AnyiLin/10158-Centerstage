@@ -175,7 +175,7 @@ public class RedRightInnerAuto extends OpMode {
                 secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2, Math.PI * 1.5 - Math.toRadians(1));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.5, Math.PI * 1.5 - Math.toRadians(2));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.5, Math.PI * 1.5 - Math.toRadians(3.5));
                 secondCycleStackPose = new Pose2d(redInnerStack.getX() - 1.3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2, Math.PI * 1.5 - Math.toRadians(1));
                 break;
             case "right":
@@ -486,7 +486,7 @@ public class RedRightInnerAuto extends OpMode {
     public void stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 0.9) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 12 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 0.85) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 12 * MathFunctions.getSign(error));
 
         if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 

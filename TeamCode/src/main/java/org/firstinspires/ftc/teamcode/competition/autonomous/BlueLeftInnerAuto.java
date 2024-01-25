@@ -116,7 +116,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX(), blueLeftSideMiddleSpikeMark.getY()+4, Math.PI/2);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX()+1.5, blueLeftSideMiddleSpikeMark.getY()+4, Math.PI/2);
                 initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() + 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-0.5,Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
@@ -176,7 +176,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case "middle":
                 firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 - Math.toRadians(2));
                 break;
             case "right":
                 firstCycleStackPose = new Pose2d(blueInnerStack.getX()-2.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(2));
@@ -185,9 +185,9 @@ public class BlueLeftInnerAuto extends OpMode {
         }
 
         firstCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 28, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -198,17 +198,17 @@ public class BlueLeftInnerAuto extends OpMode {
                 .build();
 
         firstCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(2.5)
                 .build();
 
         secondCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 28, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -219,9 +219,9 @@ public class BlueLeftInnerAuto extends OpMode {
                 .build();
 
         secondCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
                 .setPathEndTimeout(2.5)
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .build();
@@ -486,7 +486,7 @@ public class BlueLeftInnerAuto extends OpMode {
     public void stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 0.9) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 12 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 1) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 8 * MathFunctions.getSign(error));
 
         if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 
