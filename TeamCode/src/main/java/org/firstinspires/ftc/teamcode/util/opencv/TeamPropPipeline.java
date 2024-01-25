@@ -24,7 +24,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     public TeamPropPipeline() {
         defaultSetup();
-        COLOR = 0;
+        COLOR = 2;
     }
 
     public TeamPropPipeline(int color) {
@@ -36,13 +36,13 @@ public class TeamPropPipeline extends OpenCvPipeline {
         WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
         GRAY_ERROR = 120;
-        rightLeftBound = 230;
-        rightRightBound = 255;
+        rightLeftBound = 200;
+        rightRightBound = 260;
         rightTopBound = 360;
         middleLeftBound = 200;
         middleRightBound = 285;
         middleTopBound = 85;
-        minDetected = 40000;
+        minDetected = 15000;
         minMultiple = 30;
     }
 
@@ -60,15 +60,16 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
     public Mat actualProcessFrame(Mat input) {
+
         for (int x = 0; x < 640; x++){
             for (int y = 0; y < 480; y++){
-                if (y > 480 - 2.2 * (x - 195) && x < 240 && y < 480 - 2.2 * (x - 208)){
-                    if (draw){
+                if (y > 480 - 2.2 * (x - 195) && x < 240 && y < 480 - 2.2 * (x - 203)){
                         Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
-                    }
                 }
             }
         }
+
+
         output = input.clone();
 
         Imgproc.cvtColor(output, hsv, Imgproc.COLOR_RGB2HSV);
@@ -113,9 +114,9 @@ public class TeamPropPipeline extends OpenCvPipeline {
         }
 
 
-        if (middleTotal > 15000){//rightTotal * minMultiple){
+        if (middleTotal > minDetected){//rightTotal * minMultiple){
             navigation = "middle";
-        } else if (rightTotal > 15000){//middleTotal * minMultiple){
+        } else if (rightTotal > minDetected){//middleTotal * minMultiple){
             navigation = "right";
         } else {
             navigation = "left";

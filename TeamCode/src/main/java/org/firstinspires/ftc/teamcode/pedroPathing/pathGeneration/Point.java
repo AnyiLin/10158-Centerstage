@@ -99,7 +99,7 @@ public class Point {
             if (y > 0) {
                 return new double[] {y, Math.PI/2};
             } else {
-                return new double[] {-y, (3 * Math.PI) / 2};
+                return new double[] {y, (3 * Math.PI) / 2};
             }
         }
         double r = Math.sqrt(x*x+y*y);

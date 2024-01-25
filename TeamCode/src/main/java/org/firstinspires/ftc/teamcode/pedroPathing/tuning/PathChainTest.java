@@ -3,39 +3,42 @@ package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 
 @Config
-@Autonomous (name = "Curved Back And Forth", group = "Autonomous Pathing Tuning")
-public class CurvedBackAndForth extends OpMode {
+@Autonomous (name = "Path Chain Test", group = "Autonomous Pathing Tuning")
+public class PathChainTest extends OpMode {
     private Telemetry telemetryA;
-
-    public static double DISTANCE = 20;
-
-    private boolean forward = true;
 
     private Follower follower;
 
-    private Path forwards, backwards;
+    private PathChain pathChain, pathChain2;
 
     @Override
     public void init() {
         follower = new Follower(hardwareMap);
 
-        forwards = new Path(new BezierCurve(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN), new Point(DISTANCE,DISTANCE, Point.CARTESIAN)));
-        backwards = new Path(new BezierCurve(new Point(DISTANCE,DISTANCE, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
+        follower.setStartingPose(new Pose2d(36+72, 72+50, Math.PI*1.5));
 
-        backwards.setReversed(true);
+        pathChain = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(36+72, 72+50, Point.CARTESIAN), new Point(76.5, 106, Point.CARTESIAN), new Point(84, 79, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(85, 28, Point.CARTESIAN)))//, new Point(84, 28, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(Math.PI*1.5)
+                .setPathEndTimeout(0)
+                .build();
 
-        follower.followPath(forwards);
+        follower.followPath(pathChain);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetryA.addLine("stuff");
@@ -53,17 +56,8 @@ public class CurvedBackAndForth extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        if (!follower.isBusy()) {
-            if (forward) {
-                forward = false;
-                follower.followPath(backwards);
-            } else {
-                forward = true;
-                follower.followPath(forwards);
-            }
-        }
 
-        telemetryA.addData("forward", forward);
+        telemetryA.addData("path number", follower.getCurrentPathNumber());
         telemetryA.addData("leftFront", follower.motorPowers()[0]);
         telemetryA.addData("leftRear", follower.motorPowers()[1]);
         telemetryA.addData("rightFront", follower.motorPowers()[2]);

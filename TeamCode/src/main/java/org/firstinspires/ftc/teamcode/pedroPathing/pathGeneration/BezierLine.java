@@ -97,6 +97,11 @@ public class BezierLine extends BezierCurve {
         return new Vector();
     }
 
+    @Override
+    public Vector getApproxSecondDerivative(double t) {
+        return new Vector();
+    }
+
     /**
      * Returns the ArrayList of control points for this Bezier line
      *

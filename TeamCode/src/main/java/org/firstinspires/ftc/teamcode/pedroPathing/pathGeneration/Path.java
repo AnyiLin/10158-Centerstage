@@ -101,7 +101,7 @@ public class Path {
 
         closestPointTangentVector = curve.getDerivative(closestPointTValue);
 
-        closestPointNormalVector = curve.getSecondDerivative(closestPointTValue);
+        closestPointNormalVector = curve.getApproxSecondDerivative(closestPointTValue);
 
         closestPointCurvature = curve.getCurvature(closestPointTValue);
 

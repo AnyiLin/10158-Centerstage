@@ -123,7 +123,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2.5, blueLeftSideRightSpikeMark.getY()-1.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
@@ -179,51 +179,51 @@ public class BlueLeftInnerAuto extends OpMode {
                 secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-2.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-3.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
                 break;
         }
 
         firstCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(144-80, 79, Point.CARTESIAN)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierLine(new Point(144-84, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 28, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
 
         firstCycleStackGrab = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(firstCycleStackPose.getX(), 32, Point.CARTESIAN), new Point(firstCycleStackPose)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+0.0001, 32, Point.CARTESIAN), new Point(firstCycleStackPose)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .build();
 
         firstCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(144-84, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(144-84, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
+                .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(2.5)
                 .build();
 
         secondCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(144-84, 79, Point.CARTESIAN)))
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierLine(new Point(144-84, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
+                .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 28, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
 
         secondCycleStackGrab = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(secondCycleStackPose.getX(), 32, Point.CARTESIAN), new Point(secondCycleStackPose)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+0.0001, 32, Point.CARTESIAN), new Point(secondCycleStackPose)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .build();
 
         secondCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(144-84, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(144-84, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+0.0001, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
                 .setPathEndTimeout(2.5)
-                .setConstantHeadingInterpolation(Math.PI * 1.5)
+                .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .build();
     }
 
@@ -486,7 +486,7 @@ public class BlueLeftInnerAuto extends OpMode {
     public void stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 0.75) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 5 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 0.9) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 12 * MathFunctions.getSign(error));
 
         if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 

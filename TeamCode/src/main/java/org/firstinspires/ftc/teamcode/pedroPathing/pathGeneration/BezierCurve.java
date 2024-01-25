@@ -201,6 +201,13 @@ public class BezierCurve {
         return returnVector;
     }
 
+    public Vector getApproxSecondDerivative(double t) {
+        double current = getDerivative(t).getTheta();
+        double deltaCurrent = getDerivative(t + 0.0001).getTheta();
+
+        return new Vector(1, deltaCurrent - current);
+    }
+
     /**
      * Returns the ArrayList of control points for this Bezier curve
      *

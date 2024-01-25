@@ -81,7 +81,7 @@ public class RobotConstants {
     INTAKE_ARM_OUT_POSITION = 0.748,
 
     // position for the intake arm being at the top of a pixel stack
-    INTAKE_ARM_STACK_TOP_POSITION = 0.68,
+    INTAKE_ARM_STACK_TOP_POSITION = 0.676,
 
     // position for the intake arm being at the middle of a pixel stack
     INTAKE_ARM_STACK_MIDDLE_POSITION = 0.718,
