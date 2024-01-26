@@ -116,14 +116,14 @@ public class BlueLeftInnerAuto extends OpMode {
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX()+1.5, blueLeftSideMiddleSpikeMark.getY()+4, Math.PI/2);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX()+1.5, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
                 initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() + 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-0.5,Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2.5, blueLeftSideRightSpikeMark.getY()-1.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
@@ -171,23 +171,23 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(0));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 - Math.toRadians(2));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(0));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-2.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(2));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-3.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(1));
                 break;
         }
 
         firstCycleToStack = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -200,7 +200,7 @@ public class BlueLeftInnerAuto extends OpMode {
         firstCycleScoreOnBackdrop = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(2.5)
                 .build();
@@ -208,7 +208,7 @@ public class BlueLeftInnerAuto extends OpMode {
         secondCycleToStack = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 28, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -221,9 +221,9 @@ public class BlueLeftInnerAuto extends OpMode {
         secondCycleScoreOnBackdrop = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106-24, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
-                .setPathEndTimeout(2.5)
+                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
+                .setPathEndTimeout(2.5)
                 .build();
     }
 
@@ -295,77 +295,82 @@ public class BlueLeftInnerAuto extends OpMode {
                 }
                 break;
             case 21:
-                if (follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.4 && follower.isBusy()) {
-                    stackCorrection();
-                }
                 if (!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(firstCycleToStack.getPath(1).getLastControlPoint().getX(),firstCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), firstCycleStackPose.getHeading());
                     setPathState(22);
                 }
                 break;
             case 22:
-                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
-                setPathState(23);
-                break;
-            case 23:
-                if (twoPersonDrive.intakeArmAtTargetPosition()) {
-                    setPathState(24);
+                stackCorrection();
+                if (pathTimer.getElapsedTime() > 1000) {
+                    setPathState(23);
                 }
                 break;
+            case 23:
+                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_TOP_POSITION);
+                setPathState(24);
+                break;
             case 24:
-                if (pathTimer.getElapsedTime() > 500) {
-                    follower.followPath(firstCycleStackGrab);
+                if (twoPersonDrive.intakeArmAtTargetPosition()) {
                     setPathState(25);
                 }
                 break;
             case 25:
+                if (pathTimer.getElapsedTime() > 500) {
+                    follower.followPath(firstCycleStackGrab);
+                    setPathState(26);
+                }
+                break;
+            case 26:
                 if (follower.getCurrentTValue() > 0.92) {//!follower.isBusy()) {
                     //Follower.useHeading = false;
                     //follower.holdPoint(new BezierPoint(new Point(firstCycleStackPose)), Math.PI * 1.5);
                     twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
-                    setPathState(26);
+                    setPathState(27);
                 }
                 if (pathTimer.getElapsedTime() > 3000) {
-                    setPathState(26);
+                    setPathState(27);
                 }
                 break;
-            case 26: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+            case 27: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
                     follower.poseUpdater.resetOffset();
                     Follower.useHeading = true;
                     follower.followPath(firstCycleScoreOnBackdrop);
-                    setPathState(27);
-                }
-                break;
-            case 27:
-                if (((follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.1) || !follower.isBusy()) && twoPersonDrive.transferState == TRANSFER_PRESET_HOLD) {
-                    twoPersonDrive.liftPresetTargetPosition = 850;
-                    twoPersonDrive.setTransferState(TRANSFER_OUT);
                     setPathState(28);
                 }
                 break;
-            case 28: // detects for end of the path and outtake out and drops pixel
-                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
-                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
-                    //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+            case 28:
+                if (((follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.1) || !follower.isBusy()) && twoPersonDrive.transferState == TRANSFER_PRESET_HOLD) {
+                    twoPersonDrive.setTransferState(TRANSFER_OUT);
                     setPathState(29);
                 }
                 break;
-            case 29:
-                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+            case 29: // detects for end of the path and outtake out and drops pixel
+                if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.setLiftTargetPosition(850);
+                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
+                }
+                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
+                    //Follower.useHeading = false;
+                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
                     setPathState(210);
                 }
                 break;
             case 210:
-                if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(211);
                 }
                 break;
-            case 211: // once the outer pixel has dropped, drop the inner one and fold up
+            case 211:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    setPathState(212);
+                }
+                break;
+            case 212: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > 2*OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     setPathState(30);
@@ -381,77 +386,82 @@ public class BlueLeftInnerAuto extends OpMode {
                 }
                 break;
             case 31:
-                if (follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.4 && follower.isBusy()) {
-                    stackCorrection();
-                }
                 if (!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(secondCycleToStack.getPath(1).getLastControlPoint().getX(),secondCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), secondCycleStackPose.getHeading());
                     setPathState(32);
                 }
                 break;
             case 32:
-                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
-                setPathState(33);
-                break;
-            case 33:
-                if (twoPersonDrive.intakeArmAtTargetPosition()) {
-                    setPathState(34);
+                stackCorrection();
+                if (pathTimer.getElapsedTime() > 1000) {
+                    setPathState(33);
                 }
                 break;
+            case 33:
+                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_STACK_MIDDLE_POSITION);
+                setPathState(34);
+                break;
             case 34:
-                if (pathTimer.getElapsedTime() > 300) {
-                    follower.followPath(secondCycleStackGrab);
+                if (twoPersonDrive.intakeArmAtTargetPosition()) {
                     setPathState(35);
                 }
                 break;
             case 35:
+                if (pathTimer.getElapsedTime() > 300) {
+                    follower.followPath(secondCycleStackGrab);
+                    setPathState(36);
+                }
+                break;
+            case 36:
                 if (follower.getCurrentTValue() > 0.92) {//!follower.isBusy()) {
                     //Follower.useHeading = false;
                     //follower.holdPoint(new BezierPoint(new Point(secondCycleStackPose)), Math.PI * 1.5);
                     twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
-                    setPathState(36);
+                    setPathState(37);
                 }
                 if (pathTimer.getElapsedTime() > 3000) {
-                    setPathState(36);
-                }
-                break;
-            case 36: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
-                if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
-                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
-                    //Follower.useHeading = true;
-                    follower.poseUpdater.resetOffset();
-                    follower.followPath(secondCycleScoreOnBackdrop);
                     setPathState(37);
                 }
                 break;
-            case 37:
-                if (((follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.1) || !follower.isBusy()) && twoPersonDrive.transferState == TRANSFER_PRESET_HOLD) {
-                    twoPersonDrive.liftPresetTargetPosition = 850;
-                    twoPersonDrive.setTransferState(TRANSFER_OUT);
+            case 37: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
+                if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
+                    twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
+                    Follower.useHeading = true;
+                    follower.poseUpdater.resetOffset();
+                    follower.followPath(secondCycleScoreOnBackdrop);
                     setPathState(38);
                 }
                 break;
-            case 38: // detects for end of the path and outtake out and drops pixel
-                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
-                    twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
-                    //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+            case 38:
+                if (((follower.getCurrentPathNumber() == 1 && follower.getCurrentTValue() > 0.1) || !follower.isBusy()) && twoPersonDrive.transferState == TRANSFER_PRESET_HOLD) {
+                    twoPersonDrive.setTransferState(TRANSFER_OUT);
                     setPathState(39);
                 }
                 break;
-            case 39:
-                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+            case 39: // detects for end of the path and outtake out and drops pixel
+                if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.setLiftTargetPosition(850);
+                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
+                }
+                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
+                    //Follower.useHeading = false;
+                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
                     setPathState(310);
                 }
                 break;
             case 310:
-                if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(311);
                 }
                 break;
-            case 311: // once the outer pixel has dropped, drop the inner one and fold up
+            case 311:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    setPathState(312);
+                }
+                break;
+            case 312: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > 2*OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
@@ -486,7 +496,7 @@ public class BlueLeftInnerAuto extends OpMode {
     public void stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 1) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 8 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 0.8) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
 
         if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 

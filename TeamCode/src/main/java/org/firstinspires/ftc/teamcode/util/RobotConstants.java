@@ -166,10 +166,10 @@ public class RobotConstants {
     INTAKE_CLAW_CLOSED = 0.58,
 
     // plane launcher launch position
-    PLANE_LAUNCHER_LAUNCH = 0.5,
+    PLANE_LAUNCHER_LAUNCH = 0.3,
 
     // plane launcher hold position
-    PLANE_LAUNCHER_HOLD = 0.23,
+    PLANE_LAUNCHER_HOLD = 0.07,
 
     // the length from the middle of the robot to the back
     ROBOT_BACK_LENGTH = 11.5,

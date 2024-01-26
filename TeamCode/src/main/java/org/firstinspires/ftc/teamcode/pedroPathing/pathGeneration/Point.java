@@ -97,9 +97,9 @@ public class Point {
     public static double[] cartesianToPolar(double x, double y) {
         if (x == 0) {
             if (y > 0) {
-                return new double[] {y, Math.PI/2};
+                return new double[] {Math.abs(y), Math.PI/2};
             } else {
-                return new double[] {y, (3 * Math.PI) / 2};
+                return new double[] {Math.abs(y), (3 * Math.PI) / 2};
             }
         }
         double r = Math.sqrt(x*x+y*y);

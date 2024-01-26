@@ -24,7 +24,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     public TeamPropPipeline() {
         defaultSetup();
-        COLOR = 2;
+        COLOR = 0;
     }
 
     public TeamPropPipeline(int color) {
@@ -60,14 +60,23 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
     public Mat actualProcessFrame(Mat input) {
-
-        for (int x = 0; x < 640; x++){
-            for (int y = 0; y < 480; y++){
-                if (y > 480 - 2.2 * (x - 195) && x < 240 && y < 480 - 2.2 * (x - 203)){
-                        Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
+    if (COLOR == 0) {
+        for (int x = 0; x < 640; x++) {
+            for (int y = 0; y < 480; y++) {
+                if (y > 480 - 2.2 * (x - 203) && x < 255 && y < 480 - 2.2 * (x - 213)) {
+                    Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
                 }
             }
         }
+    } else if (COLOR == 2) {
+        for (int x = 0; x < 640; x++) {
+            for (int y = 0; y < 480; y++) {
+                if (y > 480 - 1.8 * (x - 205) && x < 260 && y < 480 - 1.8 * (x - 215)) {
+                    Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
+                }
+            }
+        }
+    }
 
 
         output = input.clone();
