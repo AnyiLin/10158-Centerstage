@@ -23,6 +23,8 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_POSITI
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_PRESET_HOLD;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_RESET;
 
+import static java.lang.Thread.sleep;
+
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -50,7 +52,7 @@ public class BlueLeftInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 
-    private Timer pathTimer, opmodeTimer;
+    private Timer pathTimer, opmodeTimer, scanTimer;
 
     private VisionPortalTeamPropPipeline teamPropPipeline;
 
@@ -534,6 +536,7 @@ public class BlueLeftInnerAuto extends OpMode {
 
         pathTimer = new Timer();
         opmodeTimer = new Timer();
+        scanTimer = new Timer();
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
@@ -560,17 +563,30 @@ public class BlueLeftInnerAuto extends OpMode {
         twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
 
         twoPersonDrive.innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_CLOSED);
+
+        try {
+            sleep(2500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        scanTimer.resetTimer();
     }
 
     @Override
     public void init_loop() {
         super.init_loop();
 
-        navigation = teamPropPipeline.getNavigation();
-        telemetry.addData("Navigation:", navigation);
-        telemetry.update();
-        setBackdropGoalPose();
-        buildPaths();
+        if (scanTimer.getElapsedTime() > 750) {
+            navigation = teamPropPipeline.getNavigation();
+            telemetry.addData("Navigation:", navigation);
+            telemetry.update();
+            scanTimer.resetTimer();
+        } else if (scanTimer.getElapsedTime() > 700){
+            visionPortal.setProcessorEnabled(teamPropPipeline, true);
+        } else {
+            visionPortal.setProcessorEnabled(teamPropPipeline, false);
+        }
     }
 
     @Override
@@ -578,6 +594,8 @@ public class BlueLeftInnerAuto extends OpMode {
         super.start();
         visionPortal.stopStreaming();
         twoPersonDrive.frameTimer.resetTimer();
+        setBackdropGoalPose();
+        buildPaths();
         opmodeTimer.resetTimer();
         setPathState(10);
     }
