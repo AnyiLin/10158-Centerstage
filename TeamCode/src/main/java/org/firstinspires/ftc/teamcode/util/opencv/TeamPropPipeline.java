@@ -35,14 +35,14 @@ public class TeamPropPipeline extends OpenCvPipeline {
     public void defaultSetup() {
         WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
-        GRAY_ERROR = 120;
-        rightLeftBound = 200;
-        rightRightBound = 260;
+        GRAY_ERROR = 135;
+        rightLeftBound = 255;
+        rightRightBound = 280;
         rightTopBound = 360;
-        middleLeftBound = 200;
-        middleRightBound = 285;
+        middleLeftBound = 270;
+        middleRightBound = 310;
         middleTopBound = 85;
-        minDetected = 15000;
+        minDetected = 16000;
         minMultiple = 30;
     }
 
@@ -63,7 +63,14 @@ public class TeamPropPipeline extends OpenCvPipeline {
     if (COLOR == 0) {
         for (int x = 0; x < 640; x++) {
             for (int y = 0; y < 480; y++) {
-                if (y > 480 - 2.2 * (x - 203) && x < 255 && y < 480 - 2.2 * (x - 213)) {
+                if (y > 480 - 1.9 * (x - 220) && x < 280 && y < 480 - 1.9 * (x - 230)) {
+                    Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
+                }
+            }
+        }
+        for (int x = 0; x < 640; x++) {
+            for (int y = 0; y < 480; y++) {
+                if (y > 80 && x < 280 && x > 270 && y < 200) {
                     Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
                 }
             }
@@ -71,7 +78,14 @@ public class TeamPropPipeline extends OpenCvPipeline {
     } else if (COLOR == 2) {
         for (int x = 0; x < 640; x++) {
             for (int y = 0; y < 480; y++) {
-                if (y > 480 - 1.8 * (x - 205) && x < 260 && y < 480 - 1.8 * (x - 215)) {
+                if (y > 480 - 1.9 * (x - 220) && x < 280 && y < 480 - 1.9 * (x - 230)) {
+                    Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
+                }
+            }
+        }
+        for (int x = 0; x < 640; x++) {
+            for (int y = 0; y < 480; y++) {
+                if (y > 80 && x < 280 && x > 270 && y < 200) {
                     Imgproc.line(input, new Point(x, y), new Point(x + 1, y + 1), new Scalar(255, 255, 255));
                 }
             }

@@ -110,20 +110,20 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()-2.5, redRightSideLeftSpikeMark.getY()-1.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.5, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()-2.5, redRightSideLeftSpikeMark.getY(), Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1.5, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1.75, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX()-0.75, redRightSideMiddleSpikeMark.getY()+4, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()+1, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH+0.5,Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()+1, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.15, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-2, redRightSideRightSpikeMark.getY()+0.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 0.5, redRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.5, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 0.5, redRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
                 break;
@@ -171,8 +171,8 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(2));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.75, Math.PI * 1.5 - Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX()-0.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX()-0.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.75, Math.PI * 1.5 - Math.toRadians(1));
                 break;
             case "middle":
                 firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(0));
