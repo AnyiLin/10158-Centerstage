@@ -112,20 +112,20 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX() + 2.5, blueLeftSideLeftSpikeMark.getY()+1, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX(), blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX() + 2.5, blueLeftSideLeftSpikeMark.getY()-0.75, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX(), blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.75, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX()+1.5, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() + 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1.25,Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() + 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2.5, blueLeftSideRightSpikeMark.getY()-1.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
@@ -500,7 +500,7 @@ public class BlueLeftInnerAuto extends OpMode {
 
         if (Math.abs(error) > 0.75) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
 
-        if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
+        if (Math.abs(follower.poseUpdater.getXOffset()) > 4) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 
         telemetry.addData("error", error);
     }

@@ -118,16 +118,16 @@ public class RedRightInnerAuto extends OpMode {
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1.75, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX()-0.75, redRightSideMiddleSpikeMark.getY()+4, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()+1, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX()-0.4, redRightSideMiddleSpikeMark.getY()+4, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()+2.3, redMiddleBackdrop.getY()-ROBOT_BACK_LENGTH,Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.15, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-2, redRightSideRightSpikeMark.getY()+0.5, Math.PI/2);
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 0.5, redRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()+1, redLeftBackdrop.getY()-ROBOT_BACK_LENGTH+0.5, Math.PI * 1.5);
                 break;
         }
     }
@@ -177,12 +177,12 @@ public class RedRightInnerAuto extends OpMode {
                 secondCycleStackPose = new Pose2d(redInnerStack.getX()-0.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.75, Math.PI * 1.5 - Math.toRadians(1));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(0));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.75, Math.PI * 1.5 - Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.75, Math.PI * 1.5 - Math.toRadians(2.5));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75, Math.PI * 1.5 - Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(2.5));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 1, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.75, Math.PI * 1.5 - Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() + 1, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.25, Math.PI * 1.5 - Math.toRadians(2.5));
                 break;
         }
 
@@ -498,9 +498,9 @@ public class RedRightInnerAuto extends OpMode {
     public void stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 0.8) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 0.75) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
 
-        if (Math.abs(follower.poseUpdater.getXOffset()) > 2) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
+        if (Math.abs(follower.poseUpdater.getXOffset()) > 6) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 
         telemetry.addData("error", error);
     }
