@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.competition.autonomous;
 
 
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INNER_OUTTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_AUTO_AVOID_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_MIDDLE_POSITION;
@@ -12,7 +10,9 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLO
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_OUT;
@@ -22,12 +22,12 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_POSITIONING;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_PRESET_HOLD;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.TRANSFER_RESET;
-
 import static java.lang.Thread.sleep;
 
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -61,6 +61,8 @@ public class RedRightInnerAuto extends OpMode {
     private String navigation;
 
     private DistanceSensor leftDistanceSensor, rightDistanceSensor;
+
+    private RevColorSensorV3 colorSensor;
 
     // IMPORTANT: y increasing is towards the backstage from the audience,
     // while x increasing is towards the red side from the blue side
@@ -271,17 +273,23 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 16:
-                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                backdropCorrection();
+                if (pathTimer.getElapsedTime() > 500) {
                     setPathState(17);
                 }
                 break;
-            case 17: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 500) {
-                    twoPersonDrive.innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_OPEN);
+            case 17:
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(18);
                 }
                 break;
-            case 18:
+            case 18: // detects for end of the path and outtake out and drops pixel
+                if (pathTimer.getElapsedTime() > 500) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    setPathState(19);
+                }
+                break;
+            case 19:
                 if (pathTimer.getElapsedTime() > 500) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     setPathState(20);
@@ -292,6 +300,7 @@ public class RedRightInnerAuto extends OpMode {
             case 20: // starts the robot off on to the first stack once the pixels have been dropped
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     Follower.useHeading = true;
+                    follower.poseUpdater.resetOffset();
                     follower.followPath(firstCycleToStack);
                     setPathState(21);
                 }
@@ -362,17 +371,45 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 210:
-                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                backdropCorrection();
+                if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
                 break;
             case 211:
-                if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(212);
                 }
                 break;
-            case 212: // once the outer pixel has dropped, drop the inner one and fold up
+            case 212:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    setPathState(213);
+                }
+                break;
+            case 213:
+                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_OUT_POSITION, 300);
+                    setPathState(214);
+                }
+                break;
+            case 214:
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    setPathState(215);
+                }
+                break;
+            case 215:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
+                    setPathState(216);
+                }
+                break;
+            case 216:
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    setPathState(217);
+                }
+                break;
+            case 217: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > 2*OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     setPathState(30);
@@ -383,6 +420,7 @@ public class RedRightInnerAuto extends OpMode {
             case 30: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     Follower.useHeading = true;
+                    follower.poseUpdater.resetOffset();
                     follower.followPath(secondCycleToStack);
                     setPathState(31);
                 }
@@ -453,17 +491,45 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 310:
-                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                backdropCorrection();
+                if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
                 break;
             case 311:
-                if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(312);
                 }
                 break;
-            case 312: // once the outer pixel has dropped, drop the inner one and fold up
+            case 312:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
+                    setPathState(313);
+                }
+                break;
+            case 313:
+                if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_OUT_POSITION, 300);
+                    setPathState(314);
+                }
+                break;
+            case 314:
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    setPathState(315);
+                }
+                break;
+            case 315:
+                if (pathTimer.getElapsedTime() > 300) {
+                    twoPersonDrive.setOuttakeArmInterpolation(0.4, 100);
+                    setPathState(316);
+                }
+                break;
+            case 316:
+                if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    setPathState(317);
+                }
+                break;
+            case 317: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > 2*OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
@@ -495,14 +561,37 @@ public class RedRightInnerAuto extends OpMode {
         autonomousPathUpdate();
     }
 
-    public void stackCorrection() {
+    public double stackCorrection() {
         double error = leftDistanceSensor.getDistance(DistanceUnit.INCH)-rightDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > 0.75) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
+        //if (Math.abs(error) > 0.75) follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 10 * MathFunctions.getSign(error));
+        if (Math.abs(error) > 0.75) {
+            follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 2 * error);
+        } else {
+            follower.poseUpdater.setXOffset(follower.getTranslationalError().getXComponent());
+        }
 
-        if (Math.abs(follower.poseUpdater.getXOffset()) > 6) follower.poseUpdater.setXOffset(2 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
+        if (Math.abs(follower.poseUpdater.getXOffset()) > 6) follower.poseUpdater.setXOffset(6 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
 
         telemetry.addData("error", error);
+
+        return error;
+    }
+
+    public double backdropCorrection() {
+        double rawLightValue = colorSensor.getRawLightDetected();
+
+        // too close
+        if (rawLightValue > 140) follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - twoPersonDrive.deltaTimeSeconds * 4);
+
+        // too far
+        if (rawLightValue < 130) follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + twoPersonDrive.deltaTimeSeconds * 4);
+
+        if (Math.abs(follower.poseUpdater.getYOffset()) > 2.5) follower.poseUpdater.setYOffset(2.5 * MathFunctions.getSign(follower.poseUpdater.getYOffset()));
+
+        telemetry.addData("raw light value", rawLightValue);
+
+        return rawLightValue;
     }
 
     @Override
@@ -526,6 +615,8 @@ public class RedRightInnerAuto extends OpMode {
     @Override
     public void init() {
         //PhotonCore.start(this.hardwareMap);
+
+        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
 
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
@@ -555,14 +646,20 @@ public class RedRightInnerAuto extends OpMode {
         twoPersonDrive.initialize();
 
         try {
-            sleep(3000);
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_CLOSED);
+
+        try {
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
         twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
-
-        twoPersonDrive.innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_CLOSED);
 
         try {
             sleep(2500);
@@ -582,7 +679,7 @@ public class RedRightInnerAuto extends OpMode {
             telemetry.addData("Navigation:", navigation);
             telemetry.update();
             scanTimer.resetTimer();
-        } else if (scanTimer.getElapsedTime() > 700){
+        } else if (scanTimer.getElapsedTime() > 720){
             visionPortal.setProcessorEnabled(teamPropPipeline, true);
         } else {
             visionPortal.setProcessorEnabled(teamPropPipeline, false);

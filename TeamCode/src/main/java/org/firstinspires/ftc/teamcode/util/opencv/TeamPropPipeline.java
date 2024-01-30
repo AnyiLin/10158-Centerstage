@@ -24,7 +24,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     public TeamPropPipeline() {
         defaultSetup();
-        COLOR = 0;
+        COLOR = 2;
     }
 
     public TeamPropPipeline(int color) {
@@ -37,10 +37,10 @@ public class TeamPropPipeline extends OpenCvPipeline {
         HEIGHT = 60 * 2;
         GRAY_ERROR = 135;
         rightLeftBound = 255;
-        rightRightBound = 280;
+        rightRightBound = 290;
         rightTopBound = 360;
         middleLeftBound = 270;
-        middleRightBound = 310;
+        middleRightBound = 305;
         middleTopBound = 85;
         minDetected = 16000;
         minMultiple = 30;
@@ -61,6 +61,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     public Mat actualProcessFrame(Mat input) {
     if (COLOR == 0) {
+        /*
         for (int x = 0; x < 640; x++) {
             for (int y = 0; y < 480; y++) {
                 if (y > 480 - 1.9 * (x - 220) && x < 280 && y < 480 - 1.9 * (x - 230)) {
@@ -75,7 +76,9 @@ public class TeamPropPipeline extends OpenCvPipeline {
                 }
             }
         }
+         */
     } else if (COLOR == 2) {
+        /*
         for (int x = 0; x < 640; x++) {
             for (int y = 0; y < 480; y++) {
                 if (y > 480 - 1.9 * (x - 220) && x < 280 && y < 480 - 1.9 * (x - 230)) {
@@ -90,6 +93,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
                 }
             }
         }
+         */
     }
 
 

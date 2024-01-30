@@ -564,6 +564,14 @@ public class Follower {
         return translationalVector;
     }
 
+    public Vector getTranslationalError() {
+        Vector error = new Vector();
+        double x = closestPose.getX() - poseUpdater.getPose().getX();
+        double y = closestPose.getY() - poseUpdater.getPose().getY();
+        error.setOrthogonalComponents(x, y);
+        return error;
+    }
+
     // TODO: remove later
     public double asdf() {
         return getTranslationalCorrection().getTheta();

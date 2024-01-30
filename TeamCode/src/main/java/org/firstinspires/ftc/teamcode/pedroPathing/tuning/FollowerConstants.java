@@ -119,12 +119,12 @@ public class FollowerConstants {
     // When the drivetrain is at the end of its current path or path chain and the translational error goes
     // below this value, then end the path. This is in inches
     // This can be custom set for each path
-    public static double pathEndTranslational = 0.5;
+    public static double pathEndTranslational = 0.2;
 
     // When the drivetrain is at the end of its current path or path chain and the heading error goes
     // below this value, then end the path. This is in radians
     // This can be custom set for each path
-    public static double pathEndHeading = 0.02;
+    public static double pathEndHeading = 0.01;
 
     // When the t-value of the closest point to the robot on the path is greater than this value,
     // then the path is considered at its end.
