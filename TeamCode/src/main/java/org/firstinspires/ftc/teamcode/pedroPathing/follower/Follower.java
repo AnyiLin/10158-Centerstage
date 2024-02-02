@@ -87,7 +87,7 @@ public class Follower {
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
-    public static double holdPointTranslationalScaling = 0.5, holdPointHeadingScaling = 0.5;
+    public static double holdPointTranslationalScaling = 0.65, holdPointHeadingScaling = 0.3;
 
     /**
      * This creates a new follower given a hardware map
@@ -263,7 +263,7 @@ public class Follower {
             if (holdingPosition) {
                 closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), 1);
 
-                drivePowers = driveVectorScaler.getDrivePowers(MathFunctions.scalarMultiplyVector(getCorrectiveVector(), holdPointTranslationalScaling), MathFunctions.scalarMultiplyVector(getHeadingVector(), holdPointHeadingScaling), new Vector(), poseUpdater.getPose().getHeading());
+                drivePowers = driveVectorScaler.getDrivePowers(MathFunctions.scalarMultiplyVector(getTranslationalCorrection(), holdPointTranslationalScaling), MathFunctions.scalarMultiplyVector(getHeadingVector(), holdPointHeadingScaling), new Vector(), poseUpdater.getPose().getHeading());
 
                 limitDrivePowers();
 

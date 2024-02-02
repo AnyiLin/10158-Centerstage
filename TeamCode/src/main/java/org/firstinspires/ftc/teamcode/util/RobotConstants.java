@@ -114,6 +114,12 @@ public class RobotConstants {
     // lower bound for outtake arm fine adjustment
     OUTTAKE_ARM_FINE_ADJUST_LOWER_BOUND = 0.2,
 
+    // outtake arm yellow pixel scoring position
+    OUTTAKE_ARM_YELLOW_SCORE_POSITION = 0.362,
+
+    // outtake arm cycle pixel scoring position
+    OUTTAKE_ARM_CYCLE_SCORE_POSITION = 0.383,
+
 
     // the position the wrist has to be at to be vertical when the outtake arm is in the robot
     OUTTAKE_WRIST_VERTICAL_OFFSET = 0.845,
@@ -158,9 +164,6 @@ public class RobotConstants {
 
     // open position of the intake claw
     INTAKE_CLAW_OPEN = 0.76,
-
-    // open position of the intake claw used for the transfer
-    //INTAKE_CLAW_TRANSFER_OPEN = 0.62, // todo test later
 
     // closed position of the intake claw
     INTAKE_CLAW_CLOSED = 0.58,

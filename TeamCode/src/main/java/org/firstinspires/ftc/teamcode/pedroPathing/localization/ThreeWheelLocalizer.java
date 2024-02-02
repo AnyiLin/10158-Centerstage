@@ -39,15 +39,17 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double X_MULTIPLIER = 0.5008239963;
     public static double Y_MULTIPLIER = 0.5018874659;
 
+    public static double leftX = -18.5/25.4 - 0.1, leftY = 164.4/25.4, rightX = -18.4/25.4 - 0.1, rightY = -159.6/25.4, strafeX = -107.9/25.4+0.25, strafeY = -1.1/25.4-0.23;
+
     private Encoder leftEncoder, rightEncoder, strafeEncoder;
 
     private List<Integer> lastEncPositions, lastEncVels;
 
     public ThreeWheelLocalizer(HardwareMap hardwareMap, List<Integer> lastTrackingEncPositions, List<Integer> lastTrackingEncVels) {
         super(Arrays.asList(
-                new Pose2d(-18.5/25.4, 164.4/25.4, 0), // left
-                new Pose2d(-18.4/25.4, -159.6/25.4, 0), // right
-                new Pose2d(-107.9/25.4, -1.1/25.4,  Math.toRadians(90)) // strafe
+                new Pose2d(leftX, leftY, 0), // left
+                new Pose2d(rightX, rightY, 0), // right
+                new Pose2d(strafeX, strafeY,  Math.toRadians(90)) // strafe
         ));
 
         lastEncPositions = lastTrackingEncPositions;

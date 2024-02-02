@@ -10,13 +10,17 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     private Mat output = new Mat(), hsv = new Mat();
 
-    private int WIDTH, HEIGHT, GRAY_ERROR, COLOR;
+    private int HEIGHT, GRAY_ERROR, COLOR;
 
     private int middleTotal, rightTotal;
 
     private int rightLeftBound, rightRightBound, rightTopBound, middleLeftBound, middleRightBound, middleTopBound;
 
     private int minDetected, minMultiple;
+
+    private Scalar WHITE = new Scalar(255, 255, 255);
+
+    private int i, j;
 
     private String navigation = "middle";
 
@@ -33,7 +37,6 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
     public void defaultSetup() {
-        WIDTH = 50 * 2;
         HEIGHT = 60 * 2;
         GRAY_ERROR = 135;
         rightLeftBound = 255;
@@ -48,7 +51,6 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
     // color corresponds with RGB values, with 0 being red, 1 being green, and 2 being blue
     public TeamPropPipeline(int WIDTH, int height, int grayError, int color) {
-        this.WIDTH = WIDTH;
         this.HEIGHT = height;
         this.GRAY_ERROR = grayError;
         this.COLOR = color;
@@ -116,24 +118,24 @@ public class TeamPropPipeline extends OpenCvPipeline {
 
         //middle column
         middleTotal = 0;
-        for (int counter = middleTopBound; counter < middleTopBound + HEIGHT; counter+=3) {
-            for (int counter2 = middleLeftBound; counter2 < middleRightBound; counter2+=2) {
-                if (!(hsv.get(counter, counter2)[1]< GRAY_ERROR)) {
-                    middleTotal += (output.get(counter, counter2)[COLOR]);
+        for (i = middleTopBound; i < middleTopBound + HEIGHT; i+=3) {
+            for (j = middleLeftBound; j < middleRightBound; j+=2) {
+                if (!(hsv.get(i, j)[1]< GRAY_ERROR)) {
+                    middleTotal += (output.get(i, j)[COLOR]);
 
-                    if(draw) Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                    if(draw) Imgproc.line(output, new Point(j, i), new Point(j + 1, i + 1), WHITE);
                 }
             }
         }
 
         //right column
         rightTotal = 0;
-        for (int counter = rightTopBound; counter < rightTopBound + HEIGHT; counter+=3) {
-            for (int counter2 = rightLeftBound; counter2 < rightRightBound; counter2+=2) {
-                if (!(hsv.get(counter, counter2)[1] < GRAY_ERROR)) {
-                    rightTotal += (output.get(counter, counter2)[COLOR]);
+        for (i = rightTopBound; i < rightTopBound + HEIGHT; i+=3) {
+            for (j = rightLeftBound; j < rightRightBound; j+=2) {
+                if (!(hsv.get(i, j)[1] < GRAY_ERROR)) {
+                    rightTotal += (output.get(i, j)[COLOR]);
                     if (draw)
-                        Imgproc.line(output, new Point(counter2, counter), new Point(counter2 + 1, counter + 1), new Scalar(255, 255, 255));
+                        Imgproc.line(output, new Point(j, i), new Point(j + 1, i + 1), WHITE);
 
                 }
 
@@ -167,9 +169,9 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
     public void writeOnScreen() {
-        Imgproc.putText(output, navigation+"", new Point(0,80), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
-        Imgproc.putText(output, middleTotal+"", new Point(0,100), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
-        Imgproc.putText(output, rightTotal+"", new Point(0,120), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);
+        Imgproc.putText(output, navigation+"", new Point(0,80), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, WHITE,1);
+        Imgproc.putText(output, middleTotal+"", new Point(0,100), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, WHITE,1);
+        Imgproc.putText(output, rightTotal+"", new Point(0,120), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, WHITE,1);
         /*
         // writes left column total
         Imgproc.putText(output, leftTotal+"", new Point(0,10), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255,255,255),1);

@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 public class StackCorrectionTest extends OpMode {
     private Telemetry telemetryA;
 
-    public static double correctionFactor = 0.2, deadZone = 1;
+    public static double correctionFactor = -0.2, deadZone = 1;
 
     private DistanceSensor leftDistanceSensor, rightDistanceSensor;
 
@@ -58,6 +58,8 @@ public class StackCorrectionTest extends OpMode {
 
         telemetryA.addData("left", leftDistanceSensor.getDistance(DistanceUnit.INCH));
         telemetryA.addData("right", rightDistanceSensor.getDistance(DistanceUnit.INCH));
+        telemetryA.addData("left connection info", leftDistanceSensor.getConnectionInfo());
+        telemetryA.addData("right connection info", rightDistanceSensor.getConnectionInfo());
         telemetryA.addData("x", follower.getPose().getX());
         telemetryA.addData("y", follower.getPose().getY());
         telemetryA.addData( "heading", follower.getPose().getHeading());
