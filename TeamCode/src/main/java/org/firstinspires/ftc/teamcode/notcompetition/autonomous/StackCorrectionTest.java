@@ -14,13 +14,16 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.util.Timer;
 
 @Config
 @Autonomous (name = "Distance Sensor Test", group = "Autonomous Pathing Tuning")
 public class StackCorrectionTest extends OpMode {
     private Telemetry telemetryA;
 
-    public static double correctionFactor = -0.2, deadZone = 1;
+    public static double correctionFactor = 3, deadZone = 0.85;
+
+    private Timer distanceSensorDecimationTimer;
 
     private DistanceSensor leftDistanceSensor, rightDistanceSensor;
 
@@ -36,6 +39,8 @@ public class StackCorrectionTest extends OpMode {
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
 
+        distanceSensorDecimationTimer = new Timer();
+
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetryA.addLine("stuff");
         telemetryA.update();
@@ -47,14 +52,14 @@ public class StackCorrectionTest extends OpMode {
 
     @Override
     public void start() {
+        distanceSensorDecimationTimer.resetTimer();
     }
 
     @Override
     public void loop() {
         follower.update();
-        double error = rightDistanceSensor.getDistance(DistanceUnit.INCH)-leftDistanceSensor.getDistance(DistanceUnit.INCH);
 
-        if (Math.abs(error) > deadZone) follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset()+correctionFactor*MathFunctions.getSign(error));
+        stackCorrection(correctionFactor);
 
         telemetryA.addData("left", leftDistanceSensor.getDistance(DistanceUnit.INCH));
         telemetryA.addData("right", rightDistanceSensor.getDistance(DistanceUnit.INCH));
@@ -64,6 +69,26 @@ public class StackCorrectionTest extends OpMode {
         telemetryA.addData("y", follower.getPose().getY());
         telemetryA.addData( "heading", follower.getPose().getHeading());
         telemetryA.update();
+    }
+
+    public void stackCorrection(double correctionPower) {
+        if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
+
+            double error = leftDistanceSensor.getDistance(DistanceUnit.INCH) - rightDistanceSensor.getDistance(DistanceUnit.INCH);
+
+            error *= -1;
+            if (Math.abs(error) > deadZone) {
+                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+            } else {
+                //follower.poseUpdater.setYOffset(follower.getTranslationalError().getYComponent());
+            }
+
+            if (Math.abs(follower.poseUpdater.getYOffset()) > 6)
+                follower.poseUpdater.setYOffset(6 * MathFunctions.getSign(follower.poseUpdater.getYOffset()));
+
+            telemetry.addData("error", error);
+            distanceSensorDecimationTimer.resetTimer();
+        }
     }
 
     @Override

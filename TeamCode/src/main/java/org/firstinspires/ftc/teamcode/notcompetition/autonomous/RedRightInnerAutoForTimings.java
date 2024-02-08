@@ -12,7 +12,7 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_TRANSFER_UPPER_LIMIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_SCORE_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_YELLOW_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
@@ -371,7 +371,7 @@ public class RedRightInnerAutoForTimings extends OpMode {
             case 29: // detects for end of the path and outtake out and drops pixel
                 if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.setLiftTargetPosition(850);
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
                 }
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
@@ -415,7 +415,7 @@ public class RedRightInnerAutoForTimings extends OpMode {
                 break;
             case 215:
                 if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
                     setPathState(216);
                 }
                 break;
@@ -496,7 +496,7 @@ public class RedRightInnerAutoForTimings extends OpMode {
             case 39: // detects for end of the path and outtake out and drops pixel
                 if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     twoPersonDrive.setLiftTargetPosition(850);
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
                 }
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
@@ -540,7 +540,7 @@ public class RedRightInnerAutoForTimings extends OpMode {
                 break;
             case 315:
                 if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
                     setPathState(316);
                 }
                 break;

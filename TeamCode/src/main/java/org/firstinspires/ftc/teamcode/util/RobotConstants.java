@@ -117,8 +117,11 @@ public class RobotConstants {
     // outtake arm yellow pixel scoring position
     OUTTAKE_ARM_YELLOW_SCORE_POSITION = 0.362,
 
-    // outtake arm cycle pixel scoring position
-    OUTTAKE_ARM_CYCLE_SCORE_POSITION = 0.383,
+    // outtake arm cycle pixel scoring position for first pixel
+    OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION = 0.383,
+
+    // outtake arm cycle pixel scoring position for second pixel
+    OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION = 0.375,
 
 
     // the position the wrist has to be at to be vertical when the outtake arm is in the robot
@@ -218,8 +221,8 @@ public class RobotConstants {
 
     // lift PIDF coefficients
     liftPIDFCoefficients = new CustomPIDFCoefficients(
-            0.01 ,
+            0.006,
             0,
-            -0.000001,
+            0.0003,
             0);
 }

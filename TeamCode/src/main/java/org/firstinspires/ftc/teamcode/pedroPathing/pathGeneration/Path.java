@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Path {
     private BezierCurve curve;
 
-    private double startHeading, endHeading, closestPointCurvature, closestPointTValue;
+    private double startHeading, endHeading, closestPointCurvature, closestPointTValue, linearInterpolationEndTime;
 
     private Vector closestPointTangentVector, closestPointNormalVector;
 
@@ -57,6 +57,21 @@ public class Path {
      * @param endHeading the end heading for the path
      */
     public void setLinearHeadingInterpolation(double startHeading, double endHeading) {
+        linearInterpolationEndTime = 1;
+        isTangentHeadingInterpolation = false;
+        this.startHeading = startHeading;
+        this.endHeading = endHeading;
+    }
+
+    /**
+     * This sets the heading interpolation to linear with a specified start heading for the path and
+     * an end heading for the path
+     *
+     * @param startHeading the start heading for the path
+     * @param endHeading the end heading for the path
+     */
+    public void setLinearHeadingInterpolation(double startHeading, double endHeading, double endTime) {
+        linearInterpolationEndTime = MathFunctions.clamp(endTime, 0.000000001, 1);
         isTangentHeadingInterpolation = false;
         this.startHeading = startHeading;
         this.endHeading = endHeading;
@@ -68,6 +83,7 @@ public class Path {
      * @param setHeading the constant heading for the path
      */
     public void setConstantHeadingInterpolation(double setHeading) {
+        linearInterpolationEndTime = 1;
         isTangentHeadingInterpolation = false;
         startHeading = setHeading;
         endHeading = setHeading;
@@ -217,7 +233,10 @@ public class Path {
             if (followTangentReversed) return MathFunctions.normalizeAngle(curve.getDerivative(t).getTheta() + Math.PI);
             return curve.getDerivative(t).getTheta();
         } else {
-            return MathFunctions.normalizeAngle(startHeading + MathFunctions.getTurnDirection(startHeading, endHeading) * MathFunctions.getSmallestAngleDifference(endHeading,startHeading) * t);
+            if (t > linearInterpolationEndTime) {
+                return MathFunctions.normalizeAngle(endHeading);
+            }
+            return MathFunctions.normalizeAngle(startHeading + MathFunctions.getTurnDirection(startHeading, endHeading) * MathFunctions.getSmallestAngleDifference(endHeading, startHeading) * (t / linearInterpolationEndTime));
         }
     }
 

@@ -87,7 +87,7 @@ public class Follower {
 
     public static boolean useTranslational = true, useCentripetal = true, useHeading = true, useDrive = true;
 
-    public static double holdPointTranslationalScaling = 0.4, holdPointHeadingScaling = 0.3;
+    public static double holdPointTranslationalScaling = 0.45, holdPointHeadingScaling = 0.35;
 
     /**
      * This creates a new follower given a hardware map

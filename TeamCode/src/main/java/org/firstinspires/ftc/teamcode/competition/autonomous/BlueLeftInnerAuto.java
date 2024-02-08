@@ -14,7 +14,8 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_TRANSFER_UPPER_LIMIT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_SCORE_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_YELLOW_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
@@ -31,7 +32,6 @@ import static java.lang.Thread.sleep;
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -51,12 +51,14 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+import java.util.ArrayList;
+
 @Autonomous(name = "Blue Left Inner Auto", group = "Autonomous")
 public class BlueLeftInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 
-    private Timer pathTimer, opmodeTimer, scanTimer;
+    private Timer pathTimer, opmodeTimer, scanTimer, distanceSensorUpdateTimer, distanceSensorDecimationTimer;
 
     private VisionPortalTeamPropPipeline teamPropPipeline;
 
@@ -64,11 +66,9 @@ public class BlueLeftInnerAuto extends OpMode {
 
     private String navigation;
 
-    private DistanceSensor leftDistanceSensor, rightDistanceSensor;
+    private DistanceSensor leftDistanceSensor, rightDistanceSensor, rearDistanceSensor;
 
-    private RevColorSensorV3 colorSensor;
-
-    private boolean distanceSensorDisconnected, colorSensorDisconnected;
+    private boolean distanceSensorDisconnected, rearDistanceSensorDisconnected;
 
     // IMPORTANT: y increasing is towards the backstage from the audience,
     // while x increasing is towards the red side from the blue side
@@ -117,7 +117,9 @@ public class BlueLeftInnerAuto extends OpMode {
     private Path scoreSpikeMark, initialScoreOnBackdrop;
     private PathChain firstCycleToStack, firstCycleStackGrab, firstCycleScoreOnBackdrop, secondCycleToStack, secondCycleStackGrab, secondCycleScoreOnBackdrop;
 
-    private int pathState;
+    private int pathState, distanceSensorDisconnectCycleCount, detectDistanceSensorDisconnect;
+
+    private ArrayList<Boolean> distanceSensorDisconnects;
 
     public void setBackdropGoalPose() {
         switch (navigation) {
@@ -176,7 +178,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
         }
         //initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        initialScoreOnBackdrop.setLinearHeadingInterpolation(scoreSpikeMark.getEndTangent().getTheta(), scoreSpikeMark.getEndTangent().getTheta() + MathFunctions.getTurnDirection(scoreSpikeMark.getEndTangent().getTheta(), Math.PI * 1.5) * MathFunctions.getSmallestAngleDifference(scoreSpikeMark.getEndTangent().getTheta(), Math.PI * 1.5) * 1.5);
+        initialScoreOnBackdrop.setLinearHeadingInterpolation(scoreSpikeMark.getEndTangent().getTheta(), Math.PI * 1.5, 0.5);
         initialScoreOnBackdrop.setPathEndTimeout(2.5);
 
         switch (navigation) {
@@ -212,7 +214,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
-                .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .setPathEndTimeout(2.5)
                 .build();
 
@@ -233,7 +235,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
-                .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
+                .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .setPathEndTimeout(2.5)
                 .build();
     }
@@ -273,37 +275,42 @@ public class BlueLeftInnerAuto extends OpMode {
                 }
                 break;
             case 15:
+                /*
                 if (follower.getCurrentTValue() > 0.5) {
                     initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
                     setPathState(16);
                 }
+                 */
+                setPathState(16);
                 break;
             case 16: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+                    Follower.useHeading = true;
+                    follower.holdPoint(new BezierPoint(new Point(initialBackdropGoalPose)), Math.PI * 1.5);
                     twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_YELLOW_SCORE_POSITION);
+                    distanceSensorDecimationTimer.resetTimer();
+                    startDistanceSensorDisconnectDetection(-1);
                     setPathState(17);
                 }
                 break;
             case 17:
-                colorSensorDisconnected = colorSensorDisconnected();
-                if (colorSensorDisconnected) {
+                if (rearDistanceSensorDisconnected) {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection();
+                backdropCorrection(initialBackdropGoalPose);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
                 break;
             case 18:
                 if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    startDistanceSensorDisconnectDetection(1);
                     setPathState(19);
                 }
                 break;
             case 19: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 500) {
+                if (pathTimer.getElapsedTime() > 0*500) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(110);
                 }
@@ -318,7 +325,6 @@ public class BlueLeftInnerAuto extends OpMode {
 
             case 20: // starts the robot off on to the first stack once the pixels have been dropped
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
-                    distanceSensorDisconnected = leftDistanceSensorDisconnected() || rightDistanceSensorDisconnected();
                     Follower.useHeading = true;
                     follower.poseUpdater.resetOffset();
                     if (distanceSensorDisconnected) {
@@ -331,17 +337,19 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 21:
                 if (!follower.isBusy()) {
+                    startDistanceSensorDisconnectDetection(1);
+                    //follower.holdPoint(new BezierPoint(new Point(follower.getPose())), firstCycleStackPose.getHeading());
                     follower.holdPoint(new BezierPoint(new Point(firstCycleToStack.getPath(1).getLastControlPoint().getX(), firstCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), firstCycleStackPose.getHeading());
+                    distanceSensorDecimationTimer.resetTimer();
                     setPathState(22);
                 }
                 break;
             case 22:
-                distanceSensorDisconnected = leftDistanceSensorDisconnected() || rightDistanceSensorDisconnected();
                 if (distanceSensorDisconnected) {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(1.5);
+                stackCorrection(3.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(23);
                 }
@@ -389,34 +397,37 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 29: // detects for end of the path and outtake out and drops pixel
                 if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.setLiftTargetPosition(400);
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
-                }
-                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.setLiftTargetPosition(250);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
+
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
                     //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+                    follower.holdPoint(new BezierPoint(new Point(firstCycleBackdropGoalPose)), Math.PI * 1.5);
+                    startDistanceSensorDisconnectDetection(-1);
+                    distanceSensorDecimationTimer.resetTimer();
                     setPathState(210);
+                }
+                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                 }
                 break;
             case 210:
-                colorSensorDisconnected = colorSensorDisconnected();
-                if (colorSensorDisconnected) {
+                if (rearDistanceSensorDisconnected) {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection();
+                backdropCorrection(firstCycleBackdropGoalPose);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
                 break;
             case 211:
                 if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    startDistanceSensorDisconnectDetection(1);
                     setPathState(212);
                 }
                 break;
             case 212:
-                if (pathTimer.getElapsedTime() > 300) {
+                if (pathTimer.getElapsedTime() > 0*300) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(213);
                 }
@@ -434,7 +445,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 215:
                 if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION, 100);
                     setPathState(216);
                 }
                 break;
@@ -453,7 +464,6 @@ public class BlueLeftInnerAuto extends OpMode {
 
             case 30: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
-                    distanceSensorDisconnected = leftDistanceSensorDisconnected() || rightDistanceSensorDisconnected();
                     Follower.useHeading = true;
                     follower.poseUpdater.resetOffset();
                     if (distanceSensorDisconnected) {
@@ -466,17 +476,18 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 31:
                 if (!follower.isBusy()) {
+                    startDistanceSensorDisconnectDetection(1);
                     follower.holdPoint(new BezierPoint(new Point(secondCycleToStack.getPath(1).getLastControlPoint().getX(), secondCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), secondCycleStackPose.getHeading());
+                    distanceSensorDecimationTimer.resetTimer();
                     setPathState(32);
                 }
                 break;
             case 32:
-                distanceSensorDisconnected = leftDistanceSensorDisconnected() || rightDistanceSensorDisconnected();
                 if (distanceSensorDisconnected) {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(3);
+                stackCorrection(3.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(33);
                 }
@@ -524,34 +535,37 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 39: // detects for end of the path and outtake out and drops pixel
                 if (follower.atParametricEnd() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
-                    twoPersonDrive.setLiftTargetPosition(400);
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
-                }
-                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
+                    twoPersonDrive.setLiftTargetPosition(700);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION, 100);
+
                     //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
                     //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+                    follower.holdPoint(new BezierPoint(new Point(secondCycleBackdropGoalPose)), Math.PI * 1.5);
+                    distanceSensorDecimationTimer.resetTimer();
+                    startDistanceSensorDisconnectDetection(-1);
                     setPathState(310);
+                }
+                if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                 }
                 break;
             case 310:
-                colorSensorDisconnected = colorSensorDisconnected();
-                if (colorSensorDisconnected) {
+                if (rearDistanceSensorDisconnected) {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection();
+                backdropCorrection(secondCycleBackdropGoalPose);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
                 break;
             case 311:
                 if (twoPersonDrive.outtakeArmAtTargetPosition()) {
+                    startDistanceSensorDisconnectDetection(1);
                     setPathState(312);
                 }
                 break;
             case 312:
-                if (pathTimer.getElapsedTime() > 300) {
+                if (pathTimer.getElapsedTime() > 0*300) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(313);
                 }
@@ -569,7 +583,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 break;
             case 315:
                 if (pathTimer.getElapsedTime() > 300) {
-                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SCORE_POSITION, 100);
+                    twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION, 100);
                     setPathState(316);
                 }
                 break;
@@ -630,31 +644,36 @@ public class BlueLeftInnerAuto extends OpMode {
         autonomousPathUpdate();
     }
 
-    public boolean stackCorrection(double correctionPower) {
-        double error = leftDistanceSensor.getDistance(DistanceUnit.INCH) - rightDistanceSensor.getDistance(DistanceUnit.INCH);
-        if (!(leftDistanceSensor.getDistance(DistanceUnit.MM) == 65535 || rightDistanceSensor.getDistance(DistanceUnit.MM) == 65535)) {
+    public void stackCorrection(double correctionPower) {
+        if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
 
-            if (Math.abs(error) > 0.85) {
-                follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * correctionPower * MathFunctions.getSign(error));
+            double left = leftDistanceSensor.getDistance(DistanceUnit.MM);
+
+            if (!(left == 65535)) {
+
+                double right = rightDistanceSensor.getDistance(DistanceUnit.MM);
+
+                if (!(right == 65535)) {
+
+                    double error = (left / 25.4) - (right / 25.4);
+
+                    error *= -1;
+
+                    if (Math.abs(error) > 0.85) {
+                        follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+                    }
+
+                    follower.poseUpdater.setXOffset(MathFunctions.clamp(follower.poseUpdater.getXOffset(), -6, 6));
+
+                    //telemetry.addData("error", error);
+                    distanceSensorDecimationTimer.resetTimer();
+                } else {
+                    distanceSensorDisconnected = true;
+                }
             } else {
-                follower.poseUpdater.setXOffset(follower.getTranslationalError().getXComponent());
+                distanceSensorDisconnected = true;
             }
-        /*
-        if (Math.abs(error) > 0.85) {
-            follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + twoPersonDrive.deltaTimeSeconds * 3 * error);
-        } else {
-            follower.poseUpdater.setXOffset(follower.getTranslationalError().getXComponent());
         }
-         */
-
-            if (Math.abs(follower.poseUpdater.getXOffset()) > 6)
-                follower.poseUpdater.setXOffset(6 * MathFunctions.getSign(follower.poseUpdater.getXOffset()));
-        } else {
-            return false;
-        }
-        telemetry.addData("error", error);
-
-        return true;
     }
 
     public boolean leftDistanceSensorDisconnected() {
@@ -665,34 +684,88 @@ public class BlueLeftInnerAuto extends OpMode {
         return rightDistanceSensor.getDistance(DistanceUnit.MM) == 65535;
     }
 
-    public boolean backdropCorrection() {
-        double rawLightValue = colorSensor.getRawLightDetected();
+    public void startDistanceSensorDisconnectDetection(int state) {
+        detectDistanceSensorDisconnect = state;
+        distanceSensorDisconnectCycleCount = 0;
+        distanceSensorDisconnects.clear();
+    }
 
-        if (!(rawLightValue == 0)) {
+    public void updateDistanceSensorDisconnects() {
+        if (detectDistanceSensorDisconnect == 1) {
+            if (distanceSensorDisconnectCycleCount < 10) {
+                if (distanceSensorUpdateTimer.getElapsedTime() > 20) {
+                    distanceSensorDisconnectCycleCount++;
+                    distanceSensorUpdateTimer.resetTimer();
+
+                    distanceSensorDisconnects.add(leftDistanceSensorDisconnected() || rightDistanceSensorDisconnected());
+                }
+            } else {
+                detectDistanceSensorDisconnect = 0;
+
+                distanceSensorDisconnected = true;
+                for (Boolean detection : distanceSensorDisconnects) {
+                    if (!detection) {
+                        distanceSensorDisconnected = false;
+                    }
+                }
+            }
+        } else if (detectDistanceSensorDisconnect == -1) {
+            if (distanceSensorDisconnectCycleCount < 10) {
+                if (distanceSensorUpdateTimer.getElapsedTime() > 20) {
+                    distanceSensorDisconnectCycleCount++;
+                    distanceSensorUpdateTimer.resetTimer();
+
+                    distanceSensorDisconnects.add(rearDistanceSensorDisconnected());
+                }
+            } else {
+                detectDistanceSensorDisconnect = 0;
+
+                rearDistanceSensorDisconnected = true;
+                for (Boolean detection : distanceSensorDisconnects) {
+                    if (!detection) {
+                        rearDistanceSensorDisconnected = false;
+                    }
+                }
+            }
+        }
+    }
+
+    public void backdropCorrection(Pose2d scorePose) {
+        if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
+
+            double distance = rearDistanceSensor.getDistance(DistanceUnit.INCH);
+
+
+            follower.holdPoint(new BezierPoint(new Point(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + distance - 1.9, scorePose.getY() - 3, scorePose.getY() + 3), Point.CARTESIAN)), Math.PI * 1.5);
+/*
             // too close
-            if (rawLightValue > 150)
-                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + twoPersonDrive.deltaTimeSeconds * 4);
+            if (distance < 0.5)
+                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * 1.5);
 
             // too far
-            if (rawLightValue < 134)
-                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - twoPersonDrive.deltaTimeSeconds * 6);
+            if (distance > 0.75)
+                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - distanceSensorDecimationTimer.getElapsedTimeSeconds() * 1.5);
+
+            // to do add some sort of deadzone or dampening
+            // perhaps take note of the estimated pose at the start and see how far off we need to go instead of incrementing off of the current one
+            // or just remove the getyoffset thing? think about later
+            follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - (distance - 2));
 
             if (Math.abs(follower.poseUpdater.getYOffset()) > 1.5)
                 follower.poseUpdater.setYOffset(1.5 * MathFunctions.getSign(follower.poseUpdater.getYOffset()));
-        } else {
-            return false;
+*/
+            //telemetry.addData("rear distance value", distance);
+            distanceSensorDecimationTimer.resetTimer();
         }
-        telemetry.addData("raw light value", rawLightValue);
-
-        return true;
     }
 
-    public boolean colorSensorDisconnected() {
-        return colorSensor.getRawLightDetected() == 0;
+    public boolean rearDistanceSensorDisconnected() {
+        return rearDistanceSensor.getDistance(DistanceUnit.MM) == 65535;
     }
 
     @Override
     public void loop() {
+        updateDistanceSensorDisconnects();
         follower.update();
         twoPersonDrive.autonomousControlUpdate();
 
@@ -713,8 +786,9 @@ public class BlueLeftInnerAuto extends OpMode {
     public void init() {
         //PhotonCore.start(this.hardwareMap);
 
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
+        distanceSensorDisconnects = new ArrayList<>();
 
+        rearDistanceSensor = hardwareMap.get(DistanceSensor.class, "rearDistanceSensor");
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
 
@@ -725,6 +799,8 @@ public class BlueLeftInnerAuto extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         scanTimer = new Timer();
+        distanceSensorUpdateTimer = new Timer();
+        distanceSensorDecimationTimer = new Timer();
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
@@ -765,7 +841,7 @@ public class BlueLeftInnerAuto extends OpMode {
             }
         }
 
-        if (colorSensorDisconnected()) {
+        if (rearDistanceSensorDisconnected()) {
             try {
                 throw new Exception("color sensor disconnected");
             } catch (Exception e) {
