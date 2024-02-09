@@ -16,7 +16,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_C
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTER_OUTTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_OUT_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_ARM_YELLOW_SCORE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_CLAW_DROP_TIME;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.OUTTAKE_IN;
@@ -110,7 +109,7 @@ public class RedRightInnerAuto extends OpMode {
     private Pose2d startPose = new Pose2d(63 + 72, 12 + 72, Math.PI);
 
     // TODO: dont forget to adjust this too
-    private Point abortPoint = new Point(83.5, 120, Point.CARTESIAN);
+    private Point abortPoint = new Point(83.5, 120, Point.CARTESIAN), backdropGoalPoint;
 
     private Follower follower;
 
@@ -127,20 +126,20 @@ public class RedRightInnerAuto extends OpMode {
             case "left":
                 spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 3, redRightSideLeftSpikeMark.getY()+1.5, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 3.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX() - 0.4, redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.3, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() - 1.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.5, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() - 4, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.15, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX() - 1, redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.5, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.15, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY() + 0.5, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() - 0.5, redRightBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() - 0.75, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.5, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() + 2, redRightBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.5, Math.PI * 1.5);
                 break;
         }
     }
@@ -184,23 +183,23 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.75, Math.PI * 1.5 - Math.toRadians(4));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.5, Math.PI * 1.5 - Math.toRadians(2));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.25, Math.PI * 1.5 - Math.toRadians(4));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 3, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3, Math.PI * 1.5 - Math.toRadians(2));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.75, Math.PI * 1.5 - Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 4, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.5, Math.PI * 1.5 - Math.toRadians(3.5));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.25, Math.PI * 1.5 - Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 4, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3, Math.PI * 1.5 - Math.toRadians(3.5));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 6.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.75, Math.PI * 1.5 - Math.toRadians(4));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 5.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2.5, Math.PI * 1.5 - Math.toRadians(3.5));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 7.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4.25, Math.PI * 1.5 - Math.toRadians(4));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 6.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.75, Math.PI * 1.5 - Math.toRadians(3.5));
                 break;
         }
 
         firstCycleToStack = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(firstCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 21, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -221,7 +220,7 @@ public class RedRightInnerAuto extends OpMode {
         secondCycleToStack = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(secondCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 21, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX() + 0.0001, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .setPathEndTimeout(0)
                 .build();
@@ -286,7 +285,8 @@ public class RedRightInnerAuto extends OpMode {
             case 16: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     Follower.useHeading = true;
-                    follower.holdPoint(new BezierPoint(new Point(initialBackdropGoalPose)), Math.PI * 1.5);
+                    backdropGoalPoint = new Point(initialBackdropGoalPose);
+                    follower.holdPoint(new BezierPoint(backdropGoalPoint), Math.PI * 1.5);
                     twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_YELLOW_SCORE_POSITION);
                     distanceSensorDecimationTimer.resetTimer();
                     startDistanceSensorDisconnectDetection(-1);
@@ -298,7 +298,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose);
+                backdropCorrection(initialBackdropGoalPose, 2.75);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -310,7 +310,7 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 19: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 0*500) {
+                if (pathTimer.getElapsedTime() > 700) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(110);
                 }
@@ -337,7 +337,7 @@ public class RedRightInnerAuto extends OpMode {
                 break;
             case 21:
                 if (!follower.isBusy()) {
-                    startDistanceSensorDisconnectDetection(1);
+                    //startDistanceSensorDisconnectDetection(1);
                     //follower.holdPoint(new BezierPoint(new Point(follower.getPose())), firstCycleStackPose.getHeading());
                     follower.holdPoint(new BezierPoint(new Point(firstCycleToStack.getPath(1).getLastControlPoint().getX(), firstCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), firstCycleStackPose.getHeading());
                     distanceSensorDecimationTimer.resetTimer();
@@ -402,7 +402,8 @@ public class RedRightInnerAuto extends OpMode {
 
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
                     //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(firstCycleBackdropGoalPose)), Math.PI * 1.5);
+                    backdropGoalPoint = new Point(firstCycleBackdropGoalPose);
+                    follower.holdPoint(new BezierPoint(backdropGoalPoint), Math.PI * 1.5);
                     startDistanceSensorDisconnectDetection(-1);
                     distanceSensorDecimationTimer.resetTimer();
                     setPathState(210);
@@ -415,7 +416,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose);
+                backdropCorrection(firstCycleBackdropGoalPose, 2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -427,16 +428,19 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 212:
-                if (pathTimer.getElapsedTime() > 0*300) {
+                if (pathTimer.getElapsedTime() > 300) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(213);
                 }
                 break;
             case 213:
+                setPathState(214);
+                /*
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_OUT_POSITION, 300);
                     setPathState(214);
                 }
+                 */
                 break;
             case 214:
                 if (twoPersonDrive.outtakeArmAtTargetPosition()) {
@@ -476,7 +480,7 @@ public class RedRightInnerAuto extends OpMode {
                 break;
             case 31:
                 if (!follower.isBusy()) {
-                    startDistanceSensorDisconnectDetection(1);
+                    //startDistanceSensorDisconnectDetection(1);
                     follower.holdPoint(new BezierPoint(new Point(secondCycleToStack.getPath(1).getLastControlPoint().getX(), secondCycleToStack.getPath(1).getLastControlPoint().getY() + 1, Point.CARTESIAN)), secondCycleStackPose.getHeading());
                     distanceSensorDecimationTimer.resetTimer();
                     setPathState(32);
@@ -540,7 +544,8 @@ public class RedRightInnerAuto extends OpMode {
 
                     //twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
                     //Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(secondCycleBackdropGoalPose)), Math.PI * 1.5);
+                    backdropGoalPoint = new Point(secondCycleBackdropGoalPose);
+                    follower.holdPoint(new BezierPoint(backdropGoalPoint), Math.PI * 1.5);
                     distanceSensorDecimationTimer.resetTimer();
                     startDistanceSensorDisconnectDetection(-1);
                     setPathState(310);
@@ -553,7 +558,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose);
+                backdropCorrection(secondCycleBackdropGoalPose, 2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -565,16 +570,19 @@ public class RedRightInnerAuto extends OpMode {
                 }
                 break;
             case 312:
-                if (pathTimer.getElapsedTime() > 0*300) {
+                if (pathTimer.getElapsedTime() > 300) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(313);
                 }
                 break;
             case 313:
+                setPathState(314);
+                /*
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_OUT_POSITION, 300);
                     setPathState(314);
                 }
+                 */
                 break;
             case 314:
                 if (twoPersonDrive.outtakeArmAtTargetPosition()) {
@@ -730,13 +738,17 @@ public class RedRightInnerAuto extends OpMode {
         }
     }
 
-    public void backdropCorrection(Pose2d scorePose) {
+    public void backdropCorrection(Pose2d scorePose, double distanceGoal) {
         if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
 
-            double distance = rearDistanceSensor.getDistance(DistanceUnit.INCH);
+            double distance = rearDistanceSensor.getDistance(DistanceUnit.MM);
 
-
-            follower.holdPoint(new BezierPoint(new Point(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + distance - 1.9, scorePose.getY() - 3, scorePose.getY() + 3), Point.CARTESIAN)), Math.PI * 1.5);
+            if (distance != 65535) {
+                //follower.holdPoint(new BezierPoint(new Point(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + (distance / 25.4) - distanceGoal, scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN)), Math.PI * 1.5);
+                backdropGoalPoint.setCoordinates(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() - ((distance / 25.4) - distanceGoal), scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN);
+            } else {
+                rearDistanceSensorDisconnected = true;
+            }
 /*
             // too close
             if (distance < 0.5)

@@ -223,6 +223,6 @@ public class RobotConstants {
     liftPIDFCoefficients = new CustomPIDFCoefficients(
             0.006,
             0,
-            0.0003,
+            0.00027,
             0);
 }

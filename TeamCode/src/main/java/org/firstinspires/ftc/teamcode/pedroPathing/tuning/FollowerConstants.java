@@ -59,7 +59,7 @@ public class FollowerConstants {
 
     // Large translational PIDF coefficients
     public static CustomPIDFCoefficients largeTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.05,
+            0.1,
             0,
             0,
             0);
