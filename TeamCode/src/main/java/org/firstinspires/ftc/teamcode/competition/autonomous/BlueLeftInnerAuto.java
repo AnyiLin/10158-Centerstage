@@ -298,7 +298,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 2.75);
+                backdropCorrection(initialBackdropGoalPose, 4.25);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -416,7 +416,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 2);
+                backdropCorrection(firstCycleBackdropGoalPose, 3.5);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -558,7 +558,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 2);
+                backdropCorrection(secondCycleBackdropGoalPose, 3.5);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -745,7 +745,7 @@ public class BlueLeftInnerAuto extends OpMode {
 
             if (distance != 65535) {
                 //follower.holdPoint(new BezierPoint(new Point(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + (distance / 25.4) - distanceGoal, scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN)), Math.PI * 1.5);
-                backdropGoalPoint.setCoordinates(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() - ((distance / 25.4) - distanceGoal), scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN);
+                backdropGoalPoint.setCoordinates(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + ((distance / 25.4) - distanceGoal), scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN);
             } else {
                 rearDistanceSensorDisconnected = true;
             }

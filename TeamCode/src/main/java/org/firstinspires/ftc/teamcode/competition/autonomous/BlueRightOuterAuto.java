@@ -25,12 +25,12 @@ import static java.lang.Thread.sleep;
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
@@ -49,7 +49,7 @@ public class BlueRightOuterAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 
-    private Timer pathTimer, opmodeTimer, scanTimer;
+    private Timer pathTimer, opmodeTimer, scanTimer, distanceSensorDecimationTimer;
 
     private VisionPortalTeamPropPipeline teamPropPipeline;
 
@@ -57,11 +57,9 @@ public class BlueRightOuterAuto extends OpMode {
 
     private String navigation;
 
-    private DistanceSensor leftDistanceSensor, rightDistanceSensor;
+    private DistanceSensor rearDistanceSensor;
 
-    private RevColorSensorV3 colorSensor;
-
-    private boolean distanceSensorDisconnected, colorSensorDisconnected;
+    private boolean rearDistanceSensorDisconnected;
 
     // IMPORTANT: y increasing is towards the backstage from the audience,
     // while x increasing is towards the red side from the blue side
@@ -97,18 +95,18 @@ public class BlueRightOuterAuto extends OpMode {
     private Pose2d blueMiddleStack = new Pose2d(-24 + 72, -72 + 72);
     private Pose2d blueOuterStack = new Pose2d(-36 + 72, -72 + 72);
 
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, firstCycleStackPose, firstCycleBackdropGoalPose, secondCycleStackPose, secondCycleBackdropGoalPose;
+    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose;
 
     // TODO: adjust this for each auto
     private Pose2d startPose = new Pose2d(144-(63 + 72), 36, 0);
 
     // TODO: dont forget to adjust this too
-    private Point abortPoint = new Point(144-132, 120, Point.CARTESIAN);
+    private Point abortPoint = new Point(144-132, 120, Point.CARTESIAN), backdropGoalPoint;
 
     private Follower follower;
 
     private Path scoreSpikeMark, adjustHeadingFromSpikeMark;
-    private PathChain initialScoreOnBackdrop, firstCycleToStack, firstCycleStackGrab, firstCycleScoreOnBackdrop, secondCycleToStack, secondCycleStackGrab, secondCycleScoreOnBackdrop;
+    private PathChain initialScoreOnBackdrop;
 
     private int pathState;
 
@@ -116,15 +114,15 @@ public class BlueRightOuterAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(blueRightSideLeftSpikeMark.getX() + 2.5, blueRightSideLeftSpikeMark.getY() + 0.75, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(blueRightSideLeftSpikeMark.getX() + 1.5, blueRightSideLeftSpikeMark.getY() + 0.75, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX(), blueLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueRightSideMiddleSpikeMark.getX() + 1.5, blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(blueRightSideMiddleSpikeMark.getX(), blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX(), blueMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(blueRightSideRightSpikeMark.getX() + 2.5, blueRightSideRightSpikeMark.getY() - 1.5, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(blueRightSideRightSpikeMark.getX() - 0.5, blueRightSideRightSpikeMark.getY() - 1.5, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
         }
@@ -156,7 +154,7 @@ public class BlueRightOuterAuto extends OpMode {
         initialScoreOnBackdrop = follower.pathBuilder()
                 .addPath(new BezierLine(adjustHeadingFromSpikeMark.getLastControlPoint(), new Point(144-132, 85, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .addPath(new BezierCurve(new Point(144-132, 85, Point.CARTESIAN), new Point(144-132, 115, Point.CARTESIAN), new Point(initialBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(144-132, 85, Point.CARTESIAN), new Point(144-128, 105, Point.CARTESIAN), new Point(initialBackdropGoalPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .setPathEndTimeout(2.5)
                 .build();
@@ -209,18 +207,19 @@ public class BlueRightOuterAuto extends OpMode {
             case 17: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
                     Follower.useHeading = false;
-                    follower.holdPoint(new BezierPoint(new Point(follower.getPose())), Math.PI * 1.5);
+                    backdropGoalPoint = new Point(initialBackdropGoalPose);
+                    follower.holdPoint(new BezierPoint(backdropGoalPoint), Math.PI * 1.5);
                     twoPersonDrive.setOuttakeArmInterpolation(OUTTAKE_ARM_YELLOW_SCORE_POSITION);
+                    distanceSensorDecimationTimer.resetTimer();
                     setPathState(18);
                 }
                 break;
             case 18:
-                colorSensorDisconnected = colorSensorDisconnected();
-                if (colorSensorDisconnected) {
+                if (rearDistanceSensorDisconnected) {
                     setPathState(19);
                     break;
                 }
-                backdropCorrection();
+                backdropCorrection(initialBackdropGoalPose, 4.25);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(19);
                 }
@@ -231,7 +230,7 @@ public class BlueRightOuterAuto extends OpMode {
                 }
                 break;
             case 110: // detects for end of the path and outtake out and drops pixel
-                if (pathTimer.getElapsedTime() > 500) {
+                if (pathTimer.getElapsedTime() > 700) {
                     twoPersonDrive.outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
                     setPathState(111);
                 }
@@ -279,30 +278,41 @@ public class BlueRightOuterAuto extends OpMode {
         autonomousPathUpdate();
     }
 
-    public boolean backdropCorrection() {
-        double rawLightValue = colorSensor.getRawLightDetected();
+    public void backdropCorrection(Pose2d scorePose, double distanceGoal) {
+        if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
 
-        if (!(rawLightValue == 0)) {
+            double distance = rearDistanceSensor.getDistance(DistanceUnit.MM);
+
+            if (distance != 65535) {
+                //follower.holdPoint(new BezierPoint(new Point(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + (distance / 25.4) - distanceGoal, scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN)), Math.PI * 1.5);
+                backdropGoalPoint.setCoordinates(scorePose.getX(), MathFunctions.clamp(follower.getPose().getY() + ((distance / 25.4) - distanceGoal), scorePose.getY() - 4, scorePose.getY() + 4), Point.CARTESIAN);
+            } else {
+                rearDistanceSensorDisconnected = true;
+            }
+/*
             // too close
-            if (rawLightValue > 150)
-                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + twoPersonDrive.deltaTimeSeconds * 4);
+            if (distance < 0.5)
+                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * 1.5);
 
             // too far
-            if (rawLightValue < 134)
-                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - twoPersonDrive.deltaTimeSeconds * 6);
+            if (distance > 0.75)
+                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - distanceSensorDecimationTimer.getElapsedTimeSeconds() * 1.5);
+
+            // to do add some sort of deadzone or dampening
+            // perhaps take note of the estimated pose at the start and see how far off we need to go instead of incrementing off of the current one
+            // or just remove the getyoffset thing? think about later
+            follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() - (distance - 2));
 
             if (Math.abs(follower.poseUpdater.getYOffset()) > 1.5)
                 follower.poseUpdater.setYOffset(1.5 * MathFunctions.getSign(follower.poseUpdater.getYOffset()));
-        } else {
-            return false;
+*/
+            //telemetry.addData("rear distance value", distance);
+            distanceSensorDecimationTimer.resetTimer();
         }
-        telemetry.addData("raw light value", rawLightValue);
-
-        return true;
     }
 
-    public boolean colorSensorDisconnected() {
-        return colorSensor.getRawLightDetected() == 0;
+    public boolean rearDistanceSensorDisconnected() {
+        return rearDistanceSensor.getDistance(DistanceUnit.MM) == 65535;
     }
 
     @Override
@@ -327,7 +337,7 @@ public class BlueRightOuterAuto extends OpMode {
     public void init() {
         //PhotonCore.start(this.hardwareMap);
 
-        colorSensor = hardwareMap.get(RevColorSensorV3.class, "colorSensor");
+        rearDistanceSensor = hardwareMap.get(DistanceSensor.class, "rearDistanceSensor");
 
         twoPersonDrive = new TwoPersonDrive(true);
         twoPersonDrive.hardwareMap = hardwareMap;
@@ -336,6 +346,7 @@ public class BlueRightOuterAuto extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         scanTimer = new Timer();
+        distanceSensorDecimationTimer = new Timer();
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
@@ -360,7 +371,7 @@ public class BlueRightOuterAuto extends OpMode {
             throw new RuntimeException(e);
         }
 
-        if (colorSensorDisconnected()) {
+        if (rearDistanceSensorDisconnected()) {
             try {
                 throw new Exception("color sensor disconnected");
             } catch (Exception e) {
