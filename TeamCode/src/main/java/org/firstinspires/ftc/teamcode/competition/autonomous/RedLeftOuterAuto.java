@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Red Left Outer Auto", group = "Autonomous")
+@Autonomous(name = "Red Far Side 2 + 0", group = "Autonomous")
 public class RedLeftOuterAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
@@ -114,15 +114,15 @@ public class RedLeftOuterAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(redLeftSideLeftSpikeMark.getX() - 2, redLeftSideLeftSpikeMark.getY() + 0.5, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(redLeftSideLeftSpikeMark.getX() - 2, redLeftSideLeftSpikeMark.getY() + 3, Math.PI / 2);
+                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 4, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redLeftSideMiddleSpikeMark.getX() - 0.4, redLeftSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 6, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(redLeftSideMiddleSpikeMark.getX(), redLeftSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 5.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(redLeftSideRightSpikeMark.getX() - 3, redLeftSideRightSpikeMark.getY(), Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(redLeftSideRightSpikeMark.getX() - 2, redLeftSideRightSpikeMark.getY() + 1, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() + 5, redRightBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
         }
@@ -219,7 +219,7 @@ public class RedLeftOuterAuto extends OpMode {
                     setPathState(19);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.25);
+                backdropCorrection(initialBackdropGoalPose, 4.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(19);
                 }

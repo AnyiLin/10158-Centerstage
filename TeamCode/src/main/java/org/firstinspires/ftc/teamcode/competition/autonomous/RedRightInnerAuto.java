@@ -52,7 +52,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Red Right Inner Auto", group = "Autonomous")
+@Autonomous(name = "Red Close Side 2 + 4", group = "Autonomous")
 public class RedRightInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
@@ -124,10 +124,10 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 3, redRightSideLeftSpikeMark.getY()+1.5, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 3.75, redRightSideLeftSpikeMark.getY()+1.5, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 3.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 3.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.75, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX() - 1, redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
@@ -138,7 +138,7 @@ public class RedRightInnerAuto extends OpMode {
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY() + 0.5, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() + 2, redRightBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 2, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.5, Math.PI * 1.5);
                 break;
         }
@@ -192,7 +192,7 @@ public class RedRightInnerAuto extends OpMode {
                 break;
             case "right":
                 firstCycleStackPose = new Pose2d(redInnerStack.getX() - 7.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4.25, Math.PI * 1.5 - Math.toRadians(4));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 6.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.75, Math.PI * 1.5 - Math.toRadians(3.5));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 4.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 3.75, Math.PI * 1.5 - Math.toRadians(3.5));
                 break;
         }
 
@@ -298,7 +298,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.25);
+                backdropCorrection(initialBackdropGoalPose, 4.6);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -416,7 +416,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.5);
+                backdropCorrection(firstCycleBackdropGoalPose, 3.8);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -558,7 +558,7 @@ public class RedRightInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.5);
+                backdropCorrection(secondCycleBackdropGoalPose, 3.8);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -667,8 +667,10 @@ public class RedRightInnerAuto extends OpMode {
 
                     error *= -1;
 
-                    if (Math.abs(error) > 0.85) {
+                    if (Math.abs(error) > 0.7) {
                         follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+                    } else {
+                        follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + follower.getTranslationalError().getXComponent());
                     }
 
                     follower.poseUpdater.setXOffset(MathFunctions.clamp(follower.poseUpdater.getXOffset(), -6, 6));

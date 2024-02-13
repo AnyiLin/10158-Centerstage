@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@Autonomous(name = "Blue Right Outer Auto", group = "Autonomous")
+@Autonomous(name = "Blue Far Side 2 + 0", group = "Autonomous")
 public class BlueRightOuterAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
@@ -114,11 +114,11 @@ public class BlueRightOuterAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(blueRightSideLeftSpikeMark.getX() + 1.5, blueRightSideLeftSpikeMark.getY() + 0.75, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX(), blueLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueRightSideLeftSpikeMark.getX() + 1.5, blueRightSideLeftSpikeMark.getY() + 0.25, Math.PI / 2);
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX() - 3.25, blueLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueRightSideMiddleSpikeMark.getX(), blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(blueRightSideMiddleSpikeMark.getX() + 1, blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX(), blueMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
             case "right":
@@ -219,7 +219,7 @@ public class BlueRightOuterAuto extends OpMode {
                     setPathState(19);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.25);
+                backdropCorrection(initialBackdropGoalPose, 4.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(19);
                 }

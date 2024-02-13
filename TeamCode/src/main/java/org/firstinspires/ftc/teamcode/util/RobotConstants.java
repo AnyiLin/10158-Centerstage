@@ -66,34 +66,34 @@ public class RobotConstants {
     public static double
 
     // how offset the right intake arm is from the left
-    RIGHT_INTAKE_ARM_OFFSET = 0.04,
+    RIGHT_INTAKE_ARM_OFFSET = 0,
 
     // position for the intake arm being in the robot
-    INTAKE_ARM_IN_POSITION = 0.11,
+    INTAKE_ARM_IN_POSITION = 0.1925,
 
     // position for the intake arm to avoid the outtake arm
-    INTAKE_ARM_AVOID_POSITION = 0.4,
+    INTAKE_ARM_AVOID_POSITION = 0.4825,
 
     // position for the intake arm to avoid the beacon in auto
-    INTAKE_ARM_AUTO_AVOID_POSITION = 0.42, // todo set this
+    INTAKE_ARM_AUTO_AVOID_POSITION = 0.5025, // todo set this
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.748,
+    INTAKE_ARM_OUT_POSITION = 0.842,
 
     // position for the intake arm being at the top of a pixel stack
-    INTAKE_ARM_STACK_TOP_POSITION = 0.676,
+    INTAKE_ARM_STACK_TOP_POSITION = 0.767,
 
     // position for the intake arm being at the middle of a pixel stack
-    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.718,
+    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.8085,
 
     // upper bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.4,
+    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.4825,
 
     // lower bound for intake arm fine adjustment
     INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = INTAKE_ARM_OUT_POSITION,
 
     // reference for the vertical position of the intake arm
-    INTAKE_ARM_VERTICAL_POSITION = 0.283, // TODO: SET LATER
+    INTAKE_ARM_VERTICAL_POSITION = 0.3655,//0.283, // TODO: SET LATER
 
 
     // how offset the right outtake arm is from the left
@@ -118,7 +118,7 @@ public class RobotConstants {
     OUTTAKE_ARM_YELLOW_SCORE_POSITION = 0.362,
 
     // outtake arm cycle pixel scoring position for first pixel
-    OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION = 0.383,
+    OUTTAKE_ARM_CYCLE_FIRST_SCORE_POSITION = 0.386,
 
     // outtake arm cycle pixel scoring position for second pixel
     OUTTAKE_ARM_CYCLE_SECOND_SCORE_POSITION = 0.375,

@@ -31,6 +31,7 @@ import android.util.Size;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -50,6 +51,7 @@ import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 @Autonomous(name = "!Red Right Inner Auto For Timings!", group = "Autonomous")
+@Disabled
 public class RedRightInnerAutoForTimings extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;

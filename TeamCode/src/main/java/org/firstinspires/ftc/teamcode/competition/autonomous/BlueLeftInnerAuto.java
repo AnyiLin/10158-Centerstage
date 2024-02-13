@@ -52,7 +52,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Blue Left Inner Auto", group = "Autonomous")
+@Autonomous(name = "Blue Close Side 2 + 4", group = "Autonomous")
 public class BlueLeftInnerAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
@@ -130,8 +130,8 @@ public class BlueLeftInnerAuto extends OpMode {
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX()+1.5, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() + 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX() + 0.75, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
@@ -187,8 +187,8 @@ public class BlueLeftInnerAuto extends OpMode {
                 secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(1));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+1, Math.PI * 1.5 + Math.toRadians(2));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(1.5));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+1, Math.PI * 1.5 + Math.toRadians(0.5));
                 break;
             case "right":
                 firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3));
@@ -298,7 +298,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.25);
+                backdropCorrection(initialBackdropGoalPose, 4.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -416,7 +416,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.5);
+                backdropCorrection(firstCycleBackdropGoalPose, 3.8);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -558,7 +558,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.5);
+                backdropCorrection(secondCycleBackdropGoalPose, 3.8);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -667,8 +667,10 @@ public class BlueLeftInnerAuto extends OpMode {
 
                     error *= -1;
 
-                    if (Math.abs(error) > 0.85) {
+                    if (Math.abs(error) > 0.7) {
                         follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+                    } else {
+                        follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + follower.getTranslationalError().getXComponent());
                     }
 
                     follower.poseUpdater.setXOffset(MathFunctions.clamp(follower.poseUpdater.getXOffset(), -6, 6));

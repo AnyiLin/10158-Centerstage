@@ -99,6 +99,7 @@ public class TeamPropPipeline extends OpenCvPipeline {
     }
 
 
+        output.release();
         output = input.clone();
 
         Imgproc.cvtColor(output, hsv, Imgproc.COLOR_RGB2HSV);
