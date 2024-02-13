@@ -695,7 +695,7 @@ public class RedRightInnerAuto extends OpMode {
     }
 
     public void startDistanceSensorDisconnectDetection(int state) {
-        detectDistanceSensorDisconnect = state;
+        detectDistanceSensorDisconnect = 0;//state;
         distanceSensorDisconnectCycleCount = 0;
         distanceSensorDisconnects.clear();
     }
@@ -891,7 +891,7 @@ public class RedRightInnerAuto extends OpMode {
             telemetry.addData("Navigation:", navigation);
             telemetry.update();
             scanTimer.resetTimer();
-        } else if (scanTimer.getElapsedTime() > 720) {
+        } else if (scanTimer.getElapsedTime() > 700) {
             visionPortal.setProcessorEnabled(teamPropPipeline, true);
         } else {
             visionPortal.setProcessorEnabled(teamPropPipeline, false);

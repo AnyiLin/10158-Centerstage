@@ -52,8 +52,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Blue Close Side 2 + 4", group = "Autonomous")
-public class BlueLeftInnerAuto extends OpMode {
+@Autonomous(name = "Charlie Blue 2 + 4", group = "Autonomous Custom")
+public class CharlieBlueAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 
@@ -109,7 +109,7 @@ public class BlueLeftInnerAuto extends OpMode {
     private Pose2d startPose = new Pose2d(144-(63+72), 12+72, 0);
 
     // TODO: dont forget to adjust this too
-    private Point abortPoint = new Point(144-83.5, 120, Point.CARTESIAN), backdropGoalPoint;
+    private Point abortPoint = new Point(144-87, 120, Point.CARTESIAN), backdropGoalPoint;
 
     private Follower follower;
 
@@ -604,7 +604,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 if (pathTimer.getElapsedTime() > 2 * OUTTAKE_CLAW_DROP_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
-                    setPathState(40);
+                    setPathState(50);
                 }
                 break;
 
@@ -624,7 +624,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 setPathState(51);
                 break;
             case 51:
-                if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.intakeArmAtTargetPosition() && twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
+                if (twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
                     follower.poseUpdater.resetOffset();
                     PathChain abort = follower.pathBuilder()
                             .addPath(new BezierLine(new Point(follower.poseUpdater.getPose()), abortPoint))
@@ -635,6 +635,11 @@ public class BlueLeftInnerAuto extends OpMode {
                 }
                 break;
             case 52:
+                if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.intakeArmAtTargetPosition() && twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
+                    setPathState(53);
+                }
+                break;
+            case 53:
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }

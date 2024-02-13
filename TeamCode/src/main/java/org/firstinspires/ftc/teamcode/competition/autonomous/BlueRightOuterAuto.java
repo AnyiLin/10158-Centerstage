@@ -405,7 +405,7 @@ public class BlueRightOuterAuto extends OpMode {
             telemetry.addData("Navigation:", navigation);
             telemetry.update();
             scanTimer.resetTimer();
-        } else if (scanTimer.getElapsedTime() > 720) {
+        } else if (scanTimer.getElapsedTime() > 700) {
             visionPortal.setProcessorEnabled(teamPropPipeline, true);
         } else {
             visionPortal.setProcessorEnabled(teamPropPipeline, false);
