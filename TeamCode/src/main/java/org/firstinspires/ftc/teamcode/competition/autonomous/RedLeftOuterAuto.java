@@ -219,7 +219,7 @@ public class RedLeftOuterAuto extends OpMode {
                     setPathState(19);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.4);
+                backdropCorrection(initialBackdropGoalPose, 4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(19);
                 }

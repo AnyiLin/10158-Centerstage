@@ -133,7 +133,7 @@ public class CharlieRedAuto extends OpMode {
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX() - 1, redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.5, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.15, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.15, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY() + 0.5, Math.PI / 2);
@@ -298,7 +298,7 @@ public class CharlieRedAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.6);
+                backdropCorrection(initialBackdropGoalPose, 4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -416,7 +416,7 @@ public class CharlieRedAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.8);
+                backdropCorrection(firstCycleBackdropGoalPose, 3.2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -558,7 +558,7 @@ public class CharlieRedAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.8);
+                backdropCorrection(secondCycleBackdropGoalPose, 3.2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }

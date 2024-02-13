@@ -298,7 +298,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4.4);
+                backdropCorrection(initialBackdropGoalPose, 4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -416,7 +416,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.8);
+                backdropCorrection(firstCycleBackdropGoalPose, 3.2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -558,7 +558,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.8);
+                backdropCorrection(secondCycleBackdropGoalPose, 3.2);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
