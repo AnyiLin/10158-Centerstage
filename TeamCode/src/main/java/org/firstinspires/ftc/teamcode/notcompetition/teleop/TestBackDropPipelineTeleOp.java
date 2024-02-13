@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.notcompetition.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp
+@Disabled
 public class TestBackDropPipelineTeleOp extends LinearOpMode {
     private OpenCvCamera camera;
 
