@@ -444,7 +444,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public void buttonControls() {
         // plane
-        if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_right || gamepad2.dpad_down) {
+        if (gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_right || gamepad1.dpad_down) {
             plane.setPosition(PLANE_LAUNCHER_LAUNCH);
         }
 
