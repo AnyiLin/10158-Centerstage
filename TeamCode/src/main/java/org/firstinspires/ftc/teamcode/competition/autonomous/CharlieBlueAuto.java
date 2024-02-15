@@ -298,7 +298,7 @@ public class CharlieBlueAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 4);
+                backdropCorrection(initialBackdropGoalPose, 3.5);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -349,7 +349,7 @@ public class CharlieBlueAuto extends OpMode {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(3.5);
+                stackCorrection(4.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(23);
                 }
@@ -376,7 +376,7 @@ public class CharlieBlueAuto extends OpMode {
                     twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
                     setPathState(27);
                 }
-                if (pathTimer.getElapsedTime() > 1500) {
+                if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(27);
                 }
                 break;
@@ -416,7 +416,7 @@ public class CharlieBlueAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.2);
+                backdropCorrection(firstCycleBackdropGoalPose, 2.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -491,7 +491,7 @@ public class CharlieBlueAuto extends OpMode {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(3.5);
+                stackCorrection(4.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(33);
                 }
@@ -518,7 +518,7 @@ public class CharlieBlueAuto extends OpMode {
                     twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
                     setPathState(37);
                 }
-                if (pathTimer.getElapsedTime() > 1500) {
+                if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(37);
                 }
                 break;
@@ -558,7 +558,7 @@ public class CharlieBlueAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.2);
+                backdropCorrection(secondCycleBackdropGoalPose, 2.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -672,7 +672,7 @@ public class CharlieBlueAuto extends OpMode {
 
                     error *= -1;
 
-                    if (Math.abs(error) > 0.7) {
+                    if (Math.abs(error) > 0.5) {
                         follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
                     } else {
                         follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + follower.getTranslationalError().getXComponent());
