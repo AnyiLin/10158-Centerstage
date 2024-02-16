@@ -245,6 +245,7 @@ public class BlueRightOuterAuto extends OpMode {
             case 20:
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     Follower.useHeading = true;
+                    twoPersonDrive.setTransferState(TRANSFER_RESET);
                     twoPersonDrive.moveIntake(INTAKE_IN);
                     setPathState(21);
                 }
@@ -262,6 +263,18 @@ public class BlueRightOuterAuto extends OpMode {
                 break;
             case 22:
                 if (!follower.isBusy()) {
+                    setPathState(-1);
+                }
+                break;
+
+
+            case 40: // move the intake in
+                twoPersonDrive.setTransferState(TRANSFER_RESET);
+                twoPersonDrive.moveIntake(INTAKE_IN);
+                setPathState(41);
+                break;
+            case 41: // once the robot is nice and folded up, request stop
+                if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.intakeArmAtTargetPosition() && twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition()) {
                     setPathState(-1);
                 }
                 break;

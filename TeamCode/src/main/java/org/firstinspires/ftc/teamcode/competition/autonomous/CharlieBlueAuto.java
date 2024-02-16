@@ -46,6 +46,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.util.SingleRunAction;
 import org.firstinspires.ftc.teamcode.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -66,6 +67,8 @@ public class CharlieBlueAuto extends OpMode {
     private String navigation;
 
     private DistanceSensor leftDistanceSensor, rightDistanceSensor, rearDistanceSensor;
+
+    private SingleRunAction foldUp;
 
     private boolean distanceSensorDisconnected, rearDistanceSensorDisconnected;
 
@@ -610,6 +613,7 @@ public class CharlieBlueAuto extends OpMode {
 
 
             case 40: // move the intake in
+                twoPersonDrive.setTransferState(TRANSFER_RESET);
                 twoPersonDrive.moveIntake(INTAKE_IN);
                 setPathState(41);
                 break;
@@ -620,6 +624,7 @@ public class CharlieBlueAuto extends OpMode {
                 break;
 
             case 50:
+                twoPersonDrive.setTransferState(TRANSFER_RESET);
                 twoPersonDrive.moveIntake(INTAKE_IN);
                 setPathState(51);
                 break;
@@ -648,6 +653,10 @@ public class CharlieBlueAuto extends OpMode {
             default:
                 requestOpModeStop();
                 break;
+        }
+
+        if (opmodeTimer.getElapsedTimeSeconds() > 28) {
+            foldUp.run();
         }
     }
 
@@ -804,6 +813,8 @@ public class CharlieBlueAuto extends OpMode {
     @Override
     public void init() {
         //PhotonCore.start(this.hardwareMap);
+
+        foldUp = new SingleRunAction(()-> setPathState(40));
 
         distanceSensorDisconnects = new ArrayList<>();
 
