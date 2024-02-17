@@ -605,7 +605,7 @@ public class CharlieRedAuto extends OpMode {
                 break;
             case 317: // once the outer pixel has dropped, drop the inner one and fold up
                 if (pathTimer.getElapsedTime() > 2 * OUTTAKE_CLAW_DROP_TIME) {
-                    twoPersonDrive.setTransferState(TRANSFER_RESET);
+                    //twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
                     setPathState(50);
                 }
@@ -816,7 +816,9 @@ public class CharlieRedAuto extends OpMode {
     public void init() {
         //PhotonCore.start(this.hardwareMap);
 
-        foldUp = new SingleRunAction(()-> setPathState(40));
+        foldUp = new SingleRunAction(()-> {
+            if (Integer.parseInt(String.valueOf(pathState).substring(0,1)) < 4) setPathState(50);
+        });
 
         distanceSensorDisconnects = new ArrayList<>();
 

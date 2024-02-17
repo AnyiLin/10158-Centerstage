@@ -219,7 +219,7 @@ public class BlueRightOuterAuto extends OpMode {
                     setPathState(19);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 3.5);
+                backdropCorrection(initialBackdropGoalPose, 3.6);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(19);
                 }
