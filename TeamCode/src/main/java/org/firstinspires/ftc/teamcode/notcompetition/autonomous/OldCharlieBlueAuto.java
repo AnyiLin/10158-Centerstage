@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.competition.autonomous;
+package org.firstinspires.ftc.teamcode.notcompetition.autonomous;
 
 
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_AUTO_AVOID_POSITION;
@@ -32,6 +32,7 @@ import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
@@ -53,8 +54,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Blue Close Side 2 + 4", group = "Autonomous")
-public class BlueLeftInnerAuto extends OpMode {
+@Autonomous(name = "Old Charlie Blue 2 + 4", group = "Autonomous Custom")
+@Disabled
+public class OldCharlieBlueAuto extends OpMode {
 
     private TwoPersonDrive twoPersonDrive;
 
@@ -112,7 +114,7 @@ public class BlueLeftInnerAuto extends OpMode {
     private Pose2d startPose = new Pose2d(144-(63+72), 12+72, 0);
 
     // TODO: dont forget to adjust this too
-    private Point abortPoint = new Point(144-83.5, 120, Point.CARTESIAN), backdropGoalPoint;
+    private Point abortPoint = new Point(144-87, 120, Point.CARTESIAN), backdropGoalPoint;
 
     private Follower follower;
 
@@ -127,22 +129,22 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX() + 0.5, blueLeftSideLeftSpikeMark.getY(), Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX() - 2, blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX() + 2.5, blueLeftSideLeftSpikeMark.getY()-0.75, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX(), blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.75, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX() - 1.25, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 1.25, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.5, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX() + 0.75, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 0.5, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.5, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2, blueLeftSideRightSpikeMark.getY()+0.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 2.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 2, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2.5, blueLeftSideRightSpikeMark.getY()+0.5, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1.5,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 2.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 2, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-0.25, Math.PI * 1.5);
                 break;
         }
     }
@@ -186,16 +188,16 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+2.75, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+2.5, Math.PI * 1.5 + Math.toRadians(4));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+2, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+1, Math.PI * 1.5 + Math.toRadians(3));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(1));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3.5));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-0.25, Math.PI * 1.5 + Math.toRadians(2.5));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(1.5));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+1, Math.PI * 1.5 + Math.toRadians(0.5));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+3.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH - 0.5, Math.PI * 1.5 + Math.toRadians(0));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(2));
                 break;
         }
 
@@ -246,7 +248,7 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (pathState) {
             case 10: // starts following the first path to score on the spike mark
                 follower.followPath(scoreSpikeMark);
-                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_POSITION - 0.01);
+                twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_OUT_POSITION + 0.01);
                 setPathState(11);
                 break;
             case 11: // detects the path to progress away from the wall and sets tangent interpolation
@@ -256,31 +258,34 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(12);
                 }
                 break;
-            case 12:
-                if (!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(scoreSpikeMark.getLastControlPoint()), scoreSpikeMark.getEndTangent().getTheta());
+            case 12: // detects for the end of the path and everything else to be in order and releases the pixel
+                if (!follower.isBusy() && twoPersonDrive.intakeState == INTAKE_OUT) {
+                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
                     setPathState(13);
                 }
                 break;
-            case 13: // detects for the end of the path and everything else to be in order and releases the pixel
-                if (twoPersonDrive.intakeState == INTAKE_OUT) {
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
-                    setPathState(14);
-                }
-                break;
-            case 14: // moves mechanisms into position to score and pick up from stack as well as starts moving to score
+            case 13: // moves mechanisms into position to score and pick up from stack as well as starts moving to score
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_OUT);
                     twoPersonDrive.outtakeWristOffset = -15;
                     twoPersonDrive.moveToCustomIntakeOutPosition(INTAKE_ARM_AUTO_AVOID_POSITION);
+                    setPathState(14);
+                }
+                break;
+            case 14:
+                if (pathTimer.getElapsedTime() > 500) {
+                    follower.followPath(initialScoreOnBackdrop);
                     setPathState(15);
                 }
                 break;
             case 15:
-                if (pathTimer.getElapsedTime() > 500) {
-                    follower.followPath(initialScoreOnBackdrop);
+                /*
+                if (follower.getCurrentTValue() > 0.5) {
+                    initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
                     setPathState(16);
                 }
+                 */
+                setPathState(16);
                 break;
             case 16: // detects for end of the path and outtake out and drops pixel
                 if (!follower.isBusy() && twoPersonDrive.outtakeState == OUTTAKE_OUT) {
@@ -298,7 +303,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(18);
                     break;
                 }
-                backdropCorrection(initialBackdropGoalPose, 3.6);
+                backdropCorrection(initialBackdropGoalPose, 3.5);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(18);
                 }
@@ -349,7 +354,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(5.5);
+                stackCorrection(4.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(23);
                 }
@@ -416,7 +421,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(211);
                     break;
                 }
-                backdropCorrection(firstCycleBackdropGoalPose, 3.2);
+                backdropCorrection(firstCycleBackdropGoalPose, 2.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(211);
                 }
@@ -491,7 +496,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(50);
                     break;
                 }
-                stackCorrection(5.5);
+                stackCorrection(4.5);
                 if (pathTimer.getElapsedTime() > 1000) {
                     setPathState(33);
                 }
@@ -558,7 +563,7 @@ public class BlueLeftInnerAuto extends OpMode {
                     setPathState(311);
                     break;
                 }
-                backdropCorrection(secondCycleBackdropGoalPose, 3.2);
+                backdropCorrection(secondCycleBackdropGoalPose, 2.4);
                 if (pathTimer.getElapsedTime() > 500) {
                     setPathState(311);
                 }
@@ -604,7 +609,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 if (pathTimer.getElapsedTime() > 2 * OUTTAKE_CLAW_DROP_TIME) {
                     //twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
-                    setPathState(40);
+                    setPathState(50);
                 }
                 break;
 
@@ -626,7 +631,7 @@ public class BlueLeftInnerAuto extends OpMode {
                 setPathState(51);
                 break;
             case 51:
-                if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.intakeArmAtTargetPosition() && twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
+                if (twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
                     follower.poseUpdater.resetOffset();
                     PathChain abort = follower.pathBuilder()
                             .addPath(new BezierLine(new Point(follower.poseUpdater.getPose()), abortPoint))
@@ -637,6 +642,11 @@ public class BlueLeftInnerAuto extends OpMode {
                 }
                 break;
             case 52:
+                if (twoPersonDrive.intakeState == INTAKE_IN && twoPersonDrive.intakeArmAtTargetPosition() && twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
+                    setPathState(53);
+                }
+                break;
+            case 53:
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
@@ -807,7 +817,7 @@ public class BlueLeftInnerAuto extends OpMode {
         //PhotonCore.start(this.hardwareMap);
 
         foldUp = new SingleRunAction(()-> {
-            if (Integer.parseInt(String.valueOf(pathState).substring(0,1)) < 4) setPathState(40);
+            if (Integer.parseInt(String.valueOf(pathState).substring(0,1)) < 4) setPathState(50);
         });
 
         distanceSensorDisconnects = new ArrayList<>();
