@@ -604,7 +604,7 @@ public class CharlieBlueAuto extends OpMode {
                 if (pathTimer.getElapsedTime() > 2 * OUTTAKE_CLAW_DROP_TIME) {
                     //twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
-                    setPathState(40);
+                    setPathState(50);
                 }
                 break;
 

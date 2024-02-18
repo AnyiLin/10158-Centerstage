@@ -133,7 +133,7 @@ public class CharlieRedAuto extends OpMode {
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
+                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX() - 3, redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
                 initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
                 firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.5, Math.PI * 1.5);
                 secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1.15, Math.PI * 1.5);
@@ -604,7 +604,7 @@ public class CharlieRedAuto extends OpMode {
                 if (pathTimer.getElapsedTime() > 2 * OUTTAKE_CLAW_DROP_TIME) {
                     //twoPersonDrive.setTransferState(TRANSFER_RESET);
                     Follower.useHeading = true;
-                    setPathState(40);
+                    setPathState(50);
                 }
                 break;
 
