@@ -67,6 +67,19 @@ public class PoseUpdater {
         localizer.setPoseEstimate(set);
     }
 
+    /**
+     *
+     * This resets the current pose to a specified pose, using offsets to avoid having to reset using roadrunners pose reset
+     *
+     * @param set this is the pose we want to set the current pose to, using offsets
+     */
+    public void setCurrentPoseUsingOffset(Pose2d set) {
+        Pose2d currentPose = localizer.getPoseEstimate();
+        setXOffset(set.getX() - currentPose.getX());
+        setYOffset(set.getY() - currentPose.getY());
+        setHeadingOffset(MathFunctions.getTurnDirection(currentPose.getHeading(), set.getHeading()) * MathFunctions.getSmallestAngleDifference(currentPose.getHeading(), set.getHeading()));
+    }
+
     public void setXOffset(double offset) {
         xOffset = offset;
     }
