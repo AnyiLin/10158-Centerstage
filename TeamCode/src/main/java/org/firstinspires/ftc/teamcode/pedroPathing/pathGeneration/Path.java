@@ -6,55 +6,84 @@ import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 
 import java.util.ArrayList;
 
+/**
+ * This is the Path class. This class handles containing information on the actual path the Follower
+ * will follow, not just the shape of the path that the BezierCurve class handles. This contains
+ * information on the stop criteria for a Path, the heading interpolation, and deceleration.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/9/2024
+ */
 public class Path {
     private BezierCurve curve;
 
-    private double startHeading, endHeading, closestPointCurvature, closestPointTValue, linearInterpolationEndTime;
+    private double startHeading;
+    private double endHeading;
+    private double closestPointCurvature;
+    private double closestPointTValue;
+    private double linearInterpolationEndTime;
 
-    private Vector closestPointTangentVector, closestPointNormalVector;
+    private Vector closestPointTangentVector;
+    private Vector closestPointNormalVector;
 
-    private boolean isTangentHeadingInterpolation = true, followTangentReversed;
+    private boolean isTangentHeadingInterpolation = true;
+    private boolean followTangentReversed;
 
-    // When the drivetrain is at the end of its current path or path chain and the velocity goes
-    // below this value, then end the path. This is in inches/second
-    // This can be custom set for each path
-    public static double pathEndVelocity = FollowerConstants.pathEndVelocity;
+    // A multiplier for the zero power acceleration to change the speed the robot decelerates at
+    // the end of paths.
+    // Increasing this will cause the robot to try to decelerate faster, at the risk of overshoots
+    // or localization slippage.
+    // Decreasing this will cause the deceleration at the end of the Path to be slower, making the
+    // robot slower but reducing risk of end-of-path overshoots or localization slippage.
+    // This can be set individually for each Path, but this is the default.
+    private static double zeroPowerAccelerationMultiplier = FollowerConstants.zeroPowerAccelerationMultiplier;
 
-    // When the drivetrain is at the end of its current path or path chain and the translational error goes
-    // below this value, then end the path. This is in inches
-    // This can be custom set for each path
-    public static double pathEndTranslational = FollowerConstants.pathEndTranslational;
+    // When the robot is at the end of its current Path or PathChain and the velocity goes
+    // this value, then end the Path. This is in inches/second.
+    // This can be custom set for each Path.
+    private static double pathEndVelocityConstraint = FollowerConstants.pathEndVelocityConstraint;
 
-    // When the drivetrain is at the end of its current path or path chain and the heading error goes
-    // below this value, then end the path. This is in radians
-    // This can be custom set for each path
-    public static double pathEndHeading = FollowerConstants.pathEndHeading;
+    // When the robot is at the end of its current Path or PathChain and the translational error
+    // goes below this value, then end the Path. This is in inches.
+    // This can be custom set for each Path.
+    private static double pathEndTranslationalConstraint = FollowerConstants.pathEndTranslationalConstraint;
 
-    // When the t-value of the closest point to the robot on the path is greater than this value,
-    // then the path is considered at its end.
-    // This can be custom set for each path
-    public static double pathEndTValue = FollowerConstants.pathEndTValue;
+    // When the robot is at the end of its current Path or PathChain and the heading error goes
+    // below this value, then end the Path. This is in radians.
+    // This can be custom set for each Path.
+    private static double pathEndHeadingConstraint = FollowerConstants.pathEndHeadingConstraint;
 
-    // When the path is considered at its end parametrically, then the follower has this many
+    // When the t-value of the closest point to the robot on the Path is greater than this value,
+    // then the Path is considered at its end.
+    // This can be custom set for each Path.
+    private static double pathEndTValueConstraint = FollowerConstants.pathEndTValueConstraint;
+
+    // When the Path is considered at its end parametrically, then the Follower has this many
     // seconds to further correct by default.
-    // This can be custom set for each path
-    public static double pathEndTimeout = FollowerConstants.pathEndTimeout;
+    // This can be custom set for each Path.
+    private static double pathEndTimeoutConstraint = FollowerConstants.pathEndTimeoutConstraint;
 
     /**
-     * Creates a new Path from a Bezier curve. The default heading interpolation is tangential.
+     * Creates a new Path from a BezierCurve. The default heading interpolation is tangential.
      *
-     * @param curve the Bezier curve
+     * @param curve the BezierCurve.
      */
     public Path(BezierCurve curve) {
         this.curve = curve;
     }
 
     /**
-     * This sets the heading interpolation to linear with a specified start heading for the path and
-     * an end heading for the path
+     * This sets the heading interpolation to linear with a specified start heading and end heading
+     * for the Path. This will interpolate across the entire length of the Path, so there may be
+     * some issues with end heading accuracy and precision if this is used. If a precise end heading
+     * is necessary, then use the setLinearHeadingInterpolation(double startHeading,
+     * double endHeading, double endTime) method.
      *
-     * @param startHeading the start heading for the path
-     * @param endHeading the end heading for the path
+     * @param startHeading The start of the linear heading interpolation.
+     * @param endHeading The end of the linear heading interpolation.
+     *                   This will be reached at the end of the Path if no end time is specified.
      */
     public void setLinearHeadingInterpolation(double startHeading, double endHeading) {
         linearInterpolationEndTime = 1;
@@ -64,11 +93,17 @@ public class Path {
     }
 
     /**
-     * This sets the heading interpolation to linear with a specified start heading for the path and
-     * an end heading for the path
+     * This sets the heading interpolation to linear with a specified start heading and end heading
+     * for the Path. This will interpolate from the start of the Path to the specified end time.
+     * This ensures high accuracy and precision than interpolating across the entire Path. However,
+     * interpolating too quickly can cause undesired oscillations and inaccuracies of its own, so
+     * generally interpolating to something like 0.8 of your Path should work best.
      *
-     * @param startHeading the start heading for the path
-     * @param endHeading the end heading for the path
+     * @param startHeading The start of the linear heading interpolation.
+     * @param endHeading The end of the linear heading interpolation.
+     *                   This will be reached at the end of the Path if no end time is specified.
+     * @param endTime The end time on the Path that the linear heading interpolation will finish.
+     *                This value ranges from [0, 1] since Bezier curves are parametric functions.
      */
     public void setLinearHeadingInterpolation(double startHeading, double endHeading, double endTime) {
         linearInterpolationEndTime = MathFunctions.clamp(endTime, 0.000000001, 1);
@@ -78,9 +113,9 @@ public class Path {
     }
 
     /**
-     * This sets the heading interpolation to maintain a constant heading
+     * This sets the heading interpolation to maintain a constant heading.
      *
-     * @param setHeading the constant heading for the path
+     * @param setHeading the constant heading for the Path.
      */
     public void setConstantHeadingInterpolation(double setHeading) {
         linearInterpolationEndTime = 1;
@@ -90,12 +125,12 @@ public class Path {
     }
 
     /**
-     * This gets the closest point from a specified pose to the curve with a specified binary search
-     * step limit
+     * This gets the closest Point from a specified pose to the BezierCurve with a binary search
+     * that is limited to some specified step limit.
      *
-     * @param pose the pose
-     * @param searchStepLimit the binary search step limit
-     * @return returns the closest point
+     * @param pose the pose.
+     * @param searchStepLimit the binary search step limit.
+     * @return returns the closest Point.
      */
     public Pose2d getClosestPoint(Pose2d pose, int searchStepLimit) {
         double lower = 0;
@@ -246,7 +281,7 @@ public class Path {
      * @return returns if at end
      */
     public boolean isAtParametricEnd() {
-        if (closestPointTValue >= pathEndTValue) return true;
+        if (closestPointTValue >= pathEndTValueConstraint) return true;
         return false;
     }
 
@@ -256,7 +291,7 @@ public class Path {
      * @return returns if at start
      */
     public boolean isAtParametricStart() {
-        if (closestPointTValue <= 1-pathEndTValue) return true;
+        if (closestPointTValue <= 1- pathEndTValueConstraint) return true;
         return false;
     }
 
@@ -306,12 +341,21 @@ public class Path {
     }
 
     /**
+     * This sets the path's deceleration factor
+     *
+     * @param set
+     */
+    public void setZeroPowerAccelerationMultiplier(double set) {
+        zeroPowerAccelerationMultiplier = set;
+    }
+
+    /**
      * This sets the velocity stop criteria
      *
      * @param set
      */
-    public void setPathEndVelocity(double set) {
-        pathEndVelocity = set;
+    public void setPathEndVelocityConstraint(double set) {
+        pathEndVelocityConstraint = set;
     }
 
     /**
@@ -319,8 +363,8 @@ public class Path {
      *
      * @param set
      */
-    public void setPathEndTranslational(double set) {
-        pathEndTranslational = set;
+    public void setPathEndTranslationalConstraint(double set) {
+        pathEndTranslationalConstraint = set;
     }
 
     /**
@@ -328,8 +372,8 @@ public class Path {
      *
      * @param set
      */
-    public void setPathEndHeading(double set) {
-        pathEndHeading = set;
+    public void setPathEndHeadingConstraint(double set) {
+        pathEndHeadingConstraint = set;
     }
 
     /**
@@ -337,8 +381,8 @@ public class Path {
      *
      * @param set
      */
-    public void setPathEndTValue(double set) {
-        pathEndTValue = set;
+    public void setPathEndTValueConstraint(double set) {
+        pathEndTValueConstraint = set;
     }
 
     /**
@@ -346,43 +390,50 @@ public class Path {
      *
      * @param set
      */
-    public void setPathEndTimeout(double set) {
-        pathEndTimeout = set;
+    public void setPathEndTimeoutConstraint(double set) {
+        pathEndTimeoutConstraint = set;
+    }
+
+    /**
+     * This gets the deceleration multiplier
+     */
+    public double getZeroPowerAccelerationMultiplier() {
+        return zeroPowerAccelerationMultiplier;
     }
 
     /**
      * This gets the velocity stop criteria
      */
-    public double getPathEndVelocity() {
-        return pathEndVelocity;
+    public double getPathEndVelocityConstraint() {
+        return pathEndVelocityConstraint;
     }
 
     /**
      * This gets the translational stop criteria
      */
-    public double getPathEndTranslational() {
-        return pathEndTranslational;
+    public double getPathEndTranslationalConstraint() {
+        return pathEndTranslationalConstraint;
     }
 
     /**
      * This gets the heading stop criteria
      */
-    public double getPathEndHeading() {
-        return pathEndHeading;
+    public double getPathEndHeadingConstraint() {
+        return pathEndHeadingConstraint;
     }
 
     /**
      * This gets the parametric end criteria
      */
-    public double getPathEndTValue() {
-        return pathEndTValue;
+    public double getPathEndTValueConstraint() {
+        return pathEndTValueConstraint;
     }
 
     /**
      * This gets the end correction time
      */
-    public double getPathEndTimeout() {
-        return pathEndTimeout;
+    public double getPathEndTimeoutConstraint() {
+        return pathEndTimeoutConstraint;
     }
 
     /**

@@ -35,7 +35,7 @@ public class PathChainTest extends OpMode {
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .addPath(new BezierLine(new Point(84, 79, Point.CARTESIAN), new Point(85, 28, Point.CARTESIAN)))//, new Point(84, 28, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(Math.PI*1.5)
-                .setPathEndTimeout(0)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         follower.followPath(pathChain);
@@ -58,14 +58,7 @@ public class PathChainTest extends OpMode {
         follower.update();
 
         telemetryA.addData("path number", follower.getCurrentPathNumber());
-        telemetryA.addData("leftFront", follower.motorPowers()[0]);
-        telemetryA.addData("leftRear", follower.motorPowers()[1]);
-        telemetryA.addData("rightFront", follower.motorPowers()[2]);
-        telemetryA.addData("rightRear", follower.motorPowers()[3]);
         telemetryA.addData("Heading error", MathFunctions.getTurnDirection(follower.getPose().getHeading(), 0) * MathFunctions.getSmallestAngleDifference(0,follower.getPose().getHeading()));
-        telemetryA.addData("translational error heading", follower.asdf());
-        telemetryA.addData("left side pathing power", follower.qwerty());
-        telemetryA.addData("right side pathing power", follower.qwerty2());
         telemetryA.addData("isBusy", follower.isBusy());
         telemetryA.addData("heading", follower.getHeadingVector().getMagnitude());
         telemetryA.addData("corrective", follower.getCorrectiveVector().getMagnitude());
@@ -75,7 +68,6 @@ public class PathChainTest extends OpMode {
         telemetryA.addData("drive", follower.getDriveVector().getTheta());
         telemetryA.addData("x", follower.getPose().getX());
         telemetryA.addData("y", follower.getPose().getY());
-        telemetryA.addData("drive error", follower.zxcv());
         telemetryA.addData("pose", follower.getClosestPose().getX() + ", " + follower.getClosestPose().getY());
         telemetryA.update();
     }

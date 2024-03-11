@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_OUT_
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_MIDDLE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_TOP_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MIDDLE_PRESET_POSITION;
@@ -33,8 +32,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
-import org.firstinspires.ftc.teamcode.util.SingleRunAction;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -133,7 +132,7 @@ public class LM5_BlueAuto extends OpMode {
 
         initialScoreOnBackdrop = new Path(new BezierCurve(new Point(scoreSpikeMark.getLastControlPoint().getX(), scoreSpikeMark.getLastControlPoint().getY(), Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 111, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
         initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        initialScoreOnBackdrop.setPathEndTimeout(2.5);
+        initialScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
 
         getOutOfWay = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 106, Point.CARTESIAN), new Point(144-86, 120, Point.CARTESIAN)));
         getOutOfWay.setConstantHeadingInterpolation(Math.PI * 1.5);
@@ -151,7 +150,7 @@ public class LM5_BlueAuto extends OpMode {
                 if (follower.getCurrentTValue() > 0.6) scoreSpikeMark.setConstantHeadingInterpolation(scoreSpikeMarkAngle);
                 if (follower.getCurrentTValue() > 0.8) moveExtensionToSpikeMarkDrop.run();
                 if (!follower.isBusy() && twoPersonDrive.intakeState == INTAKE_OUT /*&& twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_SPIKE_MARK_POSITION - 20*/) {
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+                    twoPersonDrive.setIntakeClawOpen(true);
                     setPathState(2);
                 }
                 break;

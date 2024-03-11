@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.util.CustomPIDFCoefficients;
+
 @Config
 public class RobotConstants {
 
@@ -69,13 +71,13 @@ public class RobotConstants {
     RIGHT_INTAKE_ARM_OFFSET = 0,
 
     // position for the intake arm being in the robot
-    INTAKE_ARM_IN_POSITION = 0.1925,
+    INTAKE_ARM_IN_POSITION = 0.25,
 
     // position for the intake arm to avoid the outtake arm
-    INTAKE_ARM_AVOID_POSITION = 0.4825,
+    INTAKE_ARM_AVOID_POSITION = 0.6,
 
     // position for the intake arm to avoid the beacon in auto
-    INTAKE_ARM_AUTO_AVOID_POSITION = 0.5025, // todo set this
+    INTAKE_ARM_AUTO_AVOID_POSITION = 0.61, // todo set this
 
     // position for the intake arm being out of the robot at ground level
     INTAKE_ARM_OUT_POSITION = 0.842,
@@ -87,7 +89,7 @@ public class RobotConstants {
     INTAKE_ARM_STACK_MIDDLE_POSITION = 0.8085,
 
     // upper bound for intake arm fine adjustment
-    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.4825,
+    INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.6,
 
     // lower bound for intake arm fine adjustment
     INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = INTAKE_ARM_OUT_POSITION,
@@ -100,7 +102,7 @@ public class RobotConstants {
     RIGHT_OUTTAKE_ARM_OFFSET = -0.01,
 
     // position for the outtake arm being in the robot
-    OUTTAKE_ARM_IN_POSITION = 0.82,
+    OUTTAKE_ARM_IN_POSITION = 0.805,
 
     // position for the outtake arm to drop in the robot
     OUTTAKE_ARM_DROP_POSITION = 0.84,
@@ -125,7 +127,7 @@ public class RobotConstants {
 
 
     // the position the wrist has to be at to be vertical when the outtake arm is in the robot
-    OUTTAKE_WRIST_VERTICAL_OFFSET = 0.845,
+    OUTTAKE_WRIST_VERTICAL_OFFSET = 0.8,
 
     // upper bound for outtake wrist fine adjustment
     OUTTAKE_WRIST_FINE_ADJUST_UPPER_BOUND = -60,
@@ -165,11 +167,14 @@ public class RobotConstants {
     // closed position of the inner scoring claw
     INNER_OUTTAKE_CLAW_CLOSED = 0.88,
 
-    // open position of the intake claw
-    INTAKE_CLAW_OPEN = 0.76,
+    // open position of the intake claw when the arm is out
+    INTAKE_CLAW_OUT_OPEN = 0.45,
+
+    // open position of the intake claw when the arm is not out
+    INTAKE_CLAW_IN_OPEN = 0.5,
 
     // closed position of the intake claw
-    INTAKE_CLAW_CLOSED = 0.58,
+    INTAKE_CLAW_CLOSED = 0.68,
 
     // plane launcher launch position
     PLANE_LAUNCHER_LAUNCH = 0.3,
@@ -197,7 +202,7 @@ public class RobotConstants {
     OUTTAKE_CLAW_CLOSE_TIME = 250,
 
     // roughly the time it takes for our intake claw to close
-    INTAKE_CLAW_CLOSE_TIME = 250,
+    INTAKE_CLAW_CLOSE_TIME = 400,
 
     // the delay between the inner outtake claw closing and the outer outtake claw closing on transfer
     TRANSFER_CLAW_DELAY = 50,

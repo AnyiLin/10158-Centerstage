@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 
 @Config
 @Autonomous (name = "Color Sensor Test", group = "Autonomous Pathing Tuning")

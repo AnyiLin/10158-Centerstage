@@ -8,7 +8,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STAC
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_TOP_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSE_TIME;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_TRANSFER_UPPER_LIMIT;
@@ -47,8 +46,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.util.SingleRunAction;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -167,7 +166,7 @@ public class OldCharlieBlueAuto extends OpMode {
         scoreSpikeMarkMidToSpikeDistance = MathFunctions.distance(spikeMarkGoalPose, scoreSpikeMarkMidPoint);
         scoreSpikeMark = new Path(new BezierCurve(new Point(startPose), scoreSpikeMarkMidPoint, new Point(spikeMarkGoalPose.getX() + MathFunctions.getSign(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * Math.abs(scoreSpikeMarkMidPoint.getX() - spikeMarkGoalPose.getX()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, spikeMarkGoalPose.getY() + MathFunctions.getSign(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * Math.abs(scoreSpikeMarkMidPoint.getY() - spikeMarkGoalPose.getY()) * ROBOT_FRONT_LENGTH / scoreSpikeMarkMidToSpikeDistance, Point.CARTESIAN)));
         scoreSpikeMark.setConstantHeadingInterpolation(startPose.getHeading());
-        scoreSpikeMark.setPathEndTimeout(3);
+        scoreSpikeMark.setPathEndTimeoutConstraint(3);
 
         switch (navigation) {
             default:
@@ -183,7 +182,7 @@ public class OldCharlieBlueAuto extends OpMode {
         }
         //initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
         initialScoreOnBackdrop.setLinearHeadingInterpolation(scoreSpikeMark.getEndTangent().getTheta(), Math.PI * 1.5, 0.5);
-        initialScoreOnBackdrop.setPathEndTimeout(2.5);
+        initialScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
 
         switch (navigation) {
             default:
@@ -206,7 +205,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .setPathEndTimeout(0)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         firstCycleStackGrab = follower.pathBuilder()
@@ -219,7 +218,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .setPathEndTimeout(2.5)
+                .setPathEndTimeoutConstraint(2.5)
                 .build();
 
         secondCycleToStack = follower.pathBuilder()
@@ -227,7 +226,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .setPathEndTimeout(0)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         secondCycleStackGrab = follower.pathBuilder()
@@ -240,7 +239,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
-                .setPathEndTimeout(2.5)
+                .setPathEndTimeoutConstraint(2.5)
                 .build();
     }
 
@@ -260,7 +259,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 break;
             case 12: // detects for the end of the path and everything else to be in order and releases the pixel
                 if (!follower.isBusy() && twoPersonDrive.intakeState == INTAKE_OUT) {
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+                    twoPersonDrive.setIntakeClawOpen(true);
                     setPathState(13);
                 }
                 break;
@@ -331,7 +330,7 @@ public class OldCharlieBlueAuto extends OpMode {
             case 20: // starts the robot off on to the first stack once the pixels have been dropped
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     Follower.useHeading = true;
-                    follower.poseUpdater.resetOffset();
+                    follower.resetOffset();
                     if (distanceSensorDisconnected) {
                         setPathState(50);
                         break;
@@ -388,7 +387,7 @@ public class OldCharlieBlueAuto extends OpMode {
             case 27: // waits for the intake claw to close and then sets the intake to move back in while pulling the extension back in slightly
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
-                    follower.poseUpdater.resetOffset();
+                    follower.resetOffset();
                     Follower.useHeading = true;
                     follower.followPath(firstCycleScoreOnBackdrop);
                     setPathState(28);
@@ -474,7 +473,7 @@ public class OldCharlieBlueAuto extends OpMode {
             case 30: // once the inner pixel has dropped, start the robot off to the second pass on the first stack
                 if (pathTimer.getElapsedTime() > OUTTAKE_CLAW_DROP_TIME) {
                     Follower.useHeading = true;
-                    follower.poseUpdater.resetOffset();
+                    follower.resetOffset();
                     if (distanceSensorDisconnected) {
                         setPathState(50);
                         break;
@@ -531,7 +530,7 @@ public class OldCharlieBlueAuto extends OpMode {
                 if (pathTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME) {
                     twoPersonDrive.setTransferState(TRANSFER_POSITIONING);
                     Follower.useHeading = true;
-                    follower.poseUpdater.resetOffset();
+                    follower.resetOffset();
                     follower.followPath(secondCycleScoreOnBackdrop);
                     setPathState(38);
                 }
@@ -632,9 +631,9 @@ public class OldCharlieBlueAuto extends OpMode {
                 break;
             case 51:
                 if (twoPersonDrive.outtakeState == OUTTAKE_IN && twoPersonDrive.outtakeArmAtTargetPosition() && twoPersonDrive.liftEncoder.getCurrentPosition() < LIFT_TRANSFER_UPPER_LIMIT) {
-                    follower.poseUpdater.resetOffset();
+                    follower.resetOffset();
                     PathChain abort = follower.pathBuilder()
-                            .addPath(new BezierLine(new Point(follower.poseUpdater.getPose()), abortPoint))
+                            .addPath(new BezierLine(new Point(follower.getPose()), abortPoint))
                             .setConstantHeadingInterpolation(Math.PI * 1.5)
                             .build();
                     follower.followPath(abort);
@@ -684,12 +683,12 @@ public class OldCharlieBlueAuto extends OpMode {
                     error *= -1;
 
                     if (Math.abs(error) > 0.5) {
-                        follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+                        follower.setXOffset(follower.getXOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
                     } else {
-                        follower.poseUpdater.setXOffset(follower.poseUpdater.getXOffset() + follower.getTranslationalError().getXComponent());
+                        follower.setXOffset(follower.getXOffset() + follower.getTranslationalError().getXComponent());
                     }
 
-                    follower.poseUpdater.setXOffset(MathFunctions.clamp(follower.poseUpdater.getXOffset(), -6, 6));
+                    follower.setXOffset(MathFunctions.clamp(follower.getXOffset(), -6, 6));
 
                     //telemetry.addData("error", error);
                     distanceSensorDecimationTimer.resetTimer();
@@ -804,10 +803,6 @@ public class OldCharlieBlueAuto extends OpMode {
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
-        double[] motorPowers = follower.motorPowers();
-        for (int i = 0; i < motorPowers.length; i++) {
-            telemetry.addData("motor " + i, motorPowers[i]);
-        }
         twoPersonDrive.telemetry();
         //telemetry.update();
     }

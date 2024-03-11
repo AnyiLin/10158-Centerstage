@@ -3,16 +3,25 @@ package org.firstinspires.ftc.teamcode.pedroPathing.follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
+/**
+ * This is the DriveVectorScaler class. This class takes in inputs Vectors for driving, heading
+ * correction, and translational/centripetal correction and returns an array with wheel powers.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/4/2024
+ */
 public class DriveVectorScaler {
-    // This is in the order left front, left back, right front, right back. These are also normalized
+    // This is ordered left front, left back, right front, right back. These are also normalized.
     private Vector[] mecanumVectors;
 
     /**
      * This creates a new DriveVectorScaler, which takes in various movement vectors and outputs
-     * the wheel drive powers necessary to move in the intended direction, given a set of preferred
-     * wheel drive vectors
+     * the wheel drive powers necessary to move in the intended direction, given the true movement
+     * vector for the front left mecanum wheel.
      *
-     * @param frontLeftVector this is the front left mecanum wheel's preferred drive vector
+     * @param frontLeftVector this is the front left mecanum wheel's preferred drive vector.
      */
     public DriveVectorScaler(Vector frontLeftVector) {
         Vector copiedFrontLeftVector = MathFunctions.normalizeVector(frontLeftVector);
@@ -25,17 +34,21 @@ public class DriveVectorScaler {
 
     /**
      * This takes in vectors for corrective power, heading power, and pathing power and outputs
-     * an Array of four vectors, one for each wheel
+     * an Array of four doubles, one for each wheel's motor power.
      *
-     * IMPORTANT NOTE: all vector inputs are clamped between 0 and 1 inclusive in magnitude
+     * IMPORTANT NOTE: all vector inputs are clamped between 0 and 1 inclusive in magnitude.
      *
-     * @param correctivePower this vector includes the centrifugal force scaling vector as well as a
-     * translational power vector to correct onto the Bezier curve the follower is following
-     * @param headingPower the angle of this vector doesn't particularly matter, only the magnitude.
-     * this tells the robot how much it should turn.
-     * @param pathingPower this vector should always be of magnitude 1 and points in the direction that
-     * we should be going along the path
-     * @return
+     * @param correctivePower this Vector includes the centrifugal force scaling Vector as well as a
+     *                        translational power Vector to correct onto the Bezier curve the Follower
+     *                        is following.
+     * @param headingPower this Vector points in the direction of the robot's current heaing, and
+     *                     the magnitude tells the robot how much it should turn and in which
+     *                     direction.
+     * @param pathingPower this Vector points in the direction the robot needs to go to continue along
+     *                     the Path.
+     * @param robotHeading this is the current heading of the robot, which is used to calculate how
+     *                     much power to allocate to each wheel.
+     * @return this returns an Array of doubles with a length of 4, which contains the wheel powers.
      */
     public double[] getDrivePowers(Vector correctivePower, Vector headingPower, Vector pathingPower, double robotHeading) {
         // clamps down the magnitudes of the input vectors
@@ -87,23 +100,12 @@ public class DriveVectorScaler {
         truePathingVectors[0] = MathFunctions.scalarMultiplyVector(truePathingVectors[0], 2.0);
         truePathingVectors[1] = MathFunctions.scalarMultiplyVector(truePathingVectors[1], 2.0);
 
-        // TODO: remove
-        leftSidePath = MathFunctions.copyVector(truePathingVectors[0]);
-        rightSidePath = MathFunctions.copyVector(truePathingVectors[1]);
-
         for (int i = 0; i < mecanumVectorsCopy.length; i++) {
             // this copies the vectors from mecanumVectors but creates new references for them
             mecanumVectorsCopy[i] = MathFunctions.copyVector(mecanumVectors[i]);
 
             mecanumVectorsCopy[i].rotateVector(robotHeading);
         }
-
-        /*
-        wheelPowers[0] = (truePathingVectors[0].getXComponent()*mecanumVectorsCopy[1].getYComponent() - truePathingVectors[0].getYComponent()*mecanumVectorsCopy[1].getXComponent()) / (mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent() - mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent());
-        wheelPowers[1] = (truePathingVectors[0].getXComponent()*mecanumVectorsCopy[0].getYComponent() - truePathingVectors[0].getYComponent()*mecanumVectorsCopy[0].getXComponent()) / (mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent() - mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent());
-        wheelPowers[2] = (truePathingVectors[1].getXComponent()*mecanumVectorsCopy[3].getYComponent() - truePathingVectors[1].getYComponent()*mecanumVectorsCopy[3].getXComponent()) / (mecanumVectorsCopy[2].getXComponent()*mecanumVectorsCopy[3].getYComponent() - mecanumVectorsCopy[3].getXComponent()*mecanumVectorsCopy[2].getYComponent());
-        wheelPowers[3] = (truePathingVectors[1].getXComponent()*mecanumVectorsCopy[2].getYComponent() - truePathingVectors[1].getYComponent()*mecanumVectorsCopy[2].getXComponent()) / (mecanumVectorsCopy[3].getXComponent()*mecanumVectorsCopy[2].getYComponent() - mecanumVectorsCopy[2].getXComponent()*mecanumVectorsCopy[3].getYComponent());
-         */
 
         wheelPowers[0] = (mecanumVectorsCopy[1].getXComponent()*truePathingVectors[0].getYComponent() - truePathingVectors[0].getXComponent()*mecanumVectorsCopy[1].getYComponent()) / (mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent() - mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent());
         wheelPowers[1] = (mecanumVectorsCopy[0].getXComponent()*truePathingVectors[0].getYComponent() - truePathingVectors[0].getXComponent()*mecanumVectorsCopy[0].getYComponent()) / (mecanumVectorsCopy[0].getXComponent()*mecanumVectorsCopy[1].getYComponent() - mecanumVectorsCopy[1].getXComponent()*mecanumVectorsCopy[0].getYComponent());
@@ -121,31 +123,25 @@ public class DriveVectorScaler {
         return wheelPowers;
     }
 
-    // TODO: remove
-    private Vector leftSidePath;
-    private Vector rightSidePath;
-
-    public Vector getLeftSidePath() {
-        return leftSidePath;
-    }
-    public Vector getRightSidePath() {
-        return rightSidePath;
-    }
-
     /**
-     * This takes in two vectors, one static and one variable, and returns the scaling factor that,
-     * when multiplied to the variable vector, results in magnitude of the sum of the static vector
-     * and the scaled variable vector being 1
+     * This takes in two Vectors, one static and one variable, and returns the scaling factor that,
+     * when multiplied to the variable Vector, results in magnitude of the sum of the static Vector
+     * and the scaled variable Vector being 1.
      *
      * IMPORTANT NOTE: I did not intend for this to be used for anything other than the method above
-     * this one in this class, so there will be errors if you input vectors of length greater than 1,
-     * and it will scale up the variable vector if the magnitude of the sum of the two input vectors
+     * this one in this class, so there will be errors if you input Vectors of length greater than 1,
+     * and it will scale up the variable Vector if the magnitude of the sum of the two input Vectors
      * isn't greater than 1. So, just don't use this elsewhere. There's gotta be a better way to do
      * whatever you're trying to do.
      *
-     * @param staticVector the vector that should not be changed
-     * @param variableVector the vector getting scaled
-     * @return returns the scaling factor
+     * I know that this is used outside of this class, however, I created this method so I get to
+     * use it if I want to. Also, it's only used once outside of the DriveVectorScaler class, and
+     * it's used to scale Vectors, as intended.
+     *
+     * @param staticVector the Vector that is held constant.
+     * @param variableVector the Vector getting scaled to make the sum of the input Vectors have a
+     *                       magnitude of 1.
+     * @return returns the scaling factor for the variable Vector.
      */
     public double findNormalizingScaling(Vector staticVector, Vector variableVector) {
             double a = Math.pow(variableVector.getXComponent(), 2) + Math.pow(variableVector.getYComponent(), 2);

@@ -104,7 +104,7 @@ public class ForwardZeroPowerAccelerationTuner extends OpMode {
                 accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
-                if (currentVelocity < FollowerConstants.pathEndVelocity) {
+                if (currentVelocity < FollowerConstants.pathEndVelocityConstraint) {
                     end = true;
                 }
             }

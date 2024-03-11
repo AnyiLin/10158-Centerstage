@@ -30,6 +30,11 @@ import java.util.List;
  *    \--------------/
  *
  */
+
+/**
+ * This class is adapted from the Road Runner StandardTrackingWheelLocalizer class. Later, this will
+ * be replaced with a custom localizer.
+ */
 @Config
 public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double TICKS_PER_REV = 8192;

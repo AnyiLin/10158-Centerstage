@@ -2,14 +2,25 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+/**
+ * This is the MathFunctions class. This contains many useful math related methods that I use in
+ * other classes to simplify code elsewhere.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/9/2024
+ */
 public class MathFunctions {
+
     /**
-     * There is possibly a more efficient method of doing this, but I'm doing it this way
-     * because it's simple and doesn't have many rounding errors in the middle
+     * This is a simple implementation of the choose function in math. It's equivalent to the number
+     * of ways you can choose r items from n total items, if only which items got picked and not the
+     * order of picking the items mattered.
      *
-     * @param n this is how many you want to choose from
-     * @param r this is how many you want to choose
-     * @return returns the result of the "n choose r" function
+     * @param n this is how many you want to choose from.
+     * @param r this is how many you want to choose.
+     * @return returns the result of the "n choose r" function.
      */
     public static double nCr(int n, int r) {
         double num = 1;
@@ -29,10 +40,10 @@ public class MathFunctions {
     }
 
     /**
-     * This returns the sign of a number
+     * This returns the sign (positive/negative) of a number.
      *
-     * @param get the number
-     * @return returns the sign of the number
+     * @param get the number.
+     * @return returns the sign of the number.
      */
     public static double getSign(double get) {
         if (get == 0) return 0;
@@ -41,12 +52,12 @@ public class MathFunctions {
     }
 
     /**
-     * This clamps down a value to between the lower and upper bounds
+     * This clamps down a value to between the lower and upper bounds inclusive.
      *
-     * @param num the number to be clamped
-     * @param lower the lower bound
-     * @param upper the upper bound
-     * @return returns the clamped number
+     * @param num the number to be clamped.
+     * @param lower the lower bound.
+     * @param upper the upper bound.
+     * @return returns the clamped number.
      */
     public static double clamp(double num, double lower, double upper) {
         if (num < lower) return lower;
@@ -55,12 +66,12 @@ public class MathFunctions {
     }
 
     /**
-     * This normalizes an angle to be between 0 and 2pi radians, inclusive
+     * This normalizes an angle to be between 0 and 2 pi radians, inclusive.
      *
-     * IMPORTANT NOTE: This method operates in radians
+     * IMPORTANT NOTE: This method operates in radians.
      *
-     * @param angleRadians the angle to be normalized
-     * @return returns the normalized angle
+     * @param angleRadians the angle to be normalized.
+     * @return returns the normalized angle.
      */
     public static double normalizeAngle(double angleRadians) {
         double angle = angleRadians;
@@ -70,20 +81,21 @@ public class MathFunctions {
     }
 
     /**
-     * This returns the smallest angle between two angles
+     * This returns the smallest angle between two angles. This operates in radians.
      *
-     * @param one one of the angles
-     * @param two the other one
-     * @return returns the smallest angle
+     * @param one one of the angles.
+     * @param two the other one.
+     * @return returns the smallest angle.
      */
     public static double getSmallestAngleDifference(double one, double two) {
         return Math.min(MathFunctions.normalizeAngle(one-two), MathFunctions.normalizeAngle(two-one));
     }
 
     /**
-     * This gets the direction to turn between a start heading and an end heading
+     * This gets the direction to turn between a start heading and an end heading. Positive is left
+     * and negative is right. This operates in radians.
      *
-     * @return returns the turn direction
+     * @return returns the turn direction.
      */
     public static double getTurnDirection(double startHeading, double endHeading) {
         if (MathFunctions.normalizeAngle(endHeading-startHeading) >= 0 && MathFunctions.normalizeAngle(endHeading-startHeading) <= Math.PI) {
@@ -93,98 +105,100 @@ public class MathFunctions {
     }
 
     /**
-     * This returns the distance between a Pose2d and a point
+     * This returns the distance between a Pose2d and a Point,
      *
-     * @param pose this is the pose
-     * @param point this is the point
-     * @return returns the distance between the two
+     * @param pose this is the Pose2d.
+     * @param point this is the Point.
+     * @return returns the distance between the two.
      */
     public static double distance(Pose2d pose, Point point) {
         return Math.sqrt(Math.pow(pose.getX()-point.getX(), 2) + Math.pow(pose.getY()-point.getY(), 2));
     }
 
     /**
-     * This returns the distance between a Pose2d and another Pose2d
+     * This returns the distance between a Pose2d and another Pose2d.
      *
-     * @param one this is the first pose
-     * @param two this is the second pose
-     * @return returns the distance between the two
+     * @param one this is the first Pose2d.
+     * @param two this is the second Pose2d.
+     * @return returns the distance between the two.
      */
     public static double distance(Pose2d one, Pose2d two) {
         return Math.sqrt(Math.pow(one.getX()-two.getX(), 2) + Math.pow(one.getY()-two.getY(), 2));
     }
 
     /**
-     * This returns a point that is the sum of the two input points
+     * This returns a Point that is the sum of the two input Point.
      *
-     * @param one the first point
-     * @param two the second point
-     * @return returns the sum of the two points
+     * @param one the first Point
+     * @param two the second Point
+     * @return returns the sum of the two Points.
      */
     public static Point addPoints(Point one, Point two) {
         return new Point(one.getX() + two.getX(), one.getY() + two.getY(), Point.CARTESIAN);
     }
 
     /**
-     * This subtracts the second point from the first point and returns the result as a point
-     * Do note that order matters here
+     * This subtracts the second Point from the first Point and returns the result as a Point.
+     * Do note that order matters here.
      *
-     * @param one the first point
-     * @param two the second point
-     * @return returns the difference of the two points
+     * @param one the first Point.
+     * @param two the second Point.
+     * @return returns the difference of the two Points.
      */
     public static Point subtractPoints(Point one, Point two) {
         return new Point(one.getX() - two.getX(), one.getY() - two.getY(), Point.CARTESIAN);
     }
 
     /**
-     * This multiplies a point by a scalar and returns the result as a point
+     * This multiplies a Point by a scalar and returns the result as a Point
      *
-     * @param point the point being multiplied
-     * @param scalar the scalar multiplying into the point
-     * @return returns the scaled point
+     * @param point the Point being multiplied.
+     * @param scalar the scalar multiplying into the Point.
+     * @return returns the scaled Point.
      */
     public static Point scalarMultiplyPoint(Point point, double scalar) {
         return new Point(point.getX()*scalar, point.getY()*scalar, Point.CARTESIAN);
     }
 
     /**
-     * Copies a Point, but with a different reference location in the memory
+     * Copies a Point, but with a different reference location in the memory. So basically a deep
+     * copy.
      *
-     * @param point point to be deep copied
-     * @return returns the copied point
+     * @param point the Point to be deep copied.
+     * @return returns the copied Point.
      */
     public static Point copyPoint(Point point) {
         return new Point(point.getX(), point.getY(), Point.CARTESIAN);
     }
 
     /**
-     * Copies a Vector, but with a different reference location in the memory
+     * Copies a Vector, but with a different reference location in the memory. So basically a deep
+     * copy.
      *
-     * @param vector vector to be deep copied
-     * @return returns the copied vector
+     * @param vector Vector to be deep copied.
+     * @return returns the copied Vector.
      */
     public static Vector copyVector(Vector vector) {
         return new Vector(vector.getMagnitude(), vector.getTheta());
     }
 
     /**
-     * This multiplies a vector by a scalar and returns the result as a vector
+     * This multiplies a Vector by a scalar and returns the result as a Vector.
      *
-     * @param vector the vector being multiplied
-     * @param scalar the scalar multiplying into the vector
-     * @return returns the scaled vector
+     * @param vector the Vector being multiplied.
+     * @param scalar the scalar multiplying into the Vector.
+     * @return returns the scaled Vector.
      */
     public static Vector scalarMultiplyVector(Vector vector, double scalar) {
         return new Vector(vector.getMagnitude()*scalar, vector.getTheta());
     }
 
     /**
-     * This normalizes a vector to be of magnitude 1, unless the vector is the zero vector
-     * In that case, it just returns back the original vector but with a different memory location
+     * This normalizes a Vector to be of magnitude 1, unless the Vector is the zero Vector.
+     * In that case, it just returns back the zero Vector but with a different memory location.
      *
-     * @param vector the vector being normalized
-     * @return returns the normalized (or zero) vector
+     * @param vector the Vector being normalized.
+     * @return returns the normalized (or zero) Vector.
      */
     public static Vector normalizeVector(Vector vector) {
         if (vector.getMagnitude() == 0) {
@@ -195,11 +209,11 @@ public class MathFunctions {
     }
 
     /**
-     * This returns a vector that is the sum of the two input vectors
+     * This returns a Vector that is the sum of the two input Vectors.
      *
-     * @param one the first vector
-     * @param two the second vector
-     * @return returns the sum of the vectors
+     * @param one the first Vector.
+     * @param two the second Vector.
+     * @return returns the sum of the Vectors.
      */
     public static Vector addVectors(Vector one, Vector two) {
         Vector returnVector = new Vector();
@@ -208,12 +222,12 @@ public class MathFunctions {
     }
 
     /**
-     * This subtracts the second vector from the first vector and returns the result as a vector
-     * Do note that order matters here
+     * This subtracts the second Vector from the first Vector and returns the result as a Vector.
+     * Do note that order matters here.
      *
-     * @param one the first vector
-     * @param two the second vector
-     * @return returns the second vector subtracted from the first vector
+     * @param one the first Vector.
+     * @param two the second Vector.
+     * @return returns the second Vector subtracted from the first Vector.
      */
     public static Vector subtractVectors(Vector one, Vector two) {
         Vector returnVector = new Vector();
@@ -222,46 +236,47 @@ public class MathFunctions {
     }
 
     /**
-     * This computes the dot product of the two vectors
+     * This computes the dot product of the two Vectors.
      *
-     * @param one the first vector
-     * @param two the second vector
-     * @return returns the dot product of the two vectors
+     * @param one the first Vector.
+     * @param two the second Vector.
+     * @return returns the dot product of the two Vectors.
      */
     public static double dotProduct(Vector one, Vector two) {
         return one.getXComponent()*two.getXComponent() + one.getYComponent()*two.getYComponent();
     }
 
     /**
-     * This computes the first vector crossed with the second vector
-     * Do note that order matters here
+     * This computes the first Vector crossed with the second Vector, so a cross product.
+     * Do note that order matters here.
      *
-     * @param one the first vector
-     * @param two the second vector
-     * @return returns the cross product of the two vectors
+     * @param one the first Vector.
+     * @param two the second Vector.
+     * @return returns the cross product of the two Vectors.
      */
     public static double crossProduct(Vector one, Vector two) {
         return one.getXComponent()*two.getYComponent() - one.getYComponent()*two.getXComponent();
     }
 
     /**
-     * This returns whether one is within two by plus/minus accuracy amount.
+     * This returns whether a specified value is within a second specified value by plus/minus a
+     * specified accuracy amount.
      *
-     * @param one first number
-     * @param two second number
-     * @param accuracy how close is acceptable
-     * @return returns if one is close enough to two
+     * @param one first number specified.
+     * @param two second number specified.
+     * @param accuracy the level of accuracy specified.
+     * @return returns if the two numbers are within the specified accuracy of each other.
      */
     public static boolean roughlyEquals(double one, double two, double accuracy) {
         return (one < two + accuracy && one > two - accuracy);
     }
 
     /**
-     * This returns whether one is within two by plus/minus 0.0001.
+     * This returns whether a specified number is within a second specified number by plus/minus 0.0001.
      *
-     * @param one first number
-     * @param two second number
-     * @return returns if one is within plus/minus 0.0001 of two
+     * @param one first number specified.
+     * @param two second number specified.
+     * @return returns if a specified number is within plus/minus 0.0001 of the second specified number.
      */
     public static boolean roughlyEquals(double one, double two) {
         return roughlyEquals(one, two, 0.0001);

@@ -26,7 +26,7 @@ public class TurnTest extends OpMode {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(10,0, Point.CARTESIAN)))
                 .setLinearHeadingInterpolation(0,Math.PI*1.5)
-                .setPathEndTimeout(1000)
+                .setPathEndTimeoutConstraint(1000)
                 .build();
         follower.followPath(path);
 

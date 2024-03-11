@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 
 @Config
 @Autonomous (name = "Distance Sensor Test", group = "Autonomous Pathing Tuning")
@@ -78,13 +78,13 @@ public class StackCorrectionTest extends OpMode {
 
             error *= -1;
             if (Math.abs(error) > deadZone) {
-                follower.poseUpdater.setYOffset(follower.poseUpdater.getYOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
+                follower.setYOffset(follower.getYOffset() + distanceSensorDecimationTimer.getElapsedTimeSeconds() * correctionPower * MathFunctions.getSign(error));
             } else {
                 //follower.poseUpdater.setYOffset(follower.getTranslationalError().getYComponent());
             }
 
-            if (Math.abs(follower.poseUpdater.getYOffset()) > 6)
-                follower.poseUpdater.setYOffset(6 * MathFunctions.getSign(follower.poseUpdater.getYOffset()));
+            if (Math.abs(follower.getYOffset()) > 6)
+                follower.setYOffset(6 * MathFunctions.getSign(follower.getYOffset()));
 
             telemetry.addData("error", error);
             distanceSensorDecimationTimer.resetTimer();

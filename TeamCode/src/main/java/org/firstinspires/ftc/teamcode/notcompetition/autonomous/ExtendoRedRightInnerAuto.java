@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_OUT_
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_MIDDLE_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_STACK_TOP_POSITION;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSED;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_MIDDLE_PRESET_POSITION;
@@ -35,8 +34,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
-import org.firstinspires.ftc.teamcode.util.SingleRunAction;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 import org.firstinspires.ftc.teamcode.util.VisionPortalTeamPropPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
@@ -152,7 +151,7 @@ public class ExtendoRedRightInnerAuto extends OpMode {
         initialScoreOnBackdrop = new Path(new BezierCurve(new Point(scoreSpikeMark.getLastControlPoint().getX(), scoreSpikeMark.getLastControlPoint().getY(), Point.CARTESIAN), new Point(initialBackdropGoalPose.getX(), 111, Point.CARTESIAN), new Point(initialBackdropGoalPose)));
         //initialScoreOnBackdrop.setLinearHeadingInterpolation(scoreSpikeMarkVector.getTheta(), Math.PI * 1.5);
         initialScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        initialScoreOnBackdrop.setPathEndTimeout(2.5);
+        initialScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
 
 
         firstCycleToStack = new Path(new BezierCurve(new Point(initialBackdropGoalPose), new Point(initialBackdropGoalPose.getX(), 100, Point.CARTESIAN), new Point(72, 125, Point.CARTESIAN), new Point(firstCycleStackPose)));
@@ -160,7 +159,7 @@ public class ExtendoRedRightInnerAuto extends OpMode {
 
         firstCycleScoreOnBackdrop = new Path(new BezierCurve(new Point(firstCycleStackPose), new Point(72, 135, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose.getX(), 100, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)));
         firstCycleScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        firstCycleScoreOnBackdrop.setPathEndTimeout(2.5);
+        firstCycleScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
 
 
         secondCycleToStack = new Path(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(firstCycleBackdropGoalPose.getX(), 100, Point.CARTESIAN), new Point(72, 125, Point.CARTESIAN), new Point(secondCycleStackPose)));
@@ -168,7 +167,7 @@ public class ExtendoRedRightInnerAuto extends OpMode {
 
         secondCycleScoreOnBackdrop = new Path(new BezierCurve(new Point(secondCycleStackPose), new Point(72, 135, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose.getX(), 100, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)));
         secondCycleScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        secondCycleScoreOnBackdrop.setPathEndTimeout(2.5);
+        secondCycleScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
 
 
         thirdCycleToStack = new Path(new BezierCurve(new Point(secondCycleBackdropGoalPose), new Point(secondCycleBackdropGoalPose.getX(), 112, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 121, Point.CARTESIAN), new Point(secondCycleStackPose)));
@@ -176,7 +175,7 @@ public class ExtendoRedRightInnerAuto extends OpMode {
 
         thirdCycleScoreOnBackdrop = new Path(new BezierCurve(new Point(thirdCycleStackPose), new Point(thirdCycleStackPose.getX(), 121, Point.CARTESIAN), new Point(thirdCycleBackdropGoalPose.getX(), 112, Point.CARTESIAN), new Point(thirdCycleBackdropGoalPose)));
         thirdCycleScoreOnBackdrop.setConstantHeadingInterpolation(Math.PI * 1.5);
-        thirdCycleScoreOnBackdrop.setPathEndTimeout(2.5);
+        thirdCycleScoreOnBackdrop.setPathEndTimeoutConstraint(2.5);
     }
 
     public void autonomousPathUpdate() {
@@ -191,7 +190,7 @@ public class ExtendoRedRightInnerAuto extends OpMode {
                 if (follower.getCurrentTValue() > 0.6) scoreSpikeMark.setConstantHeadingInterpolation(scoreSpikeMarkAngle);
                 if (follower.getCurrentTValue() > 0.8) moveExtensionToSpikeMarkDrop.run();
                 if (!follower.isBusy() && twoPersonDrive.intakeState == INTAKE_OUT /*&& twoPersonDrive.extensionEncoder.getCurrentPosition() > EXTENSION_SPIKE_MARK_POSITION - 20*/) {
-                    twoPersonDrive.intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+                    twoPersonDrive.setIntakeClawOpen(true);
                     setPathState(2);
                 }
                 break;

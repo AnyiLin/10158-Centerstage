@@ -16,7 +16,8 @@ import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_ARM_VERT
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_AVOID;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSED;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_CLOSE_TIME;
-import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_IN_OPEN;
+import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_CLAW_OUT_OPEN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_IN;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.INTAKE_OUT;
 import static org.firstinspires.ftc.teamcode.util.RobotConstants.LIFT_HIGH_PRESET_POSITION;
@@ -82,10 +83,10 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.util.NanoTimer;
-import org.firstinspires.ftc.teamcode.util.PIDFController;
-import org.firstinspires.ftc.teamcode.util.SingleRunAction;
-import org.firstinspires.ftc.teamcode.util.Timer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.PIDFController;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Timer;
 
 @TeleOp(name = "Two Person Drive", group = "Drive")
 public class TwoPersonDrive extends LinearOpMode {
@@ -106,7 +107,7 @@ public class TwoPersonDrive extends LinearOpMode {
 
     public NanoTimer frameTimer;
 
-    public boolean autonomous = false, pickUpAdjustIntakeArm, turnOffOuttakeArmPWM;
+    public boolean autonomous = false, pickUpAdjustIntakeArm, turnOffOuttakeArmPWM, intakeClawIsOpen;
 
     public long outtakeMovementTime;
 
@@ -186,7 +187,7 @@ public class TwoPersonDrive extends LinearOpMode {
             innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_OPEN);
             outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
         });
-        intakeClawOpen = new SingleRunAction(() -> intakeClaw.setPosition(INTAKE_CLAW_OPEN));
+        intakeClawOpen = new SingleRunAction(() -> setIntakeClawOpen(true));
         innerOuttakeClawClose = new SingleRunAction(() -> innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_CLOSED));
         outerOuttakeClawClose = new SingleRunAction(() -> outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_CLOSED));
         transferPresetHold = new SingleRunAction(() -> {
@@ -243,14 +244,14 @@ public class TwoPersonDrive extends LinearOpMode {
         });
         intakeClawToggle = new SingleRunAction(() -> {
             if (MathFunctions.roughlyEquals(intakeClaw.getPosition(), INTAKE_CLAW_CLOSED)) {
-                intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+                setIntakeClawOpen(true);
                 if (!autonomous && intakeState == INTAKE_OUT) {
                     pickUpAdjustIntakeArm = true;
                     pickUpAdjustDirection = 1;
                     pickUpAdjustTimer.resetTimer();
                 }
             } else {
-                intakeClaw.setPosition(INTAKE_CLAW_CLOSED);
+                setIntakeClawOpen(false);
                 if (!autonomous && intakeState == INTAKE_OUT) {
                     pickUpAdjustIntakeArm = true;
                     pickUpAdjustDirection = -1;
@@ -291,7 +292,9 @@ public class TwoPersonDrive extends LinearOpMode {
         rightIntakeArm.setPosition(1 - INTAKE_ARM_IN_POSITION + RIGHT_INTAKE_ARM_OFFSET);
         outerOuttakeClaw.setPosition(OUTER_OUTTAKE_CLAW_OPEN);
         innerOuttakeClaw.setPosition(INNER_OUTTAKE_CLAW_OPEN);
-        intakeClaw.setPosition(INTAKE_CLAW_OPEN);
+        intakeClaw.setPosition(INTAKE_CLAW_IN_OPEN);
+
+        intakeClawIsOpen = true;
 
         intakeState = INTAKE_IN;
         intakeArmTargetState = INTAKE_IN;
@@ -539,13 +542,26 @@ public class TwoPersonDrive extends LinearOpMode {
         updateIntake();
         updateOuttake();
         updateOuttakeWrist();
+        updateIntakeClawPixelAdjust();
         updateIntakeClaw();
     }
 
-    public void updateIntakeClaw() {
+    public void updateIntakeClawPixelAdjust() {
         if (pickUpAdjustTimer.getElapsedTime() > INTAKE_CLAW_CLOSE_TIME && pickUpAdjustIntakeArm) {
             pickUpAdjustIntakeArm = false;
             moveIntakeArmOnePixel(pickUpAdjustDirection);
+        }
+    }
+
+    public void updateIntakeClaw() {
+        if (intakeClawIsOpen) {
+            if (intakeState == INTAKE_OUT && intakeArmAtTargetPosition()) {
+                setIntakeClawPosition(INTAKE_CLAW_OUT_OPEN);
+            } else {
+                setIntakeClawPosition(INTAKE_CLAW_IN_OPEN);
+            }
+        } else {
+            setIntakeClawPosition(INTAKE_CLAW_CLOSED);
         }
     }
 
@@ -651,7 +667,7 @@ public class TwoPersonDrive extends LinearOpMode {
         if (!(transferState == TRANSFER_IDLE)) {
             switch (transferState) {
                 case TRANSFER_POSITIONING:
-                    if (MathFunctions.roughlyEquals(intakeClaw.getPosition(), INTAKE_CLAW_OPEN)) {
+                    if (intakeClawIsOpen) {
                         if (MathFunctions.roughlyEquals(outerOuttakeClaw.getPosition(), OUTER_OUTTAKE_CLAW_OPEN) || MathFunctions.roughlyEquals(innerOuttakeClaw.getPosition(), INNER_OUTTAKE_CLAW_OPEN)) {
                             setTransferState(TRANSFER_GRAB);
                         } else {
@@ -1067,5 +1083,23 @@ public class TwoPersonDrive extends LinearOpMode {
     public void updateFrameTime() {
         deltaTimeSeconds = frameTimer.getElapsedTimeSeconds();
         frameTimer.resetTimer();
+    }
+
+    public void closeIntakeClaw() {
+        setIntakeClawOpen(false);
+    }
+
+    public void openIntakeClaw() {
+        setIntakeClawOpen(true);
+    }
+
+    public void setIntakeClawOpen(boolean set) {
+        intakeClawIsOpen = set;
+    }
+
+    public void setIntakeClawPosition(double position) {
+        if (!MathFunctions.roughlyEquals(intakeClaw.getPosition(), position)) {
+            intakeClaw.setPosition(position);
+        }
     }
 }

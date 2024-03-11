@@ -125,7 +125,7 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
 
         scoreOnBackdrop = new Path(new BezierCurve(new Point(startPose.getX()+3, -48, Point.CARTESIAN), new Point(33, -58, Point.CARTESIAN), new Point(31, initialBackdropGoalPose.getY(), Point.CARTESIAN), new Point(initialBackdropGoalPose)));
         scoreOnBackdrop.setConstantHeadingInterpolation(Math.PI);
-        scoreOnBackdrop.setPathEndTimeout(2);
+        scoreOnBackdrop.setPathEndTimeoutConstraint(2);
 
         getStackPixels = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(34, initialBackdropGoalPose.getY(), Point.CARTESIAN), new Point(42, -12, Point.CARTESIAN), new Point(12, -12, Point.CARTESIAN)))
@@ -145,7 +145,7 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
     public void stackAdjustPaths() {
         actuallyGetStackPixels = new Path(new BezierLine(new Point(-48, -12, Point.CARTESIAN), new Point(stackPose)));
         actuallyGetStackPixels.setConstantHeadingInterpolation(Math.PI);
-        actuallyGetStackPixels.setPathEndHeading(0.01);
+        actuallyGetStackPixels.setPathEndHeadingConstraint(0.01);
 
         scoreStackPixels = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(stackPose), new Point(-36, -12, Point.CARTESIAN)))
