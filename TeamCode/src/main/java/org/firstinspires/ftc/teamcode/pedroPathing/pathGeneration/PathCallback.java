@@ -2,6 +2,16 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
 
+/**
+ * This is the Path class. This class handles containing information on the actual path the Follower
+ * will follow, not just the shape of the path that the BezierCurve class handles. This contains
+ * information on the stop criteria for a Path, the heading interpolation, and deceleration.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/11/2024
+ */
 public class PathCallback extends SingleRunAction {
 
     private double startCondition;

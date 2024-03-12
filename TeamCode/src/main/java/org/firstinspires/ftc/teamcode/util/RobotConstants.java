@@ -10,19 +10,19 @@ public class RobotConstants {
     public static int
 
     // max extension of the scoring slides
-    LIFT_MAX_POSITION = 2700, // TODO: check this later
+    LIFT_MAX_POSITION = 2700,
 
     // the upper limit of the lift encoder to start transferring
-    LIFT_TRANSFER_UPPER_LIMIT = 20, // TODO: set this later
+    LIFT_TRANSFER_UPPER_LIMIT = 20,
 
     // max extension of the scoring slides
-    LIFT_LOW_PRESET_POSITION = 0, // TODO: set this later
+    LIFT_LOW_PRESET_POSITION = 0,
 
     // max extension of the scoring slides
-    LIFT_MIDDLE_PRESET_POSITION = 0, // TODO: set this later
+    LIFT_MIDDLE_PRESET_POSITION = 0,
 
     // max extension of the scoring slides
-    LIFT_HIGH_PRESET_POSITION = 1400, // TODO: set this later
+    LIFT_HIGH_PRESET_POSITION = 1400,
 
     // outtake arm fine adjust speed in degrees per second
     OUTTAKE_ARM_FINE_ADJUST_DEGREES_PER_SECOND = 90,
@@ -77,7 +77,7 @@ public class RobotConstants {
     INTAKE_ARM_AVOID_POSITION = 0.6,
 
     // position for the intake arm to avoid the beacon in auto
-    INTAKE_ARM_AUTO_AVOID_POSITION = 0.61, // todo set this
+    INTAKE_ARM_AUTO_AVOID_POSITION = 0.61,
 
     // position for the intake arm being out of the robot at ground level
     INTAKE_ARM_OUT_POSITION = 0.842,
@@ -95,7 +95,7 @@ public class RobotConstants {
     INTAKE_ARM_FINE_ADJUST_LOWER_BOUND = INTAKE_ARM_OUT_POSITION,
 
     // reference for the vertical position of the intake arm
-    INTAKE_ARM_VERTICAL_POSITION = 0.3655,//0.283, // TODO: SET LATER
+    INTAKE_ARM_VERTICAL_POSITION = 0.3655,
 
 
     // how offset the right outtake arm is from the left

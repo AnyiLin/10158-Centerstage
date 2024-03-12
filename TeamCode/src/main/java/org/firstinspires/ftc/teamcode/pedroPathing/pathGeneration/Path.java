@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Aaron Yang - 10158 Scott's Bots
  * @author Harrison Womack - 10158 Scott's Bots
- * @version 1.0, 3/9/2024
+ * @version 1.0, 3/10/2024
  */
 public class Path {
     private BezierCurve curve;
@@ -160,9 +160,10 @@ public class Path {
     }
 
     /**
-     * This sets whether to follow the tangent heading reversed or not
+     * This sets whether to follow the tangent heading facing away from (reverse) or towards the
+     * tangent. This will also set your heading interpolation to tangential.
      *
-     * @param set sets reversed or not
+     * @param set sets tangential heading reversed or not.
      */
     public void setReversed(boolean set) {
         isTangentHeadingInterpolation = true;
@@ -170,83 +171,86 @@ public class Path {
     }
 
     /**
-     * This returns the unit tangent vector at the end of the curve
+     * This returns the unit tangent Vector at the end of the BezierCurve.
      *
-     * @return returns the tangent vector
+     * @return returns the end tangent Vector.
      */
     public Vector getEndTangent() {
         return curve.getEndTangent();
     }
 
     /**
-     * This gets a point on the curve at a specified t-value
+     * This returns the point on the Bezier curve that is specified by the parametric t value. A
+     * Bezier curve is a parametric function that returns points along it with t ranging from [0, 1],
+     * with 0 being the beginning of the curve and 1 being at the end. The Follower will follow
+     * BezierCurves from 0 to 1, in terms of t.
      *
-     * @param t the t-value specified
-     * @return returns the point at the t-value point on the curve
+     * @param t this is the t value of the parametric curve. t is clamped to be between 0 and 1 inclusive.
+     * @return this returns the point requested.
      */
     public Point getPoint(double t) {
         return curve.getPoint(t);
     }
 
     /**
-     * This returns the t-value of the closest point on the curve
+     * This returns the t-value of the closest Point on the BezierCurve.
      *
-     * @return returns the closest point t-value
+     * @return returns the closest Point t-value.
      */
     public double getClosestPointTValue() {
         return closestPointTValue;
     }
 
     /**
-     * This returns the approximated length of the curve
+     * This returns the approximated length of the BezierCurve.
      *
-     * @return returns the length of the curve
+     * @return returns the length of the BezierCurve.
      */
     public double length() {
         return curve.length();
     }
 
     /**
-     * This returns the curvature of the curve at a specified t-value
+     * This returns the curvature of the BezierCurve at a specified t-value.
      *
-     * @param t the specified t-value
-     * @return returns the curvature of the curve at the specified t-value
+     * @param t the specified t-value.
+     * @return returns the curvature of the BezierCurve at the specified t-value.
      */
     public double getCurvature(double t) {
         return curve.getCurvature(t);
     }
 
     /**
-     * This returns the curvature of the curve at the closest point
+     * This returns the curvature of the BezierCurve at the closest Point.
      *
-     * @return returns the curvature of the curve at the closest point
+     * @return returns the curvature of the BezierCurve at the closest Point.
      */
     public double getClosestPointCurvature() {
         return closestPointCurvature;
     }
 
     /**
-     * This returns the normal vector at the closest point
+     * This returns the normal Vector at the closest Point.
      *
-     * @return returns the normal vector at the closest point
+     * @return returns the normal Vector at the closest Point.
      */
     public Vector getClosestPointNormalVector() {
         return MathFunctions.copyVector(closestPointNormalVector);
     }
 
     /**
-     * This returns the tangent vector at the closest point
+     * This returns the tangent Vector at the closest Point.
      *
-     * @return returns the tangent vector at the closest point
+     * @return returns the tangent Vector at the closest Point.
      */
     public Vector getClosestPointTangentVector() {
         return MathFunctions.copyVector(closestPointTangentVector);
     }
 
     /**
-     * This returns the heading goal at the closest point
+     * This returns the heading goal at the closest Point.
      *
-     * @return returns the heading goal at the closest point
+     * @return returns the heading goal at the closest Point.
      */
     public double getClosestPointHeadingGoal() {
         if (isTangentHeadingInterpolation) {
@@ -258,10 +262,10 @@ public class Path {
     }
 
     /**
-     * This gets the heading goal at a specified t-value
+     * This gets the heading goal at a specified t-value.
      *
-     * @param t the specified t-value
-     * @return returns the heading goal at the specified t-value
+     * @param t the specified t-value.
+     * @return returns the heading goal at the specified t-value.
      */
     public double getHeadingGoal(double t) {
         if (isTangentHeadingInterpolation) {
@@ -276,9 +280,9 @@ public class Path {
     }
 
     /**
-     * This returns if the robot is at the end of the path, according to the parametric t value
+     * This returns if the robot is at the end of the Path, according to the parametric t-value.
      *
-     * @return returns if at end
+     * @return returns if at end.
      */
     public boolean isAtParametricEnd() {
         if (closestPointTValue >= pathEndTValueConstraint) return true;
@@ -286,9 +290,9 @@ public class Path {
     }
 
     /**
-     * This returns if the robot is at the beginning of the path, according to the parametric t value
+     * This returns if the robot is at the beginning of the Path, according to the parametric t-value.
      *
-     * @return returns if at start
+     * @return returns if at start.
      */
     public boolean isAtParametricStart() {
         if (closestPointTValue <= 1- pathEndTValueConstraint) return true;
@@ -296,148 +300,168 @@ public class Path {
     }
 
     /**
-     * Returns the ArrayList of control points for this Bezier curve
+     * Returns the ArrayList of control points for this BezierCurve.
      *
-     * @return This returns the ArrayList
+     * @return This returns the control points.
      */
     public ArrayList<Point> getControlPoints() {
         return curve.getControlPoints();
     }
 
     /**
-     * Returns the first control point for this Bezier curve
+     * Returns the first control point for this BezierCurve.
      *
-     * @return This returns the Point
+     * @return This returns the Point.
      */
     public Point getFirstControlPoint() {
         return curve.getFirstControlPoint();
     }
 
     /**
-     * Returns the second control point, or the one after the start, for this Bezier curve
+     * Returns the second control point, or the one after the start, for this BezierCurve.
      *
-     * @return This returns the Point
+     * @return This returns the Point.
      */
     public Point getSecondControlPoint() {
         return curve.getSecondControlPoint();
     }
 
     /**
-     * Returns the second to last control point for this Bezier curve
+     * Returns the second to last control point for this BezierCurve.
      *
-     * @return This returns the Point
+     * @return This returns the Point.
      */
     public Point getSecondToLastControlPoint() {
         return curve.getSecondToLastControlPoint();
     }
 
     /**
-     * Returns the last control point for this Bezier curve
+     * Returns the last control point for this BezierCurve.
      *
-     * @return This returns the Point
+     * @return This returns the Point.
      */
     public Point getLastControlPoint() {
         return curve.getLastControlPoint();
     }
 
     /**
-     * This sets the path's deceleration factor
+     * This sets the path's deceleration factor in terms of the natural deceleration of the robot
+     * when power is cut from the drivetrain.
      *
-     * @param set
+     * @param set This sets the multiplier.
      */
     public void setZeroPowerAccelerationMultiplier(double set) {
         zeroPowerAccelerationMultiplier = set;
     }
 
     /**
-     * This sets the velocity stop criteria
+     * This sets the velocity stop criteria. When velocity is below this amount, then this is met.
      *
-     * @param set
+     * @param set This sets the velocity end constraint.
      */
     public void setPathEndVelocityConstraint(double set) {
         pathEndVelocityConstraint = set;
     }
 
     /**
-     * This sets the translational stop criteria
+     * This sets the translational stop criteria. When the translational error, or how far off the
+     * end point the robot is, goes below this, then the translational end criteria is met.
      *
-     * @param set
+     * @param set This sets the translational end constraint.
      */
     public void setPathEndTranslationalConstraint(double set) {
         pathEndTranslationalConstraint = set;
     }
 
     /**
-     * This sets the heading stop criteria
+     * This sets the heading stop criteria. When the heading error is less than this amount, then
+     * the heading end criteria is met.
      *
-     * @param set
+     * @param set This sets the heading end constraint.
      */
     public void setPathEndHeadingConstraint(double set) {
         pathEndHeadingConstraint = set;
     }
 
     /**
-     * This sets the parametric end criteria
+     * This sets the parametric end criteria. When the t-value of the closest Point on the Path is
+     * greater than this amount, then the parametric end criteria is met.
      *
-     * @param set
+     * @param set This sets the t-value end constraint.
      */
     public void setPathEndTValueConstraint(double set) {
         pathEndTValueConstraint = set;
     }
 
     /**
-     * This sets the path end timeout
+     * This sets the Path end timeout. If the Path is at its end parametrically, then the Follower
+     * has this many seconds to correct before the Path gets ended anyways.
      *
-     * @param set
+     * @param set This sets the Path end timeout.
      */
     public void setPathEndTimeoutConstraint(double set) {
         pathEndTimeoutConstraint = set;
     }
 
     /**
-     * This gets the deceleration multiplier
+     * This gets the deceleration multiplier.
+     *
+     * @return This returns the deceleration multiplier.
      */
     public double getZeroPowerAccelerationMultiplier() {
         return zeroPowerAccelerationMultiplier;
     }
 
     /**
-     * This gets the velocity stop criteria
+     * This gets the velocity stop criteria.
+     *
+     * @return This returns the velocity stop criteria.
      */
     public double getPathEndVelocityConstraint() {
         return pathEndVelocityConstraint;
     }
 
     /**
-     * This gets the translational stop criteria
+     * This gets the translational stop criteria.
+     *
+     * @return This returns the translational stop criteria.
      */
     public double getPathEndTranslationalConstraint() {
         return pathEndTranslationalConstraint;
     }
 
     /**
-     * This gets the heading stop criteria
+     * This gets the heading stop criteria.
+     *
+     * @return This returns the heading stop criteria.
      */
     public double getPathEndHeadingConstraint() {
         return pathEndHeadingConstraint;
     }
 
     /**
-     * This gets the parametric end criteria
+     * This gets the parametric end criteria.
+     *
+     * @return This returns the parametric end criteria.
      */
     public double getPathEndTValueConstraint() {
         return pathEndTValueConstraint;
     }
 
     /**
-     * This gets the end correction time
+     * This gets the Path end correction time.
+     *
+     * @return This returns the Path end correction time.
      */
     public double getPathEndTimeoutConstraint() {
         return pathEndTimeoutConstraint;
     }
 
     /**
-     * This returns the path type
+     * Returns the type of path. This is used in case we need to identify the type of BezierCurve
+     * this is.
+     *
+     * @return returns the type of path.
      */
     public String pathType() {
         return curve.pathType();

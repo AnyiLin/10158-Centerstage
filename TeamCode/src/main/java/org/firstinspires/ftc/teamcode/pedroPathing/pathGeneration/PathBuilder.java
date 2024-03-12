@@ -2,6 +2,17 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
 import java.util.ArrayList;
 
+/**
+ * This is the PathBuilder class. This class makes it easier to create PathChains, so you don't have
+ * to individually create Path instances to create a PathChain. A PathBuilder can be accessed
+ * through running the pathBuilder() method on an instance of the Follower class, or just creating
+ * an instance of PathBuilder regularly.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/11/2024
+ */
 public class PathBuilder {
     private ArrayList<Path> paths = new ArrayList<>();
 

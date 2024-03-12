@@ -105,7 +105,7 @@ public class BezierCurve {
     /**
      * This returns the unit tangent Vector at the end of the BezierCurve.
      *
-     * @return returns the tangent Vector.
+     * @return returns the end tangent Vector.
      */
     public Vector getEndTangent() {
         return MathFunctions.copyVector(endTangent);
