@@ -22,14 +22,17 @@ import java.util.List;
 @Config
 @Autonomous (name = "Lateral Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
 public class LateralZeroPowerAccelerationTuner extends OpMode {
-    private ArrayList<Double> accelerations = new ArrayList<Double>();
+    private ArrayList<Double> accelerations = new ArrayList<>();
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
     private List<DcMotorEx> motors;
 
     private PoseUpdater poseUpdater;
 
-    public static double VELOCITY = 10;
+    public static double VELOCITY = 30;
 
     private double previousVelocity;
 
@@ -37,8 +40,12 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
 
     private Telemetry telemetryA;
 
-    private boolean stopping, end;
+    private boolean stopping;
+    private boolean end;
 
+    /**
+     * This initializes the drive motors as well as the FTC Dashboard telemetry.
+     */
     @Override
     public void init() {
         poseUpdater = new PoseUpdater(hardwareMap);
@@ -48,6 +55,7 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
+        // TODO: Make sure that this is the direction your motors need to be reversed in.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -64,16 +72,17 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second");
-        telemetryA.addLine("Make sure you have enough room");
-        telemetryA.addLine("Press cross or A to stop");
+        telemetryA.addLine("The robot will run to the right until it reaches " + VELOCITY + " inches per second.");
+        telemetryA.addLine("Then, it will cut power from the drivetrain and roll to a stop.");
+        telemetryA.addLine("Make sure you have enough room.");
+        telemetryA.addLine("After stopping, the lateral zero power acceleration (natural deceleration) will be displayed.");
+        telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
         telemetryA.update();
     }
 
-    @Override
-    public void init_loop() {
-    }
-
+    /**
+     * This starts the OpMode by setting the drive motors to run forward at full power.
+     */
     @Override
     public void start() {
         leftFront.setPower(1);
@@ -82,6 +91,12 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
         rightRear.setPower(1);
     }
 
+    /**
+     * This runs the OpMode. At any point during the running of the OpMode, pressing CROSS or A on
+     * game pad 1 will stop the OpMode. When the robot hits the specified velocity, the robot will
+     * record its deceleration / negative acceleration until it stops. Then, it will average all the
+     * recorded deceleration / negative acceleration and print that value.
+     */
     @Override
     public void loop() {
         if (gamepad1.cross || gamepad1.a) {
@@ -102,7 +117,7 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
                 }
             } else {
                 double currentVelocity = MathFunctions.dotProduct(poseUpdater.getVelocity(), heading);
-                accelerations.add(new Double((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9))));
+                accelerations.add((currentVelocity - previousVelocity) / ((System.nanoTime() - previousTimeNano) / Math.pow(10.0, 9)));
                 previousVelocity = currentVelocity;
                 previousTimeNano = System.nanoTime();
                 if (currentVelocity < FollowerConstants.pathEndVelocityConstraint) {
@@ -112,17 +127,12 @@ public class LateralZeroPowerAccelerationTuner extends OpMode {
         } else {
             double average = 0;
             for (Double acceleration : accelerations) {
-                average += acceleration.doubleValue();
+                average += acceleration;
             }
             average /= (double)accelerations.size();
 
-            telemetryA.addData("average acceleration:", average);
+            telemetryA.addData("lateral zero power acceleration (deceleration):", average);
             telemetryA.update();
         }
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
     }
 }

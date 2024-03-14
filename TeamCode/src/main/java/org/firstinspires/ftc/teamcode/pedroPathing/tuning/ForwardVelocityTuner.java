@@ -19,22 +19,45 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This is the ForwardVelocityTuner autonomous tuning OpMode. This runs the robot forwards at max
+ * power until it reaches some specified distance. It records the most recent velocities, and on
+ * reaching the end of the distance, it averages them and prints out the velocity obtained. It is
+ * recommended to run this multiple times on a full battery to get the best results. What this does
+ * is, when paired with StrafeVelocityTuner, allows FollowerConstants to create a Vector that
+ * empirically represents the direction your mecanum wheels actually prefer to go in, allowing for
+ * more accurate following.
+ * You can adjust the distance the robot will travel on FTC Dashboard: 192/168/43/1:8080/dash
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/13/2024
+ */
 @Config
 @Autonomous (name = "Forward Velocity Tuner", group = "Autonomous Pathing Tuning")
 public class ForwardVelocityTuner extends OpMode {
-    private ArrayList<Double> velocities = new ArrayList<Double>();
+    private ArrayList<Double> velocities = new ArrayList<>();
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear, leftExtension, rightExtension;
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
     private List<DcMotorEx> motors;
 
     private PoseUpdater poseUpdater;
 
-    public static double DISTANCE = 40, RECORD_NUMBER = 10;
+    public static double DISTANCE = 40;
+    public static double RECORD_NUMBER = 10;
 
     private Telemetry telemetryA;
 
     private boolean end;
 
+    /**
+     * This initializes the drive motors as well as the cache of velocities and the FTC Dashboard
+     * telemetry.
+     */
     @Override
     public void init() {
         poseUpdater = new PoseUpdater(hardwareMap);
@@ -44,6 +67,7 @@ public class ForwardVelocityTuner extends OpMode {
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
+        // TODO: Make sure that this is the direction your motors need to be reversed in.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -60,21 +84,21 @@ public class ForwardVelocityTuner extends OpMode {
         }
 
         for (int i = 0; i < RECORD_NUMBER; i++) {
-            velocities.add(new Double(0));
+            velocities.add(0.0);
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches forward.");
         telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
-        telemetryA.addLine("Press cross or A to stop");
+        telemetryA.addLine("After running the distance, the robot will cut power from the drivetrain and display the forward velocity.");
+        telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
         telemetryA.update();
 
     }
 
-    @Override
-    public void init_loop() {
-    }
-
+    /**
+     * This starts the OpMode by setting the drive motors to run forward at full power.
+     */
     @Override
     public void start() {
         leftFront.setPower(1);
@@ -84,6 +108,12 @@ public class ForwardVelocityTuner extends OpMode {
         end = false;
     }
 
+    /**
+     * This runs the OpMode. At any point during the running of the OpMode, pressing CROSS or A on
+     * game pad 1 will stop the OpMode. This continuously records the RECORD_NUMBER most recent
+     * velocities, and when the robot has run forward enough, these last velocities recorded are
+     * averaged and printed.
+     */
     @Override
     public void loop() {
         if (gamepad1.cross || gamepad1.a) {
@@ -99,27 +129,18 @@ public class ForwardVelocityTuner extends OpMode {
                 }
             } else {
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));
-                velocities.add(new Double(currentVelocity));
+                velocities.add(currentVelocity);
                 velocities.remove(0);
-                /*
-                if (currentVelocity < FollowerConstants.pathEndVelocity) {
-                    end = true;
-                }*/
             }
         } else {
             double average = 0;
             for (Double velocity : velocities) {
-                average += velocity.doubleValue();
+                average += velocity;
             }
             average /= (double) velocities.size();
 
             telemetryA.addData("forward velocity:", average);
             telemetryA.update();
         }
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
     }
 }
