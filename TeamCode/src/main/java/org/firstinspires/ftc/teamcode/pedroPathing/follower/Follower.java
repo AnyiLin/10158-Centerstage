@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.translationalPIDFSwitch;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,6 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
@@ -83,6 +85,8 @@ public class Follower {
     private double previousLargeTranslationalIntegral;
     private double holdPointTranslationalScaling = FollowerConstants.holdPointTranslationalScaling;
     private double holdPointHeadingScaling = FollowerConstants.holdPointHeadingScaling;
+    public double driveError;
+    public double headingError;
 
     private long reachedParametricPathEndTime;
 
@@ -98,6 +102,11 @@ public class Follower {
     private Vector averageAcceleration;
     private Vector smallTranslationalIntegralVector;
     private Vector largeTranslationalIntegralVector;
+    public Vector driveVector;
+    public Vector headingVector;
+    public Vector translationalVector;
+    public Vector centripetalVector;
+    public Vector correctiveVector;
 
     private PIDFController smallTranslationalPIDF = new PIDFController(FollowerConstants.smallTranslationalPIDFCoefficients);
     private PIDFController smallTranslationalIntegral = new PIDFController(FollowerConstants.smallTranslationalIntegral);
@@ -538,6 +547,13 @@ public class Follower {
         largeTranslationalIntegral.reset();
         largeTranslationalIntegralVector = new Vector();
         previousLargeTranslationalIntegral = 0;
+        driveVector = new Vector();
+        headingVector = new Vector();
+        translationalVector = new Vector();
+        centripetalVector = new Vector();
+        correctiveVector = new Vector();
+        driveError = 0;
+        headingError = 0;
 
         for (int i = 0; i < motors.size(); i++) {
             motors.get(i).setPower(0);
@@ -575,15 +591,17 @@ public class Follower {
             return new Vector(1, currentPath.getClosestPointTangentVector().getTheta());
         }
 
-        double driveError = getDriveVelocityError();
+        driveError = getDriveVelocityError();
 
         if (Math.abs(driveError) < drivePIDFSwitch) {
             smallDrivePIDF.updateError(driveError);
-            return new Vector(MathFunctions.clamp(smallDrivePIDF.runPIDF() + smallDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+            driveVector = new Vector(MathFunctions.clamp(smallDrivePIDF.runPIDF() + smallDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+            return MathFunctions.copyVector(driveVector);
         }
 
         largeDrivePIDF.updateError(driveError);
-        return new Vector(MathFunctions.clamp(largeDrivePIDF.runPIDF() + largeDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+        driveVector = new Vector(MathFunctions.clamp(largeDrivePIDF.runPIDF() + largeDrivePIDFFeedForward * MathFunctions.getSign(driveError), -1, 1), currentPath.getClosestPointTangentVector().getTheta());
+        return MathFunctions.copyVector(driveVector);
     }
 
     /**
@@ -609,13 +627,13 @@ public class Follower {
         double forwardVelocity = MathFunctions.dotProduct(forwardHeadingVector, velocity);
         double forwardDistanceToGoal = MathFunctions.dotProduct(forwardHeadingVector, distanceToGoalVector);
         double forwardVelocityGoal = MathFunctions.getSign(forwardDistanceToGoal) * Math.sqrt(Math.abs(-2 * currentPath.getZeroPowerAccelerationMultiplier() * forwardZeroPowerAcceleration * forwardDistanceToGoal));
-        double forwardVelocityZeroPowerDecay = MathFunctions.getSign(Math.pow(forwardVelocity, 2) + 2 * forwardZeroPowerAcceleration * forwardDistanceToGoal) * Math.sqrt(Math.abs(Math.pow(forwardVelocity, 2) + 2 * forwardZeroPowerAcceleration * forwardDistanceToGoal));
+        double forwardVelocityZeroPowerDecay = forwardVelocity - MathFunctions.getSign(forwardDistanceToGoal) * Math.sqrt(Math.abs(Math.pow(forwardVelocity, 2) + 2 * forwardZeroPowerAcceleration * forwardDistanceToGoal));
 
         Vector lateralHeadingVector = new Vector(1.0, poseUpdater.getPose().getHeading() - Math.PI / 2);
         double lateralVelocity = MathFunctions.dotProduct(lateralHeadingVector, velocity);
         double lateralDistanceToGoal = MathFunctions.dotProduct(lateralHeadingVector, distanceToGoalVector);
         double lateralVelocityGoal = MathFunctions.getSign(lateralDistanceToGoal) * Math.sqrt(Math.abs(-2 * currentPath.getZeroPowerAccelerationMultiplier() * lateralZeroPowerAcceleration * lateralDistanceToGoal));
-        double lateralVelocityZeroPowerDecay = MathFunctions.getSign(Math.pow(lateralVelocity, 2) + 2 * lateralZeroPowerAcceleration * lateralDistanceToGoal) * Math.sqrt(Math.abs(Math.pow(lateralVelocity, 2) + 2 * lateralZeroPowerAcceleration * lateralDistanceToGoal));
+        double lateralVelocityZeroPowerDecay = lateralVelocity - MathFunctions.getSign(lateralDistanceToGoal) * Math.sqrt(Math.abs(Math.pow(lateralVelocity, 2) + 2 * lateralZeroPowerAcceleration * lateralDistanceToGoal));
 
         Vector forwardVelocityError = new Vector(forwardVelocityGoal - forwardVelocityZeroPowerDecay - forwardVelocity, forwardHeadingVector.getTheta());
         Vector lateralVelocityError = new Vector(lateralVelocityGoal - lateralVelocityZeroPowerDecay - lateralVelocity, lateralHeadingVector.getTheta());
@@ -636,13 +654,15 @@ public class Follower {
      */
     public Vector getHeadingVector() {
         if (!useHeading) return new Vector();
-        double headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
+        headingError = MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()) * MathFunctions.getSmallestAngleDifference(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal());
         if (Math.abs(headingError) < headingPIDFSwitch) {
             smallHeadingPIDF.updateError(headingError);
-            return new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF() + smallHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+            headingVector = new Vector(MathFunctions.clamp(smallHeadingPIDF.runPIDF() + smallHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+            return MathFunctions.copyVector(headingVector);
         }
         largeHeadingPIDF.updateError(headingError);
-        return new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() + largeHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+        headingVector = new Vector(MathFunctions.clamp(largeHeadingPIDF.runPIDF() + largeHeadingPIDFFeedForward * MathFunctions.getTurnDirection(poseUpdater.getPose().getHeading(), currentPath.getClosestPointHeadingGoal()), -1, 1), poseUpdater.getPose().getHeading());
+        return MathFunctions.copyVector(headingVector);
     }
 
     /**
@@ -661,6 +681,8 @@ public class Follower {
         if (corrective.getMagnitude() > 1) {
             return MathFunctions.addVectors(centripetal, MathFunctions.scalarMultiplyVector(translational, driveVectorScaler.findNormalizingScaling(centripetal, translational)));
         }
+
+        correctiveVector = MathFunctions.copyVector(corrective);
 
         return corrective;
     }
@@ -707,6 +729,8 @@ public class Follower {
 
         translationalVector.setMagnitude(MathFunctions.clamp(translationalVector.getMagnitude(), 0, 1));
 
+        this.translationalVector = MathFunctions.copyVector(translationalVector);
+
         return translationalVector;
     }
 
@@ -742,7 +766,8 @@ public class Follower {
             curvature = (Math.pow(Math.sqrt(1 + Math.pow(yPrime, 2)), 3)) / (yDoublePrime);
         }
         if (Double.isNaN(curvature)) return new Vector();
-        return new Vector(MathFunctions.clamp(FollowerConstants.centrifugalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature, -1, 1), currentPath.getClosestPointTangentVector().getTheta() + Math.PI / 2 * MathFunctions.getSign(currentPath.getClosestPointNormalVector().getTheta()));
+        centripetalVector = new Vector(MathFunctions.clamp(FollowerConstants.centripetalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature, -1, 1), currentPath.getClosestPointTangentVector().getTheta() + Math.PI / 2 * MathFunctions.getSign(currentPath.getClosestPointNormalVector().getTheta()));
+        return centripetalVector;
     }
 
     /**
@@ -810,5 +835,44 @@ public class Follower {
      */
     public PathBuilder pathBuilder() {
         return new PathBuilder();
+    }
+
+    /**
+     * This writes out information about the various motion Vectors to the Telemetry specified.
+     *
+     * @param telemetry this is an instance of Telemetry or the FTC Dashboard telemetry that this
+     *                  method will use to output the debug data.
+     */
+    public void telemetryDebug(MultipleTelemetry telemetry) {
+        telemetry.addData("follower busy", isBusy());
+        telemetry.addData("heading error", headingError);
+        telemetry.addData("heading vector magnitude", headingVector.getMagnitude());
+        telemetry.addData("corrective vector magnitude", correctiveVector.getMagnitude());
+        telemetry.addData("corrective vector heading", correctiveVector.getTheta());
+        telemetry.addData("translational error magnitude", getTranslationalError().getMagnitude());
+        telemetry.addData("translational error direction", getTranslationalError().getTheta());
+        telemetry.addData("translational vector magnitude", translationalVector.getMagnitude());
+        telemetry.addData("translational vector heading", translationalVector.getMagnitude());
+        telemetry.addData("centripetal vector magnitude", centripetalVector.getMagnitude());
+        telemetry.addData("centripetal vector heading", centripetalVector.getTheta());
+        telemetry.addData("drive error", driveError);
+        telemetry.addData("drive vector magnitude", driveVector.getMagnitude());
+        telemetry.addData("drive vector heading", driveVector.getTheta());
+        telemetry.addData("x", getPose().getX());
+        telemetry.addData("y", getPose().getY());
+        telemetry.addData("heading", getPose().getHeading());
+        telemetry.addData("velocity magnitude", getVelocity().getMagnitude());
+        telemetry.addData("velocity heading", getVelocity().getTheta());
+        telemetry.update();
+    }
+
+    /**
+     * This writes out information about the various motion Vectors to the Telemetry specified.
+     *
+     * @param telemetry this is an instance of Telemetry or the FTC Dashboard telemetry that this
+     *                  method will use to output the debug data.
+     */
+    public void telemetryDebug(Telemetry telemetry) {
+        telemetryDebug(new MultipleTelemetry(telemetry));
     }
 }

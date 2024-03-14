@@ -101,6 +101,15 @@ public class PathBuilder {
         this.paths.get(paths.size()-1).setReversed(set);
         return this;
     }
+    /**
+     * This sets the heading interpolation to tangential on the last Path added to the PathBuilder.
+     * There really shouldn't be a reason to use this since the default heading interpolation is
+     * tangential but it's here.
+     */
+    public PathBuilder setTangentHeadingInterpolation() {
+        this.paths.get(paths.size()-1).setTangentHeadingInterpolation();
+        return this;
+    }
 
     /**
      * This sets the deceleration multiplier on the last Path added to the PathBuilder.

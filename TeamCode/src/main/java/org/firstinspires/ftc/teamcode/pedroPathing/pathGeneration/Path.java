@@ -171,6 +171,14 @@ public class Path {
     }
 
     /**
+     * This sets the heading interpolation to tangential.
+     */
+    public void setTangentHeadingInterpolation() {
+        isTangentHeadingInterpolation = true;
+        followTangentReversed = false;
+    }
+
+    /**
      * This returns the unit tangent Vector at the end of the BezierCurve.
      *
      * @return returns the end tangent Vector.

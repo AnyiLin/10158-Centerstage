@@ -89,22 +89,22 @@ public class FollowerConstants {
 
     // Large drive PIDF coefficients
     public static CustomPIDFCoefficients largeDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.03,
+            0.025,
             0,
-            0,
+            0.00001,
             0);
 
     // Feed forward constant added on to the large drive PIDF
     public static double largeDrivePIDFFeedForward = 0.01;
 
     // the limit at which the heading PIDF switches between the large and small drive PIDFs
-    public static double drivePIDFSwitch = 10;
+    public static double drivePIDFSwitch = 20;
 
     // Small drive PIDF coefficients
     public static CustomPIDFCoefficients smallDrivePIDFCoefficients = new CustomPIDFCoefficients(
-            0.03,
+            0.02,
             0,
-            0,
+            0.000005,
             0);
 
     // Feed forward constant added on to the small drive PIDF
@@ -113,8 +113,8 @@ public class FollowerConstants {
     // Mass of robot in kilograms
     public static double mass = 10.65942;
 
-    // Centrifugal force to power scaling
-    public static double centrifugalScaling = 0.001;
+    // Centripetal force to power scaling
+    public static double centripetalScaling = 0.001;
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
     // if not negative, then the robot thinks that its going to go faster under 0 power

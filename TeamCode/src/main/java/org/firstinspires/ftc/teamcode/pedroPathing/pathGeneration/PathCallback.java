@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.SingleRunAction;
 
 /**
- * This is the Path class. This class handles containing information on the actual path the Follower
- * will follow, not just the shape of the path that the BezierCurve class handles. This contains
- * information on the stop criteria for a Path, the heading interpolation, and deceleration.
+ * This is the PathCallback class. This class handles callbacks of Runnables in PathChains.
+ * Basically, this allows you to run non-blocking code in the middle of PathChains.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Aaron Yang - 10158 Scott's Bots
@@ -16,9 +15,11 @@ public class PathCallback extends SingleRunAction {
 
     private double startCondition;
 
-    private int type, index;
+    private int type;
+    private int index;
 
-    public static final int TIME = 0, PARAMETRIC = 1;
+    public static final int TIME = 0;
+    public static final int PARAMETRIC = 1;
 
     /**
      * This creates a new PathCallback with a specified start condition (either time or parametric),
