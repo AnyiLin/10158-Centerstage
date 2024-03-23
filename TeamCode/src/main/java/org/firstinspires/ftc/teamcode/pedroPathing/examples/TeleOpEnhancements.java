@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.notcompetition.teleop;
+package org.firstinspires.ftc.teamcode.pedroPathing.examples;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,13 +8,31 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
-@TeleOp(name = "Test TeleOp Enhancements", group = "Test4")
-public class TestTeleOpEnhancements extends OpMode {
+
+/**
+ * This is the TeleOpEnhancements OpMode. It is an example usage of the TeleOp enhancements that
+ * Pedro Pathing is capable of.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @author Aaron Yang - 10158 Scott's Bots
+ * @author Harrison Womack - 10158 Scott's Bots
+ * @version 1.0, 3/21/2024
+ */
+@TeleOp(name = "Pedro Pathing TeleOp Enhancements", group = "Test")
+public class TeleOpEnhancements extends OpMode {
     private Follower follower;
 
-    private DcMotorEx leftFront, leftRear, rightFront, rightRear;
-    private Vector driveVector, headingVector;
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
 
+    private Vector driveVector;
+    private Vector headingVector;
+
+    /**
+     * This initializes the drive motors as well as the Follower and motion Vectors.
+     */
     @Override
     public void init() {
         follower = new Follower(hardwareMap, false);
@@ -33,50 +51,19 @@ public class TestTeleOpEnhancements extends OpMode {
         headingVector = new Vector();
     }
 
-    @Override
-    public void init_loop() {
-
-    }
-
-    @Override
-    public void start() {
-
-    }
-
+    /**
+     * This runs the OpMode. This is only drive control with Pedro Pathing live centripetal force
+     * correction.
+     */
     @Override
     public void loop() {
-        double throttle = 0.2 + 0.8 * gamepad1.right_trigger;
-
-        double strafe = 0;
-        if (gamepad1.left_bumper) {
-            strafe += 1;
-        }
-        if (gamepad1.right_bumper) {
-            strafe -= 1;
-        }
-
-        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y * throttle, strafe * throttle);
+        driveVector.setOrthogonalComponents(-gamepad1.left_stick_y, -gamepad1.left_stick_x);
         driveVector.setMagnitude(MathFunctions.clamp(driveVector.getMagnitude(), 0, 1));
         driveVector.rotateVector(follower.getPose().getHeading());
 
-
-        double rx = 0;
-        if (Math.abs(gamepad1.left_stick_x)>0.1) rx = -gamepad1.left_stick_x;
-        if (rx > 1-gamepad1.right_trigger*0.5) {
-            rx = 1-gamepad1.right_trigger*0.5;
-        } else if (rx<-1+gamepad1.right_trigger*0.5) {
-            rx = -1+gamepad1.right_trigger*0.5;
-        }
-        rx *= throttle;
-
-        headingVector.setComponents(rx, follower.getPose().getHeading());
+        headingVector.setComponents(-gamepad1.left_stick_x, follower.getPose().getHeading());
 
         follower.setMovementVectors(follower.getCentripetalForceCorrection(), headingVector, driveVector);
         follower.update();
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
     }
 }

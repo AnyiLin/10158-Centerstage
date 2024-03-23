@@ -125,7 +125,8 @@ public class ForwardVelocityTuner extends OpMode {
             if (Math.abs(poseUpdater.getPose().getX()) > DISTANCE) {
                 end = true;
                 for (DcMotorEx motor : motors) {
-                        motor.setPower(0);
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    motor.setPower(0);
                 }
             } else {
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, 0)));

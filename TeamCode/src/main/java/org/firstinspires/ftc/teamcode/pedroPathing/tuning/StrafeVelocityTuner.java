@@ -123,7 +123,8 @@ public class StrafeVelocityTuner extends OpMode {
             if (Math.abs(poseUpdater.getPose().getY()) > DISTANCE) {
                 end = true;
                 for (DcMotorEx motor : motors) {
-                        motor.setPower(0);
+                    motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    motor.setPower(0);
                 }
             } else {
                 double currentVelocity = Math.abs(MathFunctions.dotProduct(poseUpdater.getVelocity(), new Vector(1, Math.PI/2)));
