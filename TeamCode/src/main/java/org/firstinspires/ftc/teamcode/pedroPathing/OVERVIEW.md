@@ -112,3 +112,6 @@ to take corners more smoothly and efficiently. Using the same localizer as is us
 first and second derivative can be estimated from previous positions. Then, with a modified version
 of the curvature formula, we can estimate a centripetal force correction and apply it under driver
 control.
+
+## Questions?
+If you still have more questions, feel free to contact us at `scottsbots10158@gmail.com`
