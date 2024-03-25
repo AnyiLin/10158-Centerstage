@@ -14,11 +14,11 @@ dependencies:
 1. Find `build.dependencies.gradle` in the main folder of your project.
 2. Add the following code to the end of the `repositories` block:
 ```
-maven { = 'https://maven.brott.dev/' }
+maven { url = 'https://maven.brott.dev/' }
 ```
 3. Then, add the following code to the end of your `dependencies` block:
 ```
-implmentation 'com.acmerobotics.dashboard:dashboard:0.4.15'
+implementation 'com.acmerobotics.dashboard:dashboard:0.4.5'
 ```
 4. Find the `build.gradle` file under the `teamcode` folder.
 5. In this gradle file, add the following dependencies:
