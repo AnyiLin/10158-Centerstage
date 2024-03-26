@@ -80,7 +80,7 @@ public class RobotConstants {
     INTAKE_ARM_AUTO_AVOID_POSITION = 0.61,
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.842,
+    INTAKE_ARM_OUT_POSITION = 0.844,
 
     // position for the intake arm being at the top of a pixel stack
     INTAKE_ARM_STACK_TOP_POSITION = 0.767,
