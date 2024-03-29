@@ -127,21 +127,21 @@ public class RedRightInnerAuto extends OpMode {
             default:
             case "left":
                 spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX() - 3.75, redRightSideLeftSpikeMark.getY()+0.5, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 3.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 2.25, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 4.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1.75, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX(), redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 2.5, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 3.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 4.5, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.25, Math.PI * 1.5);
                 break;
             case "middle":
                 spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY() + 4, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1.65, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX() + 2.75, redMiddleBackdrop.getY() - ROBOT_BACK_LENGTH - 2.75, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 1.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 1, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.5, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX() - 2, redRightSideRightSpikeMark.getY() + 0.5, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() + 2, redRightBackdrop.getY() - ROBOT_BACK_LENGTH - 0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 1.5, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 5.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 2, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX() + 2, redRightBackdrop.getY() - ROBOT_BACK_LENGTH - 2.5, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 3, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH - 0.5, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(redLeftBackdrop.getX() + 5.25, redLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0, Math.PI * 1.5);
                 break;
         }
     }
@@ -185,16 +185,16 @@ public class RedRightInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH+2.65, Math.PI * 1.5 - Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH+2.15, Math.PI * 1.5 - Math.toRadians(1));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH - 0.85, Math.PI * 1.5 - Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH - 1.35, Math.PI * 1.5 - Math.toRadians(1));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4.5, Math.PI * 1.5 - Math.toRadians(2));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 2, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4, Math.PI * 1.5 - Math.toRadians(2));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1, Math.PI * 1.5 - Math.toRadians(2));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 0.5, Math.PI * 1.5 - Math.toRadians(2));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(redInnerStack.getX() - 5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 5.5, Math.PI * 1.5 - Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(redInnerStack.getX() - 1.5, redInnerStack.getY() + ROBOT_FRONT_LENGTH + 4.85, Math.PI * 1.5 - Math.toRadians(2.5));
+                firstCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 2, Math.PI * 1.5 - Math.toRadians(3));
+                secondCycleStackPose = new Pose2d(redInnerStack.getX(), redInnerStack.getY() + ROBOT_FRONT_LENGTH + 1.35, Math.PI * 1.5 - Math.toRadians(2.5));
                 break;
         }
 

@@ -68,10 +68,10 @@ public class RobotConstants {
     public static double
 
     // how offset the right intake arm is from the left
-    RIGHT_INTAKE_ARM_OFFSET = 0,
+    RIGHT_INTAKE_ARM_OFFSET = -0.07,
 
     // position for the intake arm being in the robot
-    INTAKE_ARM_IN_POSITION = 0.25,
+    INTAKE_ARM_IN_POSITION = 0.22,
 
     // position for the intake arm to avoid the outtake arm
     INTAKE_ARM_AVOID_POSITION = 0.6,
@@ -80,13 +80,13 @@ public class RobotConstants {
     INTAKE_ARM_AUTO_AVOID_POSITION = 0.61,
 
     // position for the intake arm being out of the robot at ground level
-    INTAKE_ARM_OUT_POSITION = 0.844,
+    INTAKE_ARM_OUT_POSITION = 0.814,
 
     // position for the intake arm being at the top of a pixel stack
-    INTAKE_ARM_STACK_TOP_POSITION = 0.767,
+    INTAKE_ARM_STACK_TOP_POSITION = 0.747,
 
     // position for the intake arm being at the middle of a pixel stack
-    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.8085,
+    INTAKE_ARM_STACK_MIDDLE_POSITION = 0.7785,
 
     // upper bound for intake arm fine adjustment
     INTAKE_ARM_FINE_ADJUST_UPPER_BOUND = 0.6,

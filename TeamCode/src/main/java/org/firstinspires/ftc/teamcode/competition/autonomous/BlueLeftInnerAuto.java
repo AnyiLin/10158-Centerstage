@@ -127,21 +127,21 @@ public class BlueLeftInnerAuto extends OpMode {
             default:
             case "left":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideLeftSpikeMark.getX() + 0.5, blueLeftSideLeftSpikeMark.getY(), Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX() - 2, blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-0.75, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX() - 2, blueLeftBackdrop.getY()-ROBOT_BACK_LENGTH-2.5, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 1, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX() - 1.25, blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 1.25, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-1,Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.5, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose2d(blueLeftSideMiddleSpikeMark.getX(), blueLeftSideMiddleSpikeMark.getY()+3, Math.PI/2);
+                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 0.75, blueMiddleBackdrop.getY()-ROBOT_BACK_LENGTH-2.75,Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.5, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+0.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
                 break;
             case "right":
                 spikeMarkGoalPose = new Pose2d(blueLeftSideRightSpikeMark.getX() + 2, blueLeftSideRightSpikeMark.getY()+0.5, Math.PI/2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1, Math.PI * 1.5);
-                firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 2.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
-                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 2, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH+0.75, Math.PI * 1.5);
+                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX()+1,blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-2.75, Math.PI * 1.5);
+                firstCycleBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX() - 2.5, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
+                secondCycleBackdropGoalPose = new Pose2d(blueRightBackdrop.getX() - 2, blueRightBackdrop.getY()-ROBOT_BACK_LENGTH-1.25, Math.PI * 1.5);
                 break;
         }
     }
@@ -185,23 +185,23 @@ public class BlueLeftInnerAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+2.75, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+2.5, Math.PI * 1.5 + Math.toRadians(4));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+2, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+1, Math.PI * 1.5 + Math.toRadians(3));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-3, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-0.5, Math.PI * 1.5 + Math.toRadians(-1));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-1.5, Math.PI * 1.5 + Math.toRadians(-2));
                 break;
             case "middle":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+0.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH+0.5, Math.PI * 1.5 + Math.toRadians(3.5));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+1, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-0.25, Math.PI * 1.5 + Math.toRadians(2.5));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-3, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-2.5, Math.PI * 1.5 + Math.toRadians(-1.5));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-2.75, Math.PI * 1.5 + Math.toRadians(-2.5));
                 break;
             case "right":
-                firstCycleStackPose = new Pose2d(blueInnerStack.getX()+3.5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH, Math.PI * 1.5 + Math.toRadians(3));
-                secondCycleStackPose = new Pose2d(blueInnerStack.getX()+5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH - 0.5, Math.PI * 1.5 + Math.toRadians(0));
+                firstCycleStackPose = new Pose2d(blueInnerStack.getX()-3, blueInnerStack.getY() + ROBOT_FRONT_LENGTH-3, Math.PI * 1.5 + Math.toRadians(-2));
+                secondCycleStackPose = new Pose2d(blueInnerStack.getX()-5, blueInnerStack.getY() + ROBOT_FRONT_LENGTH - 3, Math.PI * 1.5 + Math.toRadians(-5));
                 break;
         }
 
         firstCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(initialBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleStackPose.getX()+2, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 23, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose.getX()+2, 79, Point.CARTESIAN), new Point(firstCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .build();
@@ -212,17 +212,17 @@ public class BlueLeftInnerAuto extends OpMode {
                 .build();
 
         firstCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(firstCycleStackPose), new Point(firstCycleStackPose.getX()+2, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(firstCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(firstCycleStackPose.getX()+2, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(firstCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .setPathEndTimeoutConstraint(2.5)
                 .build();
 
         secondCycleToStack = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
+                .addPath(new BezierCurve(new Point(firstCycleBackdropGoalPose), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleStackPose.getX()+2, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 23, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose.getX()+2, 79, Point.CARTESIAN), new Point(secondCycleStackPose.getX(), 23, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .build();
@@ -233,9 +233,9 @@ public class BlueLeftInnerAuto extends OpMode {
                 .build();
 
         secondCycleScoreOnBackdrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN)))
+                .addPath(new BezierLine(new Point(secondCycleStackPose), new Point(secondCycleStackPose.getX()+2, 79, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(secondCycleStackPose.getHeading())
-                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+1, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
+                .addPath(new BezierCurve(new Point(secondCycleStackPose.getX()+2, 79, Point.CARTESIAN), new Point(144-76.5, 106, Point.CARTESIAN), new Point(secondCycleBackdropGoalPose)))
                 .setConstantHeadingInterpolation(Math.PI * 1.5)
                 .setPathEndTimeoutConstraint(2.5)
                 .build();
