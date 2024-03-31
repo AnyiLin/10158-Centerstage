@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
-public interface Localizer {
+public abstract class Localizer {
 
+    public abstract Pose getPose();
 }
