@@ -14,7 +14,6 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -22,6 +21,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
@@ -60,7 +60,7 @@ public class Follower {
 
     private PoseUpdater poseUpdater;
 
-    private Pose2d closestPose;
+    private Pose closestPose;
 
     private Path currentPath;
 
@@ -211,16 +211,16 @@ public class Follower {
      *
      * @return returns the pose
      */
-    public Pose2d getPose() {
+    public Pose getPose() {
         return poseUpdater.getPose();
     }
 
     /**
-     * This sets the current pose in the PoseUpdater using Road Runner's setPoseEstimate() method.
+     * This sets the current pose in the PoseUpdater without using offsets.
      *
      * @param pose The pose to set the current pose to.
      */
-    public void setPose(Pose2d pose) {
+    public void setPose(Pose pose) {
         poseUpdater.setPose(pose);
     }
 
@@ -256,7 +256,7 @@ public class Follower {
      *
      * @param pose the pose to set the starting pose to.
      */
-    public void setStartingPose(Pose2d pose) {
+    public void setStartingPose(Pose pose) {
         poseUpdater.setStartingPose(pose);
     }
 
@@ -267,7 +267,7 @@ public class Follower {
      *
      * @param set The pose to set the current pose to.
      */
-    public void setCurrentPoseWithOffset(Pose2d set) {
+    public void setCurrentPoseWithOffset(Pose set) {
         poseUpdater.setCurrentPoseWithOffset(set);
     }
 
@@ -327,7 +327,7 @@ public class Follower {
 
     /**
      * This resets all offsets set to the PoseUpdater. If you have reset your pose using the
-     * setCurrentPoseUsingOffset(Pose2d set) method, then your pose will be returned to what the
+     * setCurrentPoseUsingOffset(Pose set) method, then your pose will be returned to what the
      * PoseUpdater thinks your pose would be, not the pose you reset to.
      */
     public void resetOffset() {
@@ -779,7 +779,7 @@ public class Follower {
      *
      * @return returns the closest pose.
      */
-    public Pose2d getClosestPose() {
+    public Pose getClosestPose() {
         return closestPose;
     }
 

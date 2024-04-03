@@ -14,6 +14,10 @@ public class Pose {
         setHeading(setHeading);
     }
 
+    public Pose(double setX, double setY) {
+        this(setX, setY, 0);
+    }
+
     public Pose() {
         this(0,0,0);
     }
@@ -62,5 +66,35 @@ public class Pose {
         setX(x - pose.getX());
         setY(y - pose.getY());
         setHeading(heading - pose.getHeading());
+    }
+
+    public void scalarMultiply(double scalar) {
+        setX(x * scalar);
+        setY(y * scalar);
+        setHeading(heading * scalar);
+    }
+
+    public void scalarDivide(double scalar) {
+        setX(x / scalar);
+        setY(y / scalar);
+        setHeading(heading / scalar);
+    }
+
+    public void flipSigns() {
+        setX(-x);
+        setY(-y);
+        setHeading(-heading);
+    }
+
+    public boolean roughlyEquals(Pose pose, double accuracy) {
+        return MathFunctions.roughlyEquals(x, pose.getX(), accuracy) && MathFunctions.roughlyEquals(y, pose.getY(), accuracy) && MathFunctions.roughlyEquals(MathFunctions.getSmallestAngleDifference(heading, pose.getHeading()), 0, accuracy);
+    }
+
+    public boolean roughlyEquals(Pose pose) {
+        return roughlyEquals(pose, 0.0001);
+    }
+
+    public Pose copy() {
+        return new Pose(getX(), getY(), getHeading());
     }
 }

@@ -23,7 +23,6 @@ import static java.lang.Thread.sleep;
 
 import android.util.Size;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -32,6 +31,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.competition.teleop.TwoPersonDrive;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
@@ -65,39 +65,39 @@ public class BlueRightOuterAuto extends OpMode {
     // this means that 0 heading is pointing from the blue side to the red side
 
     // all spike mark locations since I'm lazy
-    private Pose2d redLeftSideLeftSpikeMark = new Pose2d(36 + 72, -47.5 + 72);
-    private Pose2d redLeftSideMiddleSpikeMark = new Pose2d(24.5 + 72, -36 + 72);
-    private Pose2d redLeftSideRightSpikeMark = new Pose2d(36 + 72, -24.5 + 72);
-    private Pose2d redRightSideLeftSpikeMark = new Pose2d(36 + 72, 0.5 + 72);
-    private Pose2d redRightSideMiddleSpikeMark = new Pose2d(24.5 + 72, 12 + 72);
-    private Pose2d redRightSideRightSpikeMark = new Pose2d(36 + 72, 23.5 + 72);
-    private Pose2d blueLeftSideLeftSpikeMark = new Pose2d(-36 + 72, 23.5 + 72);
-    private Pose2d blueLeftSideMiddleSpikeMark = new Pose2d(-24.5 + 72, 12 + 72);
-    private Pose2d blueLeftSideRightSpikeMark = new Pose2d(-36 + 72, 0.5 + 72);
-    private Pose2d blueRightSideLeftSpikeMark = new Pose2d(-36 + 72, -24.5 + 72);
-    private Pose2d blueRightSideMiddleSpikeMark = new Pose2d(-24.5 + 72, -36 + 72);
-    private Pose2d blueRightSideRightSpikeMark = new Pose2d(-36 + 72, -47.5 + 72);
+    private Pose redLeftSideLeftSpikeMark = new Pose(36 + 72, -47.5 + 72);
+    private Pose redLeftSideMiddleSpikeMark = new Pose(24.5 + 72, -36 + 72);
+    private Pose redLeftSideRightSpikeMark = new Pose(36 + 72, -24.5 + 72);
+    private Pose redRightSideLeftSpikeMark = new Pose(36 + 72, 0.5 + 72);
+    private Pose redRightSideMiddleSpikeMark = new Pose(24.5 + 72, 12 + 72);
+    private Pose redRightSideRightSpikeMark = new Pose(36 + 72, 23.5 + 72);
+    private Pose blueLeftSideLeftSpikeMark = new Pose(-36 + 72, 23.5 + 72);
+    private Pose blueLeftSideMiddleSpikeMark = new Pose(-24.5 + 72, 12 + 72);
+    private Pose blueLeftSideRightSpikeMark = new Pose(-36 + 72, 0.5 + 72);
+    private Pose blueRightSideLeftSpikeMark = new Pose(-36 + 72, -24.5 + 72);
+    private Pose blueRightSideMiddleSpikeMark = new Pose(-24.5 + 72, -36 + 72);
+    private Pose blueRightSideRightSpikeMark = new Pose(-36 + 72, -47.5 + 72);
 
     // backdrop april tag locations
-    private Pose2d blueLeftBackdrop = new Pose2d(-42.875 + 72, 60.75 + 72);
-    private Pose2d blueMiddleBackdrop = new Pose2d(-36.75 + 72, 60.75 + 72);
-    private Pose2d blueRightBackdrop = new Pose2d(-30.75 + 72, 60.75 + 72);
-    private Pose2d redLeftBackdrop = new Pose2d(30.75 + 72, 60.75 + 72);
-    private Pose2d redMiddleBackdrop = new Pose2d(36.75 + 72, 60.75 + 72);
-    private Pose2d redRightBackdrop = new Pose2d(42.875 + 72, 60.75 + 72);
+    private Pose blueLeftBackdrop = new Pose(-42.875 + 72, 60.75 + 72);
+    private Pose blueMiddleBackdrop = new Pose(-36.75 + 72, 60.75 + 72);
+    private Pose blueRightBackdrop = new Pose(-30.75 + 72, 60.75 + 72);
+    private Pose redLeftBackdrop = new Pose(30.75 + 72, 60.75 + 72);
+    private Pose redMiddleBackdrop = new Pose(36.75 + 72, 60.75 + 72);
+    private Pose redRightBackdrop = new Pose(42.875 + 72, 60.75 + 72);
 
     // white pixel stack locations
-    private Pose2d redOuterStack = new Pose2d(36 + 72, -72 + 72);
-    private Pose2d redMiddleStack = new Pose2d(24 + 72, -72 + 72);
-    private Pose2d redInnerStack = new Pose2d(12 + 72, -72 + 72);
-    private Pose2d blueInnerStack = new Pose2d(-12 + 72, -72 + 72);
-    private Pose2d blueMiddleStack = new Pose2d(-24 + 72, -72 + 72);
-    private Pose2d blueOuterStack = new Pose2d(-36 + 72, -72 + 72);
+    private Pose redOuterStack = new Pose(36 + 72, -72 + 72);
+    private Pose redMiddleStack = new Pose(24 + 72, -72 + 72);
+    private Pose redInnerStack = new Pose(12 + 72, -72 + 72);
+    private Pose blueInnerStack = new Pose(-12 + 72, -72 + 72);
+    private Pose blueMiddleStack = new Pose(-24 + 72, -72 + 72);
+    private Pose blueOuterStack = new Pose(-36 + 72, -72 + 72);
 
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose;
+    private Pose spikeMarkGoalPose, initialBackdropGoalPose;
 
     // TODO: adjust this for each auto
-    private Pose2d startPose = new Pose2d(144-(63 + 72), 36, 0);
+    private Pose startPose = new Pose(144-(63 + 72), 36, 0);
 
     // TODO: dont forget to adjust this too
     private Point abortPoint = new Point(144-132, 120, Point.CARTESIAN), backdropGoalPoint;
@@ -113,16 +113,16 @@ public class BlueRightOuterAuto extends OpMode {
         switch (navigation) {
             default:
             case "left":
-                spikeMarkGoalPose = new Pose2d(blueRightSideLeftSpikeMark.getX() + 1.5, blueRightSideLeftSpikeMark.getY() + 0.25, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(blueLeftBackdrop.getX() - 3.25, blueLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose(blueRightSideLeftSpikeMark.getX() + 1.5, blueRightSideLeftSpikeMark.getY() + 0.25, Math.PI / 2);
+                initialBackdropGoalPose = new Pose(blueLeftBackdrop.getX() - 3.25, blueLeftBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(blueRightSideMiddleSpikeMark.getX() + 1, blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(blueMiddleBackdrop.getX(), blueMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose(blueRightSideMiddleSpikeMark.getX() + 1, blueRightSideMiddleSpikeMark.getY() - 4, Math.PI / 2);
+                initialBackdropGoalPose = new Pose(blueMiddleBackdrop.getX(), blueMiddleBackdrop.getY() - ROBOT_BACK_LENGTH, Math.PI * 1.5);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(blueRightSideRightSpikeMark.getX() - 0.5, blueRightSideRightSpikeMark.getY() - 1.5, Math.PI / 2);
-                initialBackdropGoalPose = new Pose2d(blueRightBackdrop.getX(), blueRightBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
+                spikeMarkGoalPose = new Pose(blueRightSideRightSpikeMark.getX() - 0.5, blueRightSideRightSpikeMark.getY() - 1.5, Math.PI / 2);
+                initialBackdropGoalPose = new Pose(blueRightBackdrop.getX(), blueRightBackdrop.getY() - ROBOT_BACK_LENGTH + 0.25, Math.PI * 1.5);
                 break;
         }
     }
@@ -290,7 +290,7 @@ public class BlueRightOuterAuto extends OpMode {
         autonomousPathUpdate();
     }
 
-    public void backdropCorrection(Pose2d scorePose, double distanceGoal) {
+    public void backdropCorrection(Pose scorePose, double distanceGoal) {
         if (distanceSensorDecimationTimer.getElapsedTime() > 20) {
 
             double distance = rearDistanceSensor.getDistance(DistanceUnit.MM);

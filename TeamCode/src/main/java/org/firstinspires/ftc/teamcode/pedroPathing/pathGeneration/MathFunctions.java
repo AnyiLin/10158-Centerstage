@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 
 /**
  * This is the MathFunctions class. This contains many useful math related methods that I use in
@@ -105,24 +105,24 @@ public class MathFunctions {
     }
 
     /**
-     * This returns the distance between a Pose2d and a Point,
+     * This returns the distance between a Pose and a Point,
      *
-     * @param pose this is the Pose2d.
+     * @param pose this is the Pose.
      * @param point this is the Point.
      * @return returns the distance between the two.
      */
-    public static double distance(Pose2d pose, Point point) {
+    public static double distance(Pose pose, Point point) {
         return Math.sqrt(Math.pow(pose.getX()-point.getX(), 2) + Math.pow(pose.getY()-point.getY(), 2));
     }
 
     /**
-     * This returns the distance between a Pose2d and another Pose2d.
+     * This returns the distance between a Pose and another Pose.
      *
-     * @param one this is the first Pose2d.
-     * @param two this is the second Pose2d.
+     * @param one this is the first Pose.
+     * @param two this is the second Pose.
      * @return returns the distance between the two.
      */
-    public static double distance(Pose2d one, Pose2d two) {
+    public static double distance(Pose one, Pose two) {
         return Math.sqrt(Math.pow(one.getX()-two.getX(), 2) + Math.pow(one.getY()-two.getY(), 2));
     }
 

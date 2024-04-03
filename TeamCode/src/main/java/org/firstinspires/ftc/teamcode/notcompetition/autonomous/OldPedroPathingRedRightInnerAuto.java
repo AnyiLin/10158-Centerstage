@@ -13,13 +13,13 @@ import static org.firstinspires.ftc.teamcode.util.OldRobotConstants.ROBOT_INTAKE
 
 import android.util.Size;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.notcompetition.teleop.OldTwoPersonDrive;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierPoint;
@@ -44,39 +44,39 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
     private String navigation;
 
     // all spike mark locations since I'm lazy
-    private Pose2d redLeftSideLeftSpikeMark = new Pose2d(-47.5,-36);
-    private Pose2d redLeftSideMiddleSpikeMark = new Pose2d(-36,-24.5);
-    private Pose2d redLeftSideRightSpikeMark = new Pose2d(-24.5,-36);
-    private Pose2d redRightSideLeftSpikeMark = new Pose2d(0.5,-36);
-    private Pose2d redRightSideMiddleSpikeMark = new Pose2d(12,-24.5);
-    private Pose2d redRightSideRightSpikeMark = new Pose2d(23.5,-36);
-    private Pose2d blueLeftSideLeftSpikeMark = new Pose2d(23.5,36);
-    private Pose2d blueLeftSideMiddleSpikeMark = new Pose2d(12,24.5);
-    private Pose2d blueLeftSideRightSpikeMark = new Pose2d(0.5,36);
-    private Pose2d blueRightSideLeftSpikeMark = new Pose2d(-24.5,36);
-    private Pose2d blueRightSideMiddleSpikeMark = new Pose2d(-36,24.5);
-    private Pose2d blueRightSideRightSpikeMark = new Pose2d(-47.5,36);
+    private Pose redLeftSideLeftSpikeMark = new Pose(-47.5,-36);
+    private Pose redLeftSideMiddleSpikeMark = new Pose(-36,-24.5);
+    private Pose redLeftSideRightSpikeMark = new Pose(-24.5,-36);
+    private Pose redRightSideLeftSpikeMark = new Pose(0.5,-36);
+    private Pose redRightSideMiddleSpikeMark = new Pose(12,-24.5);
+    private Pose redRightSideRightSpikeMark = new Pose(23.5,-36);
+    private Pose blueLeftSideLeftSpikeMark = new Pose(23.5,36);
+    private Pose blueLeftSideMiddleSpikeMark = new Pose(12,24.5);
+    private Pose blueLeftSideRightSpikeMark = new Pose(0.5,36);
+    private Pose blueRightSideLeftSpikeMark = new Pose(-24.5,36);
+    private Pose blueRightSideMiddleSpikeMark = new Pose(-36,24.5);
+    private Pose blueRightSideRightSpikeMark = new Pose(-47.5,36);
 
     // backdrop april tag locations
-    private Pose2d blueLeftBackdrop = new Pose2d(60.75, 72-22.5-6.625);
-    private Pose2d blueMiddleBackdrop = new Pose2d(60.75, 72-22.5-12.75);
-    private Pose2d blueRightBackdrop = new Pose2d(60.75, 72-22.5-18.75);
-    private Pose2d redLeftBackdrop = new Pose2d(60.75, -72+22.5+18.75);
-    private Pose2d redMiddleBackdrop = new Pose2d(60.75, -72+22.5+12.75);
-    private Pose2d redRightBackdrop = new Pose2d(60.75, -72+22.5+6.625);
+    private Pose blueLeftBackdrop = new Pose(60.75, 72-22.5-6.625);
+    private Pose blueMiddleBackdrop = new Pose(60.75, 72-22.5-12.75);
+    private Pose blueRightBackdrop = new Pose(60.75, 72-22.5-18.75);
+    private Pose redLeftBackdrop = new Pose(60.75, -72+22.5+18.75);
+    private Pose redMiddleBackdrop = new Pose(60.75, -72+22.5+12.75);
+    private Pose redRightBackdrop = new Pose(60.75, -72+22.5+6.625);
 
     // white pixel stack locations
-    private Pose2d redOuterStack = new Pose2d(-72, -72+36);
-    private Pose2d redMiddleStack = new Pose2d(-72, -72+48);
-    private Pose2d redInnerStack = new Pose2d(-72, -72+60);
-    private Pose2d blueInnerStack = new Pose2d(-72, 72-60);
-    private Pose2d blueMiddleStack = new Pose2d(-72, 72-48);
-    private Pose2d blueOuterStack = new Pose2d(-72, 72-36);
+    private Pose redOuterStack = new Pose(-72, -72+36);
+    private Pose redMiddleStack = new Pose(-72, -72+48);
+    private Pose redInnerStack = new Pose(-72, -72+60);
+    private Pose blueInnerStack = new Pose(-72, 72-60);
+    private Pose blueMiddleStack = new Pose(-72, 72-48);
+    private Pose blueOuterStack = new Pose(-72, 72-36);
 
-    private Pose2d spikeMarkGoalPose, initialBackdropGoalPose, stackPose, firstCycleBackdropGoalPose;
+    private Pose spikeMarkGoalPose, initialBackdropGoalPose, stackPose, firstCycleBackdropGoalPose;
 
     // TODO: adjust this for each auto
-    private Pose2d startPose = new Pose2d(12,-72+9, Math.toRadians(90));
+    private Pose startPose = new Pose(12,-72+9, Math.toRadians(90));
 
     private Follower follower;
 
@@ -96,22 +96,22 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
     public void setBackdropGoalPose() {
         switch (navigation) {
             case "left":
-                spikeMarkGoalPose = new Pose2d(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2))-1.5, redRightSideLeftSpikeMark.getY());
-                initialBackdropGoalPose = new Pose2d(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, 2.5-2.5+redLeftBackdrop.getY() -0.5, Math.toRadians(180));
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5-2.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+1.5, redInnerStack.getY()-3);
+                spikeMarkGoalPose = new Pose(redRightSideLeftSpikeMark.getX()+(ROBOT_FRONT_LENGTH/Math.sqrt(2))-1.5, redRightSideLeftSpikeMark.getY());
+                initialBackdropGoalPose = new Pose(redLeftBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, 2.5-2.5+redLeftBackdrop.getY() -0.5, Math.toRadians(180));
+                firstCycleBackdropGoalPose = new Pose(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5-2.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                stackPose = new Pose(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+1.5, redInnerStack.getY()-3);
                 break;
             case "middle":
-                spikeMarkGoalPose = new Pose2d(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.25, Math.toRadians(90));
-                initialBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -2+redMiddleBackdrop.getY() -0.5, Math.toRadians(180));
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -2+redLeftBackdrop.getY(), Math.toRadians(180));
-                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
+                spikeMarkGoalPose = new Pose(redRightSideMiddleSpikeMark.getX(), redRightSideMiddleSpikeMark.getY()-ROBOT_FRONT_LENGTH-1.25, Math.toRadians(90));
+                initialBackdropGoalPose = new Pose(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -2+redMiddleBackdrop.getY() -0.5, Math.toRadians(180));
+                firstCycleBackdropGoalPose = new Pose(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -2+redLeftBackdrop.getY(), Math.toRadians(180));
+                stackPose = new Pose(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
                 break;
             case "right":
-                spikeMarkGoalPose = new Pose2d(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2))+1.5, redRightSideRightSpikeMark.getY());
-                initialBackdropGoalPose = new Pose2d(redRightBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -1.5+redRightBackdrop.getY() -0.25, Math.toRadians(180));
-                firstCycleBackdropGoalPose = new Pose2d(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
-                stackPose = new Pose2d(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
+                spikeMarkGoalPose = new Pose(redRightSideRightSpikeMark.getX()-(ROBOT_FRONT_LENGTH/Math.sqrt(2))+1.5, redRightSideRightSpikeMark.getY());
+                initialBackdropGoalPose = new Pose(redRightBackdrop.getX()-ROBOT_BACK_LENGTH -0.5, -1.5+redRightBackdrop.getY() -0.25, Math.toRadians(180));
+                firstCycleBackdropGoalPose = new Pose(redMiddleBackdrop.getX()-ROBOT_BACK_LENGTH+0.5 -0.5, -1.5+redMiddleBackdrop.getY(), Math.toRadians(180));
+                stackPose = new Pose(redInnerStack.getX()+ROBOT_FRONT_LENGTH+ROBOT_INTAKE_LENGTH+0.75, redInnerStack.getY()-2);
                 break;
         }
     }
@@ -161,16 +161,16 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
         getStackPixels2 = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
-                .lineToLinearHeading(new Pose2d(firstStackPose.getX(), firstStackPose.getY(), Math.toRadians(180)))
+                .lineToLinearHeading(new Pose(firstStackPose.getX(), firstStackPose.getY(), Math.toRadians(180)))
                 .resetConstraints()
                 .build();
 
         scoreFirstStackPixels = drive.trajectorySequenceBuilder(getStackPixels2.end())
-                .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose(-36, -12, Math.toRadians(180)))
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(27, -12, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose(27, -12, Math.toRadians(180)), Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(-0.5,()-> twoPersonDrive.startPreset(50))
-                .splineToLinearHeading(new Pose2d(40, firstCycleBackdropGoalPose.getY(), Math.toRadians(180)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose(40, firstCycleBackdropGoalPose.getY(), Math.toRadians(180)), Math.toRadians(180))
                 .setReversed(false)
                 .setVelConstraint(SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH))
                 .setAccelConstraint(SampleMecanumDrive.getAccelerationConstraint(40))
@@ -250,7 +250,7 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
         // readjustments
         if (scanningStack) {
             if (System.currentTimeMillis()-scanningTime>700) {
-                stackPose = new Pose2d(stackPose.getX(), follower.getPose().getY()+stackRelocalization.getXErrorInches());
+                stackPose = new Pose(stackPose.getX(), follower.getPose().getY()+stackRelocalization.getXErrorInches());
                 adjustStack();
                 follower.followPath(adjustStack);
                 scanningTime = System.currentTimeMillis();
@@ -342,7 +342,7 @@ public class OldPedroPathingRedRightInnerAuto extends OpMode {
 
         if (scanningStack) {
             if (System.currentTimeMillis()-scanningTime>700) {
-                firstStackPose = new Pose2d(firstStackPose.getX(), drive.getPoseEstimate().getY()+stackRelocalization.getXErrorInches());
+                firstStackPose = new Pose(firstStackPose.getX(), drive.getPoseEstimate().getY()+stackRelocalization.getXErrorInches());
                 adjustStack();
                 drive.breakFollowing();
                 drive.followTrajectorySequenceAsync(adjustStack);
