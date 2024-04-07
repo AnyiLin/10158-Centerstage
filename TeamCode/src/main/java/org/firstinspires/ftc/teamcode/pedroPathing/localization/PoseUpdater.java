@@ -22,7 +22,7 @@ public class PoseUpdater {
 
     private IMU imu;
 
-    private ThreeWheelLocalizer localizer;
+    private Localizer localizer;
 
     private Pose startingPose = new Pose(0,0,0);
 
@@ -55,6 +55,7 @@ public class PoseUpdater {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
+        // TODO: change this to your preferred localizer
         localizer = new ThreeWheelLocalizer(hardwareMap);
     }
 

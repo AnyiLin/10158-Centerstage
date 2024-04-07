@@ -3,6 +3,12 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
+/**
+ * This is the Pose class.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @version 1.0, 4/2/2024
+ */
 public class Pose {
     private double x;
     private double y;

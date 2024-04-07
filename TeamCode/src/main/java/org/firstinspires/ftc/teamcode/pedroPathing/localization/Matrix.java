@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import java.util.Arrays;
 
+/**
+ * This is the Matrix class.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @version 1.0, 4/2/2024
+ */
 public class Matrix {
     private double[][] matrix;
 

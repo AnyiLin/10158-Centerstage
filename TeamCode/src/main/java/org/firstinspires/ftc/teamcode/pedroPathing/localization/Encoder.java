@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+/**
+ * This is the Encoder class.
+ *
+ * @author Anyi Lin - 10158 Scott's Bots
+ * @version 1.0, 4/2/2024
+ */
 public class Encoder {
     private DcMotorEx motor;
     private double previousPosition;
