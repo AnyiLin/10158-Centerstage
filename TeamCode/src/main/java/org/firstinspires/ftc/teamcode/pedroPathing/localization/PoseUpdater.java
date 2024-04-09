@@ -307,4 +307,13 @@ public class PoseUpdater {
     public double getNormalizedIMUHeading() {
         return MathFunctions.normalizeAngle(-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
     }
+
+    /**
+     * This returns the total number of radians the robot has turned.
+     *
+     * @return the total heading.
+     */
+    public double getTotalHeading() {
+        return localizer.getTotalHeading();
+    }
 }

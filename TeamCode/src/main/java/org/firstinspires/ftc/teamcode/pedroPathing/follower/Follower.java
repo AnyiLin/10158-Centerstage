@@ -757,19 +757,19 @@ public class Follower {
      * @return returns the centripetal force correction vector.
      */
     public Vector getCentripetalForceCorrection() {
-        return new Vector();
-//        if (!useCentripetal) return new Vector();
-//        double curvature;
-//        if (auto) {
-//            curvature = currentPath.getClosestPointCurvature();
-//        } else {
-//            double yPrime = averageVelocity.getYComponent() / averageVelocity.getXComponent();
-//            double yDoublePrime = averageAcceleration.getYComponent() / averageVelocity.getXComponent();
-//            curvature = (Math.pow(Math.sqrt(1 + Math.pow(yPrime, 2)), 3)) / (yDoublePrime);
-//        }
-//        if (Double.isNaN(curvature)) return new Vector();
-//        centripetalVector = new Vector(MathFunctions.clamp(Math.abs(FollowerConstants.centripetalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature), -1, 1), currentPath.getClosestPointTangentVector().getTheta() + Math.PI / 2 * MathFunctions.getSign(currentPath.getClosestPointNormalVector().getTheta()));
-//        return centripetalVector;
+//        return new Vector();
+        if (!useCentripetal) return new Vector();
+        double curvature;
+        if (auto) {
+            curvature = currentPath.getClosestPointCurvature();
+        } else {
+            double yPrime = averageVelocity.getYComponent() / averageVelocity.getXComponent();
+            double yDoublePrime = averageAcceleration.getYComponent() / averageVelocity.getXComponent();
+            curvature = (Math.pow(Math.sqrt(1 + Math.pow(yPrime, 2)), 3)) / (yDoublePrime);
+        }
+        if (Double.isNaN(curvature)) return new Vector();
+        centripetalVector = new Vector(MathFunctions.clamp(Math.abs(FollowerConstants.centripetalScaling * FollowerConstants.mass * Math.pow(MathFunctions.dotProduct(poseUpdater.getVelocity(), MathFunctions.normalizeVector(currentPath.getClosestPointTangentVector())), 2) * curvature), -1, 1), currentPath.getClosestPointTangentVector().getTheta() + Math.PI / 2 * MathFunctions.getSign(currentPath.getClosestPointNormalVector().getTheta()));
+        return centripetalVector;
     }
 
     /**
@@ -876,5 +876,14 @@ public class Follower {
      */
     public void telemetryDebug(Telemetry telemetry) {
         telemetryDebug(new MultipleTelemetry(telemetry));
+    }
+
+    /**
+     * This returns the total number of radians the robot has turned.
+     *
+     * @return the total heading.
+     */
+    public double getTotalHeading() {
+        return poseUpdater.getTotalHeading();
     }
 }
