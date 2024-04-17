@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /**
  * This is the Encoder class.
@@ -34,6 +35,10 @@ public class Encoder {
     public void update() {
         previousPosition = currentPosition;
         currentPosition = motor.getCurrentPosition();
+    }
+
+    public double getMultiplier() {
+        return multiplier * (motor.getDirection() == DcMotorSimple.Direction.FORWARD ? 1 : -1);
     }
 
     public double getDeltaPosition() {
