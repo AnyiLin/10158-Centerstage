@@ -316,4 +316,13 @@ public class PoseUpdater {
     public double getTotalHeading() {
         return localizer.getTotalHeading();
     }
+
+    /**
+     * This returns the Localizer.
+     *
+     * @return the Localizer
+     */
+    public Localizer getLocalizer() {
+        return localizer;
+    }
 }

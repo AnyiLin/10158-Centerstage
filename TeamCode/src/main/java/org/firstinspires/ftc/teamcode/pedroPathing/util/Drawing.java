@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 /*
@@ -13,22 +14,19 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 public class Drawing {
     private Drawing() {}
 
-    public static void drawRobot(Canvas c, Pose t) {
+    public static void drawRobot(Canvas c, Point t) {
         final double ROBOT_RADIUS = 9;
 
         c.setStrokeWidth(1);
         c.strokeCircle(t.getX(), t.getY(), ROBOT_RADIUS);
 
-        Vector halfv = new Vector(0.5*ROBOT_RADIUS, t.getHeading());
-        Vector p1Vector = new Vector();
-        p1Vector.setOrthogonalComponents(t.getX(), t.getY());
-        Vector p1 = MathFunctions.addVectors(halfv, p1Vector);
+        Vector halfv = new Vector(0.5*ROBOT_RADIUS, t.getTheta());
+        Vector p1 = MathFunctions.addVectors(halfv, new Vector(t.getR(), t.getTheta()));
         Vector p2 = MathFunctions.addVectors(p1, halfv);
         c.strokeLine(p1.getXComponent(), p1.getYComponent(), p2.getXComponent(), p2.getYComponent());
-        c.strokeCircle(t.getX(), t.getY(), 1);
     }
 
-    public static void drawRobotTwo(Canvas c, Pose t) {
+    public static void drawRobot(Canvas c, Pose t) {
         final double ROBOT_RADIUS = 9;
 
         c.strokeCircle(t.getX(), t.getY(), ROBOT_RADIUS);

@@ -890,9 +890,18 @@ public class Follower {
         telemetry.addData("x", getPose().getX());
         telemetry.addData("y", getPose().getY());
         telemetry.addData("heading", getPose().getHeading());
+        telemetry.addData("total heading", poseUpdater.getTotalHeading());
         telemetry.addData("velocity magnitude", getVelocity().getMagnitude());
         telemetry.addData("velocity heading", getVelocity().getTheta());
         telemetry.update();
+        TelemetryPacket packet = new TelemetryPacket();
+        //Draws the current target path that the robot would like to follow
+        packet.fieldOverlay().setStroke("#4CAF50");
+        Drawing.drawRobot(packet.fieldOverlay(), new Pose(getPose().getX(), getPose().getY(), getPose().getHeading()));
+        //Draws the current path that the robot is following
+        packet.fieldOverlay().setStroke("#3F51B5");
+        if (currentPath != null) Drawing.drawRobot(packet.fieldOverlay(), getPointFromPath(currentPath.getClosestPointTValue()));
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
     /**

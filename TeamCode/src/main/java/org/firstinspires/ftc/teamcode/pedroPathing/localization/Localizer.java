@@ -23,4 +23,10 @@ public abstract class Localizer {
     public abstract void update();
 
     public abstract double getTotalHeading();
+
+    public abstract double getForwardMultiplier();
+
+    public abstract double getLateralMultiplier();
+
+    public abstract double getTurningMultiplier();
 }

@@ -22,9 +22,9 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
     private HardwareMap hardwareMap;
     private IMU imu;
     private Pose startPose;
-    private Pose currentPose;
+    private Pose displacementPose;
     private Pose currentVelocity;
-    private Matrix startRotationMatrix;
+    private Matrix prevRotationMatrix;
     private NanoTimer timer;
     private long deltaTimeNano;
     private Encoder forwardEncoder;
@@ -62,7 +62,7 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
         setStartPose(setStartPose);
         timer = new NanoTimer();
         deltaTimeNano = 1;
-        currentPose = startPose;
+        displacementPose = new Pose();
         currentVelocity = new Pose();
 
         previousIMUOrientation = MathFunctions.normalizeAngle(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
@@ -71,7 +71,7 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
 
     @Override
     public Pose getPose() {
-        return currentPose.copy();
+        return MathFunctions.addPoses(startPose, displacementPose);
     }
 
     @Override
@@ -87,21 +87,21 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
     @Override
     public void setStartPose(Pose setStart) {
         startPose = setStart;
-        setStartRotationMatrix(startPose.getHeading());
     }
 
-    public void setStartRotationMatrix(double startHeading) {
-        startRotationMatrix = new Matrix(3,3);
-        startRotationMatrix.set(0, 0, Math.cos(startHeading));
-        startRotationMatrix.set(0, 1, -Math.sin(startHeading));
-        startRotationMatrix.set(1, 0, Math.sin(startHeading));
-        startRotationMatrix.set(1, 1, Math.cos(startHeading));
-        startRotationMatrix.set(2, 2, 1.0);
+    public void setPrevRotationMatrix(double heading) {
+        prevRotationMatrix = new Matrix(3,3);
+        prevRotationMatrix.set(0, 0, Math.cos(heading));
+        prevRotationMatrix.set(0, 1, -Math.sin(heading));
+        prevRotationMatrix.set(1, 0, Math.sin(heading));
+        prevRotationMatrix.set(1, 1, Math.cos(heading));
+        prevRotationMatrix.set(2, 2, 1.0);
     }
 
     @Override
     public void setPose(Pose setPose) {
-        currentPose = setPose;
+        displacementPose = MathFunctions.subtractPoses(setPose, startPose);
+        resetEncoders();
     }
 
     @Override
@@ -111,7 +111,8 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
 
         updateEncoders();
         Matrix robotDeltas = getRobotDeltas();
-        Matrix globalDeltas = new Matrix(3,1);
+        Matrix globalDeltas;
+        setPrevRotationMatrix(getPose().getHeading());
 
         Matrix transformation = new Matrix(3,3);
         if (Math.abs(robotDeltas.get(2, 0)) < 0.001) {
@@ -128,9 +129,9 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
             transformation.set(2, 2, 1.0);
         }
 
-        globalDeltas = Matrix.multiply(Matrix.multiply(startRotationMatrix, transformation), robotDeltas);
+        globalDeltas = Matrix.multiply(Matrix.multiply(prevRotationMatrix, transformation), robotDeltas);
 
-        currentPose.add(new Pose(globalDeltas.get(0, 0), globalDeltas.get(1, 0), globalDeltas.get(2, 0)));
+        displacementPose.add(new Pose(globalDeltas.get(0, 0), globalDeltas.get(1, 0), globalDeltas.get(2, 0)));
         currentVelocity = new Pose(globalDeltas.get(0, 0) / (deltaTimeNano * Math.pow(10.0, 9)), globalDeltas.get(1, 0) / (deltaTimeNano * Math.pow(10.0, 9)), globalDeltas.get(2, 0) / (deltaTimeNano * Math.pow(10.0, 9)));
 
         totalHeading += globalDeltas.get(2, 0);
@@ -143,6 +144,11 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
         double currentIMUOrientation =MathFunctions.normalizeAngle(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
         deltaRadians = MathFunctions.getTurnDirection(previousIMUOrientation, currentIMUOrientation) * MathFunctions.getSmallestAngleDifference(currentIMUOrientation, previousIMUOrientation);
         previousIMUOrientation = currentIMUOrientation;
+    }
+
+    public void resetEncoders() {
+        forwardEncoder.reset();
+        strafeEncoder.reset();
     }
 
     public Matrix getRobotDeltas() {
@@ -158,5 +164,17 @@ public class TwoWheelLocalizer extends Localizer { // todo: make two wheel odo w
 
     public double getTotalHeading() {
         return totalHeading;
+    }
+
+    public double getForwardMultiplier() {
+        return FORWARD_TICKS_TO_INCHES;
+    }
+
+    public double getLateralMultiplier() {
+        return STRAFE_TICKS_TO_INCHES;
+    }
+
+    public double getTurningMultiplier() {
+        return 1;
     }
 }

@@ -138,6 +138,17 @@ public class MathFunctions {
     }
 
     /**
+     * This returns a Pose that is the sum of the two input Pose.
+     *
+     * @param one the first Pose
+     * @param two the second Pose
+     * @return returns the sum of the two Pose.
+     */
+    public static Pose addPoses(Pose one, Pose two) {
+        return new Pose(one.getX() + two.getX(), one.getY() + two.getY(), one.getHeading() + two.getHeading());
+    }
+
+    /**
      * This subtracts the second Point from the first Point and returns the result as a Point.
      * Do note that order matters here.
      *
@@ -147,6 +158,18 @@ public class MathFunctions {
      */
     public static Point subtractPoints(Point one, Point two) {
         return new Point(one.getX() - two.getX(), one.getY() - two.getY(), Point.CARTESIAN);
+    }
+
+    /**
+     * This subtracts the second Pose from the first Pose and returns the result as a Pose.
+     * Do note that order matters here.
+     *
+     * @param one the first Pose.
+     * @param two the second Pose.
+     * @return returns the difference of the two Pose.
+     */
+    public static Pose subtractPoses(Pose one, Pose two) {
+        return new Pose(one.getX() - two.getX(), one.getY() - two.getY(), one.getHeading() - two.getHeading());
     }
 
     /**

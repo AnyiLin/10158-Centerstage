@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
 
@@ -17,9 +18,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
 public class ThreeWheelLocalizer extends Localizer {
     private HardwareMap hardwareMap;
     private Pose startPose;
-    private Pose currentPose;
+    private Pose displacementPose;
     private Pose currentVelocity;
-    private Matrix startRotationMatrix;
+    private Matrix prevRotationMatrix;
     private NanoTimer timer;
     private long deltaTimeNano;
     private Encoder leftEncoder;
@@ -41,7 +42,7 @@ public class ThreeWheelLocalizer extends Localizer {
         // TODO: replace these with your encoder positions
         leftEncoderPose = new Pose(-18.5/25.4 - 0.1, 164.4/25.4, 0);
         rightEncoderPose = new Pose(-18.4/25.4 - 0.1, -159.6/25.4, 0);
-        strafeEncoderPose = new Pose(-107.9/25.4+0.25, -1.1/25.4-0.23, Math.toRadians(90));
+        strafeEncoderPose = new Pose(-107.9/25.4+8, -1.1/25.4-0.23, Math.toRadians(90));
 
         hardwareMap = map;
 
@@ -58,14 +59,14 @@ public class ThreeWheelLocalizer extends Localizer {
         setStartPose(setStartPose);
         timer = new NanoTimer();
         deltaTimeNano = 1;
-        currentPose = startPose;
+        displacementPose = new Pose();
         currentVelocity = new Pose();
         totalHeading = 0;
     }
 
     @Override
     public Pose getPose() {
-        return currentPose.copy();
+        return MathFunctions.addPoses(startPose, displacementPose);
     }
 
     @Override
@@ -81,21 +82,20 @@ public class ThreeWheelLocalizer extends Localizer {
     @Override
     public void setStartPose(Pose setStart) {
         startPose = setStart;
-        setStartRotationMatrix(startPose.getHeading());
     }
 
-    public void setStartRotationMatrix(double startHeading) {
-        startRotationMatrix = new Matrix(3,3);
-        startRotationMatrix.set(0, 0, Math.cos(startHeading));
-        startRotationMatrix.set(0, 1, -Math.sin(startHeading));
-        startRotationMatrix.set(1, 0, Math.sin(startHeading));
-        startRotationMatrix.set(1, 1, Math.cos(startHeading));
-        startRotationMatrix.set(2, 2, 1.0);
+    public void setPrevRotationMatrix(double heading) {
+        prevRotationMatrix = new Matrix(3,3);
+        prevRotationMatrix.set(0, 0, Math.cos(heading));
+        prevRotationMatrix.set(0, 1, -Math.sin(heading));
+        prevRotationMatrix.set(1, 0, Math.sin(heading));
+        prevRotationMatrix.set(1, 1, Math.cos(heading));
+        prevRotationMatrix.set(2, 2, 1.0);
     }
 
     @Override
     public void setPose(Pose setPose) {
-        currentPose = setPose;
+        displacementPose = MathFunctions.subtractPoses(setPose, startPose);
         resetEncoders();
     }
 
@@ -107,6 +107,7 @@ public class ThreeWheelLocalizer extends Localizer {
         updateEncoders();
         Matrix robotDeltas = getRobotDeltas();
         Matrix globalDeltas;
+        setPrevRotationMatrix(getPose().getHeading());
 
         Matrix transformation = new Matrix(3,3);
         if (Math.abs(robotDeltas.get(2, 0)) < 0.001) {
@@ -123,9 +124,9 @@ public class ThreeWheelLocalizer extends Localizer {
             transformation.set(2, 2, 1.0);
         }
 
-        globalDeltas = Matrix.multiply(Matrix.multiply(startRotationMatrix, transformation), robotDeltas);
+        globalDeltas = Matrix.multiply(Matrix.multiply(prevRotationMatrix, transformation), robotDeltas);
 
-        currentPose.add(new Pose(globalDeltas.get(0, 0), globalDeltas.get(1, 0), globalDeltas.get(2, 0)));
+        displacementPose.add(new Pose(globalDeltas.get(0, 0), globalDeltas.get(1, 0), globalDeltas.get(2, 0)));
         currentVelocity = new Pose(globalDeltas.get(0, 0) / (deltaTimeNano * Math.pow(10.0, 9)), globalDeltas.get(1, 0) / (deltaTimeNano * Math.pow(10.0, 9)), globalDeltas.get(2, 0) / (deltaTimeNano * Math.pow(10.0, 9)));
 
         totalHeading += globalDeltas.get(2, 0);
@@ -156,5 +157,17 @@ public class ThreeWheelLocalizer extends Localizer {
 
     public double getTotalHeading() {
         return totalHeading;
+    }
+
+    public double getForwardMultiplier() {
+        return FORWARD_TICKS_TO_INCHES;
+    }
+
+    public double getLateralMultiplier() {
+        return STRAFE_TICKS_TO_INCHES;
+    }
+
+    public double getTurningMultiplier() {
+        return TURN_TICKS_TO_INCHES;
     }
 }
