@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,12 +11,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.PoseUpdater;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 
 import java.util.Arrays;
 import java.util.List;
 
-@TeleOp (group = "Pedro Pathing Tuning", name = "Localization Test")
+@TeleOp(group = "Pedro Pathing Tuning", name = "Localization Test")
 public class LocalizationTest extends OpMode {
     private PoseUpdater poseUpdater;
     private Telemetry telemetryA;
@@ -54,6 +57,16 @@ public class LocalizationTest extends OpMode {
         telemetryA.addLine("This will print your robot's position to telemetry while "
                 + "allowing robot control through a basic mecanum drive on gamepad 1.");
         telemetryA.update();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
+        Drawing.drawRobot(packet.fieldOverlay(), poseUpdater.getPose());
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
+    }
+
+    @Override
+    public void start() {
+        poseUpdater.setPose(new Pose());
     }
 
     @Override
@@ -84,5 +97,9 @@ public class LocalizationTest extends OpMode {
         telemetryA.addData("total heading", poseUpdater.getTotalHeading());
         telemetryA.update();
 
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
+        Drawing.drawRobot(packet.fieldOverlay(), poseUpdater.getPose());
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 }

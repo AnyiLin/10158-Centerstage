@@ -42,6 +42,6 @@ public class Encoder {
     }
 
     public double getDeltaPosition() {
-        return multiplier * (currentPosition - previousPosition);
+        return getMultiplier() * (currentPosition - previousPosition);
     }
 }

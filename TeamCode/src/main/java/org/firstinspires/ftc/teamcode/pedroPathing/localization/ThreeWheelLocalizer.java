@@ -29,9 +29,9 @@ public class ThreeWheelLocalizer extends Localizer {
     private Pose rightEncoderPose;
     private Pose strafeEncoderPose;
     private double totalHeading;
-    public static double FORWARD_TICKS_TO_INCHES = 1;//8192 * 1.37795 * 2 * Math.PI * 0.5008239963;
-    public static double STRAFE_TICKS_TO_INCHES = 1;//8192 * 1.37795 * 2 * Math.PI * 0.5018874659;
-    public static double TURN_TICKS_TO_INCHES = 1;//8192 * 1.37795 * 2 * Math.PI * 0.5;
+    public static double FORWARD_TICKS_TO_INCHES = 0.001;//8192 * 1.37795 * 2 * Math.PI * 0.5008239963;
+    public static double STRAFE_TICKS_TO_INCHES = 0.001;//8192 * 1.37795 * 2 * Math.PI * 0.5018874659;
+    public static double TURN_TICKS_TO_INCHES = 0.001;//8192 * 1.37795 * 2 * Math.PI * 0.5;
 
     public ThreeWheelLocalizer(HardwareMap map) {
         this(map, new Pose());
@@ -53,7 +53,7 @@ public class ThreeWheelLocalizer extends Localizer {
         // TODO: reverse any encoders necessary
         leftEncoder.setDirection(Encoder.REVERSE);
         rightEncoder.setDirection(Encoder.REVERSE);
-        strafeEncoder.setDirection(Encoder.FORWARD);
+        strafeEncoder.setDirection(Encoder.REVERSE);
 
         setStartPose(setStartPose);
         timer = new NanoTimer();
@@ -89,13 +89,14 @@ public class ThreeWheelLocalizer extends Localizer {
         startRotationMatrix.set(0, 0, Math.cos(startHeading));
         startRotationMatrix.set(0, 1, -Math.sin(startHeading));
         startRotationMatrix.set(1, 0, Math.sin(startHeading));
-        startRotationMatrix.set(1, 1, -Math.cos(startHeading));
+        startRotationMatrix.set(1, 1, Math.cos(startHeading));
         startRotationMatrix.set(2, 2, 1.0);
     }
 
     @Override
     public void setPose(Pose setPose) {
         currentPose = setPose;
+        resetEncoders();
     }
 
     @Override
@@ -105,7 +106,7 @@ public class ThreeWheelLocalizer extends Localizer {
 
         updateEncoders();
         Matrix robotDeltas = getRobotDeltas();
-        Matrix globalDeltas = new Matrix(3,1);
+        Matrix globalDeltas;
 
         Matrix transformation = new Matrix(3,3);
         if (Math.abs(robotDeltas.get(2, 0)) < 0.001) {
@@ -136,6 +137,12 @@ public class ThreeWheelLocalizer extends Localizer {
         strafeEncoder.update();
     }
 
+    public void resetEncoders() {
+        leftEncoder.reset();
+        rightEncoder.reset();
+        strafeEncoder.reset();
+    }
+
     public Matrix getRobotDeltas() {
         Matrix returnMatrix = new Matrix(3,1);
         // x/forward movement
@@ -143,7 +150,7 @@ public class ThreeWheelLocalizer extends Localizer {
         //y/strafe movement
         returnMatrix.set(1,0, STRAFE_TICKS_TO_INCHES * (strafeEncoder.getDeltaPosition() - strafeEncoderPose.getX() * ((rightEncoder.getDeltaPosition() - leftEncoder.getDeltaPosition()) / (leftEncoderPose.getY() - rightEncoderPose.getY()))));
         // theta/turning
-        returnMatrix.set(2,0, TURN_TICKS_TO_INCHES * (rightEncoder.getDeltaPosition() - leftEncoder.getDeltaPosition()) / (leftEncoderPose.getY() - rightEncoderPose.getY()));
+        returnMatrix.set(2,0, TURN_TICKS_TO_INCHES * ((rightEncoder.getDeltaPosition() - leftEncoder.getDeltaPosition()) / (leftEncoderPose.getY() - rightEncoderPose.getY())));
         return returnMatrix;
     }
 

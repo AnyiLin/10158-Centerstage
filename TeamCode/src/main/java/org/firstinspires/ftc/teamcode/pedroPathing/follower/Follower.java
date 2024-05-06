@@ -12,8 +12,10 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.smallTranslationalPIDFFeedForward;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.translationalPIDFSwitch;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -29,8 +31,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathBuilder;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathCallback;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.PIDFController;
 
 import java.util.ArrayList;
@@ -118,6 +122,7 @@ public class Follower {
     private PIDFController largeDrivePIDF = new PIDFController(FollowerConstants.largeDrivePIDFCoefficients);
 
 
+    public static boolean drawStuff = true;
     public static boolean useTranslational = true;
     public static boolean useCentripetal = true;
     public static boolean useHeading = true;
@@ -184,6 +189,7 @@ public class Follower {
             accelerations.add(new Vector());
         }
         calculateAveragedVelocityAndAcceleration();
+        draw();
     }
 
     /**
@@ -203,6 +209,19 @@ public class Follower {
             if (Math.abs(drivePowers[i]) > maxPower) {
                 drivePowers[i] = maxPower * MathFunctions.getSign(drivePowers[i]);
             }
+        }
+    }
+
+    /**
+     * This gets a Point from the current Path from a specified t-value.
+     *
+     * @return returns the Point.
+     */
+    public Point getPointFromPath(double t) {
+        if (currentPath != null) {
+            return currentPath.getPoint(t);
+        } else {
+            return null;
         }
     }
 
@@ -476,6 +495,14 @@ public class Follower {
                 motors.get(i).setPower(drivePowers[i]);
             }
         }
+        draw();
+    }
+
+    public void draw() {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay().setStroke("#3F51B5");
+        Drawing.drawRobot(packet.fieldOverlay(), getPose());
+        FtcDashboard.getInstance().sendTelemetryPacket(packet);
     }
 
     /**

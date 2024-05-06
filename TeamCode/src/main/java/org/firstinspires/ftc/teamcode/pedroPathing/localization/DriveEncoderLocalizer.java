@@ -86,7 +86,7 @@ public class DriveEncoderLocalizer extends Localizer { // todo: make drive encod
         startRotationMatrix.set(0, 0, Math.cos(startHeading));
         startRotationMatrix.set(0, 1, -Math.sin(startHeading));
         startRotationMatrix.set(1, 0, Math.sin(startHeading));
-        startRotationMatrix.set(1, 1, -Math.cos(startHeading));
+        startRotationMatrix.set(1, 1, Math.cos(startHeading));
         startRotationMatrix.set(2, 2, 1.0);
     }
 
