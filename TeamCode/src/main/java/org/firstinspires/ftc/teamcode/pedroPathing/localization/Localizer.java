@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
 /**
- * This is the Localizer class.
+ * This is the Localizer class. It is an abstract superclass of all localizers used in Pedro Pathing,
+ * so it contains abstract methods that will have a concrete implementation in the subclasses. Any
+ * method that all localizers will need will be in this class.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 4/2/2024

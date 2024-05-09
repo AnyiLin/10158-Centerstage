@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -28,8 +29,10 @@ public class Encoder {
     }
 
     public void reset() {
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         previousPosition = motor.getCurrentPosition();
         currentPosition = motor.getCurrentPosition();
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void update() {

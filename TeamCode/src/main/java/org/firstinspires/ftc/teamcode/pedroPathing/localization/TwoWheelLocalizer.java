@@ -12,7 +12,25 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
 
 /**
- * This is the TwoWheelLocalizer class.
+ * This is the TwoWheelLocalizer class. This class extends the Localizer superclass and is a
+ * localizer that uses the two wheel odometry with IMU set up. The diagram below, which is taken from
+ * Road Runner, shows a typical set up.
+ *
+ * The view is from the bottom of the robot looking upwards.
+ *
+ * left on robot is y pos
+ *
+ * front on robot is x pos
+ *
+ *    /--------------\
+ *    |     ____     |
+ *    |     ----     |
+ *    | ||           |
+ *    | ||           |   left (y pos)
+ *    |              |
+ *    |              |
+ *    \--------------/
+ *      front (x pos)
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 4/2/2024

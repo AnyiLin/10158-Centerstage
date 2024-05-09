@@ -9,7 +9,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.NanoTimer;
 
 /**
- * This is the DriveEncoderLocalizer class.
+ * This is the DriveEncoderLocalizer class. This class extends the Localizer superclass and is a
+ * localizer that uses the drive encoder set up.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 4/2/2024
@@ -30,7 +31,7 @@ public class DriveEncoderLocalizer extends Localizer { // todo: make drive encod
     private double totalHeading;
     public static double FORWARD_TICKS_TO_INCHES = 1;
     public static double STRAFE_TICKS_TO_INCHES = 1;
-    public static double TURN_TICKS_TO_INCHES = 1;
+    public static double TURN_TICKS_TO_RADIANS = 1;
     public static double ROBOT_WIDTH = 1;
     public static double ROBOT_LENGTH = 1;
 
@@ -150,7 +151,7 @@ public class DriveEncoderLocalizer extends Localizer { // todo: make drive encod
         //y/strafe movement
         returnMatrix.set(1,0, STRAFE_TICKS_TO_INCHES * (-leftFront.getDeltaPosition() + rightFront.getDeltaPosition() + leftRear.getDeltaPosition() - rightRear.getDeltaPosition()));
         // theta/turning
-        returnMatrix.set(2,0, TURN_TICKS_TO_INCHES * ((-leftFront.getDeltaPosition() + rightFront.getDeltaPosition() - leftRear.getDeltaPosition() + rightRear.getDeltaPosition()) / (ROBOT_WIDTH + ROBOT_LENGTH)));
+        returnMatrix.set(2,0, TURN_TICKS_TO_RADIANS * ((-leftFront.getDeltaPosition() + rightFront.getDeltaPosition() - leftRear.getDeltaPosition() + rightRear.getDeltaPosition()) / (ROBOT_WIDTH + ROBOT_LENGTH)));
         return returnMatrix;
     }
 
@@ -167,6 +168,6 @@ public class DriveEncoderLocalizer extends Localizer { // todo: make drive encod
     }
 
     public double getTurningMultiplier() {
-        return TURN_TICKS_TO_INCHES;
+        return TURN_TICKS_TO_RADIANS;
     }
 }

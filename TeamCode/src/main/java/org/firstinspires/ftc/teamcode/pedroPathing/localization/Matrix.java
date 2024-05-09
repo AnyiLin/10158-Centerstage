@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode.pedroPathing.localization;
 import java.util.Arrays;
 
 /**
- * This is the Matrix class.
+ * This is the Matrix class. This defines matrices, primarily for use in the localizers. However, if
+ * matrices and matrix operations are necessary, this class as well as some operations in the
+ * MathFunctions class can absolutely be used there as well. It's similar to Mats in OpenCV if you've
+ * used them before, but with more limited functionality.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 4/2/2024
